@@ -1,0 +1,10 @@
+
+.DS_Store
+
+*.pyc
+
+/.vagrant/
+
+src/.coverage
+
+src/server/hundoword_django/learning/migrations/
