@@ -28,18 +28,13 @@ sudo rm -f /etc/apache2/sites-enabled/000-default
 
 # Learning
 
-sudo pip install Django==1.8.1
+sudo pip install Django==1.8.4
 sudo pip install djangorestframework==3.1
 
 if sudo mysql -u root -e "show databases" | grep -w hundoword_django; then
     echo "Database hundoword_django exists"
 else
-    sudo mysql -u root -e "CREATE DATABASE hundoword_django CHARACTER SET utf8;"
-    sudo -u vagrant rm -rf /home/vagrant/src/server/hundoword_django/learning/migrations/
-    sudo -u vagrant python /home/vagrant/src/server/hundoword_django/manage.py syncdb --noinput
-    sudo -u vagrant python /home/vagrant/src/server/hundoword_django/manage.py migrate --noinput
-    sudo -u vagrant python /home/vagrant/src/server/hundoword_django/manage.py loaddata /home/vagrant/src/server/hundoword_django/vagrant_user.json
-    sudo -u vagrant python /home/vagrant/src/server/hundoword_django/manage.py loaddata /home/vagrant/src/server/hundoword_django/learning/words.json
+    sudo -u vagrant /home/vagrant/src/server/hundoword_django/db.sh
 fi
 
 sudo cp /vagrant/www.hundoword.com /etc/apache2/sites-available/www.hundoword.com
