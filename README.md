@@ -34,7 +34,7 @@ This will create an Ubuntu server and map the vagrant user's src directory to th
 
 ## Client 
 
-In development as in has written a single line yet. 
+In development as in hasn't written a single line yet. 
 
 ## Admin 
 
