@@ -71,7 +71,7 @@ Go to http://192.168.72.87/admin/ to get at the database directly.  This has acc
   * student 
   * achievement
   * word
-  * hold - Whether attain or yielded
+  * hold - Whether attained or yielded
   * at - The date and time of the progress
 
 # API
