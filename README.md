@@ -79,111 +79,111 @@ Go to http://192.168.72.87/admin/ to get at the database directly.  This has acc
 The API is located at http://192.168.72.87/api/learning/ and all arguments are JSON. It'll be used to drive the client. 
 
 * register - Register a new User
-  * Request - POST http://192.168.72.87/api/learning/register/ 
+  * Request - `POST http://192.168.72.87/api/learning/register/`
     * username 
     * password
     * email - Must be valid format
-  * Response - 201 Created
+  * Response - `201 Created`
     * username 
     * email
 * token - Logs in and recieves the token for future communication.
-  * Request - POST http://192.168.72.87/api/learning/token/
+  * Request - `POST http://192.168.72.87/api/learning/token/`
     * username 
     * password
-  * Response - 200 Ok
+  * Response - `200 Ok`
     * key - Use in subsequent communication in Auth header
 * achievement
   * List  - Retrieves list of Achievements
-    * Request - GET http://192.168.72.87/api/learning/achievement/
-    * Response - 200 Ok
+    * Request - `GET http://192.168.72.87/api/learning/achievement/`
+    * Response - `200 Ok`
       * Array
         * id
         * name
         * description
   * Select - Retrieves an Achievement using id
-    * Request - GET http://192.168.72.87/api/learning/achievement/<id>/
-    * Response - 200 Ok
+    * Request - `GET http://192.168.72.87/api/learning/achievement/<id>/`
+    * Response - `200 Ok`
       * id
       * name
       * description
   * Create - Creates an Achievement
-    * Request - POST http://192.168.72.87/api/learning/achievement/
+    * Request - `POST http://192.168.72.87/api/learning/achievement/`
       * name
       * description
-    * Response - 201 Created
+    * Response - `201 Created`
       * id
       * name
       * description
   * Update - Updates an Achievement
-    * Request - POST http://192.168.72.87/api/learning/achievement/<id>/
+    * Request - `POST http://192.168.72.87/api/learning/achievement/<id>/`
       * name (optional)
       * description (optional)
-    * Response - 202 Accepted
+    * Response - `202 Accepted`
       * id
       * name
       * description
   * Delete - Deletes an Achievement
-    * Request - DELETE http://192.168.72.87/api/learning/achievement/<id>/
-    * Response - 200 Ok
+    * Request - `DELETE http://192.168.72.87/api/learning/achievement/<id>/`
+    * Response - `200 Ok`
 * program
   * List  - Retrieves list of Programs
-    * Request - GET http://192.168.72.87/api/learning/program/
-    * Response - 200 Ok
+    * Request - `GET http://192.168.72.87/api/learning/program/`
+    * Response - `200 Ok`
       * Array
         * id
         * name
         * description
         * words - Array of words in the program (string)
   * Select - Retrieves Program using id
-    * Request - GET http://192.168.72.87/api/learning/program/<id>/
-    * Response - 200 Ok
+    * Request - `GET http://192.168.72.87/api/learning/program/<id>/`
+    * Response - `200 Ok`
       * id
       * name
       * description
       * words - Array of words (string)
   * Create - Creates a Program
-    * Request - POST http://192.168.72.87/api/learning/program/
+    * Request - `POST http://192.168.72.87/api/learning/program/`
       * name
       * description
       * words - Array of words (string) - Duplicates are ignored, no warning
-    * Response - 201 Created
+    * Response - `201 Created`
       * id
       * name
       * description
       * words - Array of words (string)
   * Update - Updates a Program
-    * Request - POST http://192.168.72.87/api/learning/program/<id>/
+    * Request - `POST http://192.168.72.87/api/learning/program/<id>/`
       * name (optional)
       * description (optional)
       * words - Array of words (string) - Will overwrite existing list, dupes ignored
-    * Response - 202 Accepted
+    * Response - `202 Accepted`
       * id
       * name
       * description
       * words - Array of words (string)
   * Append - Adds words to a Program
-    * Request - POST http://192.168.72.87/api/learning/program/<id>/
+    * Request - `POST http://192.168.72.87/api/learning/program/<id>/`
       * words - Array of words (string) - Will be added to existing list, dupes already existing ignored
-    * Response- 202 Accepted
+    * Response- `202 Accepted`
       * id
       * name
       * description
       * words - Array of words (string)
   * Remove - Removes words to a Program
-    * Request - POST http://192.168.72.87/api/learning/program/<id>/
+    * Request - `POST http://192.168.72.87/api/learning/program/<id>/`
       * words - Array of words (string) - Will be removed from existing list, dupes ignored
-    * Response - 202 Accepted
+    * Response - `202 Accepted`
       * id
       * name
       * description
       * words - Array of words (string)
   * Delete - Deletes a Program
-    * Request - DELETE http://192.168.72.87/api/learning/program/<id>/
-    * Response - 200 Ok
+    * Request - `DELETE http://192.168.72.87/api/learning/program/<id>/`
+    * Response - `200 Ok`
 * student
   * List  - Retrieves list of Students
-    * Request - GET http://192.168.72.87/api/learning/student/
-    * Response - 200 Ok
+    * Request - `GET http://192.168.72.87/api/learning/student/`
+    * Response - `200 Ok`
       * Array
         * id
         * first_name
@@ -191,90 +191,90 @@ The API is located at http://192.168.72.87/api/learning/ and all arguments are J
         * age
         * words - Array of words to learn (string)
   * Select - Retrieves Student using id
-    * Request - GET http://192.168.72.87/api/learning/student/<id>/
-    * Response - 200 Ok
+    * Request - `GET http://192.168.72.87/api/learning/student/<id>/`
+    * Response - `200 Ok`
       * id
       * first_name
       * last_name
       * age
       * words - Array of words (string)
   * Position - Retrieves Student Position with words and Achievements using id
-    * Request - GET http://192.168.72.87/api/learning/student/<id>/position/
-    * Response - 200 Ok
+    * Request - `GET http://192.168.72.87/api/learning/student/<id>/position/`
+    * Response - `200 Ok`
       * Array - ordered by word
         * word 
         * achievments - Array of strings
   * Progress - Retrieves Student Progress with words and Achievements using id
-    * Request - GET http://192.168.72.87/api/learning/student/<id>/progress/
-    * Response - 200 Ok
+    * Request - `GET http://192.168.72.87/api/learning/student/<id>/progress/`
+    * Response - `200 Ok`
       * Array - ordered by at descending
         * word 
         * achievement
         * hold - Whether the Achieveent was attained or yielded
         * at - Date and time 
   * Create - Creates a Student
-    * Request - POST http://192.168.72.87/api/learning/student/
+    * Request - `POST http://192.168.72.87/api/learning/student/`
       * first_name
       * last_name
       * age
       * words - Array of words (string) - Duplicates are ignored, no warning
-    * Response - 201 Created
+    * Response - `201 Created`
       * id
       * first_name
       * last_name
       * age
       * words - Array of words (string)
   * Update - Updates a Student
-    * Request - POST http://192.168.72.87/api/learning/student/<id>/
+    * Request - `POST http://192.168.72.87/api/learning/student/<id>/`
       * first_name - (optional)
       * last_name - (optional)
       * age - (optional)
       * words - (optional) Array of words (string) - Will overwrite existing list, dupes ignored
-    * Response - 202 Accepted
+    * Response - `202 Accepted`
       * id
       * first_name
       * last_name
       * age
       * words - Array of words (string)
   * Append - Adds words to a Student
-    * Request - POST http://192.168.72.87/api/learning/student/<id>/
+    * Request - `POST http://192.168.72.87/api/learning/student/<id>/`
       * words - Array of words (string) - Will be added to existing list, dupes already existing ignored
-    * Response - 202 Accepted
+    * Response - `202 Accepted`
       * id
       * first_name
       * last_name
       * age
       * words - Array of words (string)
   * Remove - Removes words to a Student
-    * Request - POST http://192.168.72.87/api/learning/student/<id>/
+    * Request - `POST http://192.168.72.87/api/learning/student/<id>/`
       * words - Array of words (string) - Will be removed from existing list, dupes ignored
-    * Response - 202 Accepted
+    * Response - `202 Accepted`
       * id
       * first_name
       * last_name
       * age
       * words - Array of words (string)
   * Attain - Attains an achievement for a word for a Student and updates Position as well
-    * Request - POST http://192.168.72.87/api/learning/student/<id>/attain/
+    * Request - `POST http://192.168.72.87/api/learning/student/<id>/attain/`
       * word
       * achievement
-    * Response - 202 Accepted
+    * Response - `202 Accepted`
       * word 
       * achievement
       * hold = True - The Achieveent was attained
       * at - Date and time 
   * Yield - Yields an achievement for a word for a Student
-    * Request - POST http://192.168.72.87/api/learning/student/<id>/
+    * Request - `POST http://192.168.72.87/api/learning/student/<id>/`
       * word
       * achievement
-    * Response - 202 Accepted
+    * Response - `202 Accepted`
       * word 
       * achievement
       * hold = False - The Achieveent was yielded
       * at - Date and time 
   * Delete - Deletes a Student
-    * Request - DELETE http://192.168.72.87/api/learning/student/<id>/
-    * Response - 200 Ok
+    * Request - `DELETE http://192.168.72.87/api/learning/student/<id>/`
+    * Response - `200 Ok`
 
 # Development
 
