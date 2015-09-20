@@ -162,7 +162,7 @@ The API is located at http://192.168.72.87/api/learning/ and all arguments are J
       * description
       * words - Array of words (string)
   * Append - Adds words to a Program
-    * Request - `POST http://192.168.72.87/api/learning/program/<id>/`
+    * Request - `POST http://192.168.72.87/api/learning/program/<id>/append/`
       * words - Array of words (string) - Will be added to existing list, dupes already existing ignored
     * Response- `202 Accepted`
       * id
@@ -170,7 +170,7 @@ The API is located at http://192.168.72.87/api/learning/ and all arguments are J
       * description
       * words - Array of words (string)
   * Remove - Removes words to a Program
-    * Request - `POST http://192.168.72.87/api/learning/program/<id>/`
+    * Request - `POST http://192.168.72.87/api/learning/program/<id>/remove/`
       * words - Array of words (string) - Will be removed from existing list, dupes ignored
     * Response - `202 Accepted`
       * id
@@ -237,7 +237,7 @@ The API is located at http://192.168.72.87/api/learning/ and all arguments are J
       * age
       * words - Array of words (string)
   * Append - Adds words to a Student
-    * Request - `POST http://192.168.72.87/api/learning/student/<id>/`
+    * Request - `POST http://192.168.72.87/api/learning/student/<id>/append/`
       * words - Array of words (string) - Will be added to existing list, dupes already existing ignored
     * Response - `202 Accepted`
       * id
@@ -246,7 +246,7 @@ The API is located at http://192.168.72.87/api/learning/ and all arguments are J
       * age
       * words - Array of words (string)
   * Remove - Removes words to a Student
-    * Request - `POST http://192.168.72.87/api/learning/student/<id>/`
+    * Request - `POST http://192.168.72.87/api/learning/student/<id>/append/`
       * words - Array of words (string) - Will be removed from existing list, dupes ignored
     * Response - `202 Accepted`
       * id
@@ -264,7 +264,7 @@ The API is located at http://192.168.72.87/api/learning/ and all arguments are J
       * hold = True - The Achieveent was attained
       * at - Date and time 
   * Yield - Yields an achievement for a word for a Student
-    * Request - `POST http://192.168.72.87/api/learning/student/<id>/`
+    * Request - `POST http://192.168.72.87/api/learning/student/<id>/yield/`
       * word
       * achievement
     * Response - `202 Accepted`
