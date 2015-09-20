@@ -3,8 +3,9 @@
 
 *.pyc
 
-/.vagrant/
-
-src/.coverage
+vagrant/.vagrant/
 
 src/server/hundoword_django/learning/migrations/
+
+src/server/hundoword_django/.coverage
+
