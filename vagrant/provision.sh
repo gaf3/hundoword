@@ -19,15 +19,9 @@ sudo mysql -u root -pvagrant -e "SET PASSWORD FOR 'root'@'localhost' = PASSWORD(
 sudo apt-get install -y libmysqlclient-dev
 sudo pip install mysqlclient
 
-# Apache
+# API
 
 sudo pip install requests
-sudo apt-get install -y apache2
-sudo apt-get install -y libapache2-mod-wsgi
-sudo rm -f /etc/apache2/sites-enabled/000-default
-
-# Learning
-
 sudo pip install Django==1.8.4
 sudo pip install djangorestframework==3.1
 
@@ -37,6 +31,18 @@ else
     sudo -u vagrant /home/vagrant/src/server/hundoword_django/db.sh
 fi
 
-sudo cp /vagrant/www.hundoword.com /etc/apache2/sites-available/www.hundoword.com
-sudo ln -s /etc/apache2/sites-available/www.hundoword.com /etc/apache2/sites-enabled/www.hundoword.com
+sudo apt-get install -y apache2
+sudo apt-get install -y libapache2-mod-wsgi
+sudo service apache2 stop
+sudo rm -f /etc/apache2/sites-enabled/000-default
+sudo cp -f /vagrant/ports.conf /etc/apache2/ports.conf
+sudo cp /vagrant/api.hundoword.com /etc/apache2/sites-available/api.hundoword.com
+sudo ln -s /etc/apache2/sites-available/api.hundoword.com /etc/apache2/sites-enabled/api.hundoword.com
 sudo service apache2 restart
+
+# WWW
+
+sudo apt-get install -y nginx
+sudo cp /vagrant/www.hundoword.com /etc/nginx/sites-available/www.hundoword.com
+sudo ln -s /etc/nginx/sites-available/www.hundoword.com /etc/nginx/sites-enabled/www.hundoword.com
+sudo service nginx restart
