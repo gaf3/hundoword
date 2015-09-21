@@ -67,10 +67,10 @@ HundoWord.Words.prototype = new HundoWord.Base();
 // Add append and remove
 
 HundoWord.Words.prototype.append = function(id,words,success,error,complete) {
-    return this.rest("POST",this.build_url(id,"append"),{words: (typeof words === 'string' ? [words] : words)},success,error,complete);
+    return this.rest("POST",this.build_url(id,"append"),{words: words},success,error,complete);
 }
 HundoWord.Words.prototype.remove = function(id,words,success,error,complete) {
-    return this.rest("POST",this.build_url(id,"remove"),{words: (typeof words === 'string' ? [words] : words)},success,error,complete);
+    return this.rest("POST",this.build_url(id,"remove"),{words: words},success,error,complete);
 }
 
 // Achievement just has base

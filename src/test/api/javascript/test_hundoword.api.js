@@ -14,6 +14,12 @@ function make_achievement(achievement) {
 
 }
 
+function make_program(program) {
+
+    return hundoword_django_prefix + "-" + program
+
+}
+
 function check_user(api,username,password,email) {
 
     try {
@@ -152,6 +158,72 @@ function delete_achievements() {
         var success = $(html).find("li.success").html();
 
         if (!((success.indexOf('The achievement "' + make_achievement("")) == 0) && (success.indexOf('" was deleted successfully.') > 0))) {
+            throw "Delete unsuccessful"; 
+        }
+
+    });
+
+    $.ajax({url: hundoword_django_host + "/admin/logout/",async: false});
+
+}
+
+function delete_programs() {
+
+    var html;
+    var token;
+
+    html = $.ajax({url: hundoword_django_host + "/admin/",async: false}).responseText;
+
+    if ($(html).find("a[href='/admin/logout/']").attr('href')) {
+
+        $.ajax({url: hundoword_django_host + "/admin/logout/",async: false});
+        var html = $.ajax({url: hundoword_django_host + "/admin/",async: false}).responseText;
+
+    }
+
+    var token = $(html).find("input[name='csrfmiddlewaretoken']").attr('value');
+
+    if (!token) { throw "Couldn't get initial token"; }
+
+    var action = $(html).find("form").attr('action');
+
+    if (!action) { throw "Couldn't get initial action"; }
+
+    var html = $.ajax({
+        type: "POST",
+        url: hundoword_django_host + action,
+        data: {
+            "csrfmiddlewaretoken": token,
+            "username": "vagrant",
+            "password": "vagrant",
+            "next": "/admin/learning/program/?q=" + make_program("")
+        },
+        async: false
+    }).responseText;
+
+    var token = $(html).find("input[name='csrfmiddlewaretoken']").attr('value');
+    if (!token) { throw "Couldn't get search token"; }
+
+    $(html).find("input[name='_selected_action']").each(function() {
+
+        var program_id = $(this).attr('value');
+
+        if (!program_id) { throw "Couldn't get search program_id"; }
+
+        var html = $.ajax({
+            type: "POST",
+            dataType : "html",
+            url: hundoword_django_host + "/admin/learning/program/" + program_id + "/delete/",
+            data: {
+                "post": "yes",
+                "csrfmiddlewaretoken": token
+            },
+            async: false
+        }).responseText;
+
+        var success = $(html).find("li.success").html();
+
+        if (!((success.indexOf('The program "' + make_program("")) == 0) && (success.indexOf('" was deleted successfully.') > 0))) {
             throw "Delete unsuccessful"; 
         }
 
@@ -568,8 +640,14 @@ QUnit.test("select", function(assert) {
     var pass = assert.async();
     api.achievement.select(sight.id,
         function (data) {
-            assert.equal(data.name,make_achievement("Sight"));
-            assert.equal(data.description,"See it");
+            assert.deepEqual(
+                data,
+                {
+                    id: sight.id,
+                    name: make_achievement("Sight"),
+                    description: "See it"
+                }
+            );
             pass();
         }
     );
@@ -689,6 +767,296 @@ QUnit.test("delete", function(assert) {
 
     var pass = assert.async();
     api.achievement.delete(sound.id,
+        function (data) {
+            assert.deepEqual(data,{});
+            pass();
+        }
+    );
+
+});
+
+QUnit.module("HundoWord.Program", {
+
+    setup: function() {
+        delete_users();
+        delete_programs();
+    },
+
+    teardown: function() {
+        delete_users();
+        delete_programs();
+    }
+
+});
+
+QUnit.test("create", function(assert) {
+
+    var api = new HundoWord.API(hundoword_django_host + "/api");
+    check_user(api,"tester0","tester0","tester0@hundoword.com");
+
+    var sight = api.program.create({name: make_program("Fundamentals"), description: "Fun time",words:["fun","time"]});
+    assert.equal(sight.name,make_program("Fundamentals"));
+    assert.equal(sight.description,"Fun time");
+    assert.deepEqual(sight.words,["fun","time"]);
+
+    var pass = assert.async();
+    api.program.create({name: make_program("Basics"), description: "Base time",words: ["base","time"]},
+        function (data) {
+            assert.equal(data.name,make_program("Basics"));
+            assert.equal(data.description,"Base time");
+            assert.deepEqual(data.words,["base","time"]);
+            pass();
+        }
+    );
+
+});
+
+QUnit.test("select", function(assert) {
+
+    var api = new HundoWord.API(hundoword_django_host + "/api");
+    check_user(api,"tester0","tester0","tester0@hundoword.com");
+
+    var sight = api.program.create({name: make_program("Fundamentals"), description: "Fun time",words:["fun","time"]});
+
+    assert.deepEqual(
+        api.program.select(sight.id),
+        {
+            id: sight.id,
+            name: make_program("Fundamentals"),
+            description: "Fun time",
+            words: ["fun","time"]
+        }
+    );
+
+    var pass = assert.async();
+    api.program.select(sight.id,
+        function (data) {
+            assert.deepEqual(
+                data,
+                {
+                    id: sight.id,
+                    name: make_program("Fundamentals"),
+                    description: "Fun time",
+                    words: ["fun","time"]
+                }
+            );
+            pass();
+        }
+    );
+
+});
+
+QUnit.test("list", function(assert) {
+
+    var api = new HundoWord.API(hundoword_django_host + "/api");
+    check_user(api,"tester0","tester0","tester0@hundoword.com");
+
+    var sight = api.program.create({name: make_program("Fundamentals"), description: "Fun time",words:["fun","time"]});
+    var sound = api.program.create({name: make_program("Basics"), description: "Base time",words: ["base","time"]});
+
+    assert.deepEqual(
+        api.program.list(),
+        [
+            {
+                id: sound.id,
+                name: make_program("Basics"),
+                description: "Base time",
+                words: ["base","time"]
+            },
+            {
+                id: sight.id,
+                name: make_program("Fundamentals"),
+                description: "Fun time",
+                words: ["fun","time"]
+            }
+        ]
+    );
+
+    var pass = assert.async();
+    api.program.list(
+        function (data) {
+            assert.deepEqual(
+                data,
+                [
+                    {
+                        id: sound.id,
+                        name: make_program("Basics"),
+                        description: "Base time",
+                        words: ["base","time"]
+                    },
+                    {
+                        id: sight.id,
+                        name: make_program("Fundamentals"),
+                        description: "Fun time",
+                        words: ["fun","time"]
+                    }
+                ]
+            );
+            pass();
+        }
+    );
+
+});
+
+QUnit.test("update", function(assert) {
+
+    var api = new HundoWord.API(hundoword_django_host + "/api");
+    check_user(api,"tester0","tester0","tester0@hundoword.com");
+
+    var sight = api.program.create({name: make_program("Fundamentals"), description: "Fun time",words:["fun","time"]});
+
+    assert.deepEqual(
+        api.program.update(sight.id,{description: "Happy time"}),
+        {
+            id: sight.id,
+            name: make_program("Fundamentals"),
+            description: "Happy time",
+            words: ["fun","time"]
+        }
+    );
+
+    assert.deepEqual(
+        api.program.select(sight.id),
+        {
+            id: sight.id,
+            name: make_program("Fundamentals"),
+            description: "Happy time",
+            words: ["fun","time"]
+        }
+    );
+
+    var pass = assert.async();
+    api.program.update(sight.id,{description: "Fun time"},
+        function (data) {
+            assert.deepEqual(
+                data,
+                {
+                    id: sight.id,
+                    name: make_program("Fundamentals"),
+                    description: "Fun time",
+                    words: ["fun","time"]
+                }
+            );
+            pass();
+        }
+    );
+
+});
+
+QUnit.test("append", function(assert) {
+
+    var api = new HundoWord.API(hundoword_django_host + "/api");
+    check_user(api,"tester0","tester0","tester0@hundoword.com");
+
+    var sight = api.program.create({name: make_program("Fundamentals"), description: "Fun time",words:["fun","time"]});
+
+    assert.deepEqual(
+        api.program.append(sight.id,["dee","lite"]),
+        {
+            id: sight.id,
+            name: make_program("Fundamentals"),
+            description: "Fun time",
+            words: ["dee","fun","lite","time"]
+        }
+    );
+
+    assert.deepEqual(
+        api.program.select(sight.id),
+        {
+            id: sight.id,
+            name: make_program("Fundamentals"),
+            description: "Fun time",
+            words: ["dee","fun","lite","time"]
+        }
+    );
+
+    var pass = assert.async();
+    api.program.append(sight.id,["groove"],
+        function (data) {
+            assert.deepEqual(
+                data,
+                {
+                    id: sight.id,
+                    name: make_program("Fundamentals"),
+                    description: "Fun time",
+                    words: ["dee","fun","groove","lite","time"]
+                }
+            );
+            pass();
+        }
+    );
+
+});
+
+QUnit.test("remove", function(assert) {
+
+    var api = new HundoWord.API(hundoword_django_host + "/api");
+    check_user(api,"tester0","tester0","tester0@hundoword.com");
+
+    var sight = api.program.create({name: make_program("Fundamentals"), description: "Fun time",words:["dee","fun","groove","lite","time"]});
+
+    assert.deepEqual(
+        api.program.remove(sight.id,["dee","lite"]),
+        {
+            id: sight.id,
+            name: make_program("Fundamentals"),
+            description: "Fun time",
+            words: ["fun","groove","time"]
+        }
+    );
+
+    assert.deepEqual(
+        api.program.select(sight.id),
+        {
+            id: sight.id,
+            name: make_program("Fundamentals"),
+            description: "Fun time",
+            words: ["fun","groove","time"]
+        }
+    );
+
+    var pass = assert.async();
+    api.program.remove(sight.id,["groove"],
+        function (data) {
+            assert.deepEqual(
+                data,
+                {
+                    id: sight.id,
+                    name: make_program("Fundamentals"),
+                    description: "Fun time",
+                    words: ["fun","time"]
+                }
+            );
+            pass();
+        }
+    );
+
+});
+
+QUnit.test("delete", function(assert) {
+
+    var api = new HundoWord.API(hundoword_django_host + "/api");
+    check_user(api,"tester0","tester0","tester0@hundoword.com");
+
+    var sight = api.program.create({name: make_program("Fundamentals"), description: "Fun time",words:["fun","time"]});
+    var sound = api.program.create({name: make_program("Basics"), description: "Base time",words: ["base","time"]});
+
+    assert.deepEqual(api.program.delete(sight.id),{});
+
+    assert.deepEqual(
+        api.program.list(),
+        [
+            {
+                id: sound.id,
+                name: make_program("Basics"),
+                description: "Base time",
+                words: ["base","time"]
+            }
+        ]
+    );
+
+    var pass = assert.async();
+    api.program.delete(sound.id,
         function (data) {
             assert.deepEqual(data,{});
             pass();
