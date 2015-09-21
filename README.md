@@ -338,7 +338,7 @@ cd ~/src/server/hundoword_django/
 
 Then go to http://192.168.72.87:8000/admin/ to use the development server for admin and http://192.168.72.87:8000/learning for the API.  Note there's no api/ on this. 
 
-To turn off the server and have Apache take over again, just ctrl-C in teh window you started the server and then:
+To turn off the server and have Apache take over again, just ctrl-C in the window you started the server and then:
 
 ```bash
 sudo service apache2 start
