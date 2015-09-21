@@ -190,9 +190,9 @@ HundoWord.API.prototype.rest = function(type,url,data,headers,success,error,comp
 HundoWord.API.prototype.register = function(username,password,email,success,error,complete) {
 
     return this.rest("POST",this.build_url("register"),{
-        "username": username,
-        "password": password,
-        "email": email
+        username: username,
+        password: password,
+        email: email
     },null,success,error,complete);
 
 }
@@ -215,8 +215,8 @@ HundoWord.API.prototype.login = function(username,password,success,error,complet
         url: this.build_url("token"),
         contentType: "application/json",
         data: JSON.stringify({
-            "username": username,
-            "password": password
+            username: username,
+            password: password
         }),
         dataType: "json",
         success: respond,

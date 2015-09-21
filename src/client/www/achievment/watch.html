@@ -1,0 +1,29 @@
+{{#def.Header}}
+{{#def.PlayTabs}}
+<div class="uk-overflow-container">
+    <table class="uk-table uk-table-hover">
+        <thead>
+            <tr>
+                <th>Game</th>
+                <th>Manager</th>
+                <th>Players</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{~it.runs :run}}
+            <tr>
+                <td>{{=run.code}}</td>
+                <td>{{=run.manager}}</td>
+                <td>{{=run.joined}}</td>
+                <td>
+                    <button OnClick="Community.current.controller.watch({{=run.id}})" class="uk-button uk-button-primary">
+                        Watch
+                    </button>
+                </td>
+            </tr>
+            {{~}}
+        </tbody>
+    </table>
+</div>
+{{#def.Footer}}

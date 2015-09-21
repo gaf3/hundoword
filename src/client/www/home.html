@@ -1,0 +1,88 @@
+{{#def.Header}}
+<div class="uk-grid data-uk-grid-margin">
+    <div class="uk-width-medium-1-1">
+        <div class="uk-vertical-align uk-text-center" style="background: url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAxNi4wLjQsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIgImh0dHA6Ly93d3cudzMub3JnL0dyYXBoaWNzL1NWRy8xLjEvRFREL3N2ZzExLmR0ZCI+DQo8c3ZnIHZlcnNpb249IjEuMSIgaWQ9IkViZW5lXzEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB3aWR0aD0iMTEzMHB4IiBoZWlnaHQ9IjQ1MHB4IiB2aWV3Qm94PSIwIDAgMTEzMCA0NTAiIGVuYWJsZS1iYWNrZ3JvdW5kPSJuZXcgMCAwIDExMzAgNDUwIiB4bWw6c3BhY2U9InByZXNlcnZlIj4NCjxyZWN0IGZpbGw9IiNGNUY1RjUiIHdpZHRoPSIxMTMwIiBoZWlnaHQ9IjQ1MCIvPg0KPC9zdmc+DQo=') 50% 0 no-repeat; height: 250px;">
+            <div class="uk-vertical-align-middle uk-width-1-2">
+                <h1 class="uk-heading-large">HundoWord</h1>
+                <p class="uk-text-large">The 100 (or so) words children first need to learn for reading.</p>
+                {{? hwAPI.username }}
+                    <a href="{{=Learning.link('student')}}" class='uk-button uk-button-primary'>Students</a>
+                {{??}}
+                    <a href="{{=Learning.link('login')}}" class='uk-button uk-button-primary'>Login</a> or 
+                    <a href="{{=Learning.link('register')}}" class='uk-button uk-button-primary'>Register</a>
+                {{?}}
+            </div>
+        </div>
+    </div>
+</div>
+<div class="uk-grid data-uk-grid-margin">
+    <div class="uk-width-medium-1-3">
+        <div class="uk-grid">
+            <div class="uk-width-1-6">
+                <i class="uk-icon-group uk-icon-large uk-text-primary"></i>
+            </div>
+            <div class="uk-width-5-6">
+                <h2 class="uk-h3">Students</h2>
+                <p>Students are anyone who wants to learn to read, from your own children (Parents) to children you teach in class (Teachers).</p>
+            </div>
+        </div>
+    </div>
+    <div class="uk-width-medium-1-3">
+        <div class="uk-grid">
+            <div class="uk-width-1-6">
+                <i class="uk-icon-institution uk-icon-large uk-text-primary"></i>
+            </div>
+            <div class="uk-width-5-6">
+                <h2 class="uk-h3">Programs</h2>
+                <p>Programs are collections of words early readers are expected to learn.  The words vary but there is a great deal of overlap.</p>
+            </div>
+        </div>
+    </div>
+    <div class="uk-width-medium-1-3">
+        <div class="uk-grid">
+            <div class="uk-width-1-6">
+                <i class="uk-icon-star-half-o uk-icon-large uk-text-primary"></i>
+            </div>
+            <div class="uk-width-5-6">
+                <h2 class="uk-h3">Achievements</h2>
+                <p>Achievements are actions a Student is able to perform on a Word, such as matching, sight reading, word search, etc.  Students can Attain an achievement and also Yield an achievement.  This allows you to see words they're struggling with vs. words they know well.</p>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="uk-grid data-uk-grid-margin">
+    <div class="uk-width-medium-1-3">
+        <div class="uk-grid">
+            <div class="uk-width-1-6">
+                <i class="uk-icon-check-square-o uk-icon-large uk-text-primary"></i>
+            </div>
+            <div class="uk-width-5-6">
+                <h2 class="uk-h3">Pick a Program</h2>
+                <p>Select from several Programs which words you want students to learn. You can also enter your owns if you feel they're important.</p>
+            </div>
+        </div>
+    </div>
+    <div class="uk-width-medium-1-3">
+        <div class="uk-grid">
+            <div class="uk-width-1-6">
+                <i class="uk-icon-puzzle-piece uk-icon-large uk-text-primary"></i>
+            </div>
+            <div class="uk-width-5-6">
+                <h2 class="uk-h3">Play Games</h2>
+                <p>Have your Students play games to determine what Achievements they're able to attain. As they play, words they Attain and Yield are recorded.</p>
+            </div>
+        </div>
+    </div>
+    <div class="uk-width-medium-1-3">
+        <div class="uk-grid">
+            <div class="uk-width-1-6">
+                <i class="uk-icon-bar-chart-o uk-icon-large uk-text-primary"></i>
+            </div>
+            <div class="uk-width-5-6">
+                <h2 class="uk-h3">Gauge Performance</h2>
+                <p>Get an overview on how your students are doing, from total words to learn, to which words they have down, to which activities they tend to perform well at.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{{#def.Footer}}

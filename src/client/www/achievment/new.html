@@ -1,0 +1,27 @@
+{{#def.Header}}
+{{#def.PlayTabs}}
+<div class="uk-overflow-container">
+    <table class="uk-table uk-table-hover">
+        <thead>
+            <tr>
+                <th>Game</th>
+                <th>Players</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{~it.codes :code}}
+            <tr>
+                <td>{{=code.display}}</td>
+                <td>{{=code.players}}</td>
+                <td>
+                    <button OnClick="Community.current.controller.create({{=code.id}})" class="uk-button uk-button-primary">
+                        New
+                    </button>
+                </td>
+            </tr>
+            {{~}}
+        </tbody>
+    </table>
+</div>
+{{#def.Footer}}
