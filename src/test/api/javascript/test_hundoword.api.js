@@ -167,12 +167,10 @@ QUnit.module("HundoWord.API", {
 
     setup: function() {
         delete_users();
-        delete_achievements();
     },
 
     teardown: function() {
         delete_users();
-        delete_achievements();
     }
 
 });
@@ -283,7 +281,19 @@ QUnit.test("login", function(assert) {
 
 });
 
-QUnit.test("Base", function(assert) {
+QUnit.module("HundoWord.Base", {
+
+    setup: function() {
+        delete_users();
+    },
+
+    teardown: function() {
+        delete_users();
+    }
+
+});
+
+QUnit.test("failures", function(assert) {
 
     var api = new HundoWord.API(hundoword_django_host + "/api");
     check_user(api,"tester0","tester0","tester0@hundoword.com");
@@ -429,8 +439,19 @@ QUnit.test("Base", function(assert) {
 
 });
 
+QUnit.module("HundoWord.Words", {
 
-QUnit.test("Words", function(assert) {
+    setup: function() {
+        delete_users();
+    },
+
+    teardown: function() {
+        delete_users();
+    }
+
+});
+
+QUnit.test("failures", function(assert) {
 
     var api = new HundoWord.API(hundoword_django_host + "/api");
     check_user(api,"tester0","tester0","tester0@hundoword.com");
@@ -494,7 +515,21 @@ QUnit.test("Words", function(assert) {
 
 });
 
-QUnit.test("achievement", function(assert) {
+QUnit.module("HundoWord.Achievement", {
+
+    setup: function() {
+        delete_users();
+        delete_achievements();
+    },
+
+    teardown: function() {
+        delete_users();
+        delete_achievements();
+    }
+
+});
+
+QUnit.test("successes", function(assert) {
 
     var api = new HundoWord.API(hundoword_django_host + "/api");
     check_user(api,"tester0","tester0","tester0@hundoword.com");
