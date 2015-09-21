@@ -331,8 +331,15 @@ The default setup uses Apache and Apache WSGI uses daemons, so if you're making 
 To spin up the development Django server, which automatically refresh with code changes, open a new terminal, vagrant ssh in and:
 
 ```bash
+sudo service apache2 stop
 cd ~/src/server/hundoword_django/
 ./server.sh
 ```
 
 Then go to http://192.168.72.87:8000/admin/ to use the development server for admin and http://192.168.72.87:8000/learning for the API.  Note there's no api/ on this. 
+
+To turn off the server and have Apache take over again, just ctrl-C in teh window you started the server and then:
+
+```bash
+sudo service apache2 start
+```
