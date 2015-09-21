@@ -77,7 +77,7 @@ class Progress(models.Model):
     at = models.DateTimeField('date/time',auto_now_add=True)
 
     class Meta:
-        ordering = ['-at']
+        ordering = ['-id']
 
     def __unicode__(self):
         return "%s - %s - %s (%s) - %s" % (self.student, self.word, self.achievement, self.hold, self.at)
