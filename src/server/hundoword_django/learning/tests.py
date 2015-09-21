@@ -407,24 +407,24 @@ class test_Django(SimpleTestCase):
         self.assertEqual(response.status_code,status.HTTP_400_BAD_REQUEST);
         self.assertEqual(response.data,{"first_name": ["This field is required."]})
 
-        response = client.post("/learning/student/",{"first_name": "plain"}, format='json')
+        response = client.post("/learning/student/",{"first_name": "sane"}, format='json')
 
         self.assertEqual(response.status_code,status.HTTP_400_BAD_REQUEST);
         self.assertEqual(response.data,{"last_name": ["This field is required."]})
 
         response = client.post("/learning/student/",{
-            "first_name": "plain",
+            "first_name": "sane",
             "last_name": "jane",
             "age": 5,
             "words": ["he","she","it","it"]
         }, format='json')
 
-        student = Student.objects.get(teacher=user,first_name="plain",last_name="jane")
-        plain_jane_id = student.pk
+        student = Student.objects.get(teacher=user,first_name="sane",last_name="jane")
+        sane_jane_id = student.pk
 
         self.assertEqual(response.data,{
-            "id": plain_jane_id,
-            "first_name": "plain",
+            "id": sane_jane_id,
+            "first_name": "sane",
             "last_name": "jane",
             "age": 5,
             "words": ["he","it","she"]
@@ -434,16 +434,16 @@ class test_Django(SimpleTestCase):
 
         client.force_authenticate(user=loser)
 
-        response = client.get("/learning/student/%s" % plain_jane_id)
+        response = client.get("/learning/student/%s" % sane_jane_id)
 
         self.assertEqual(response.status_code,status.HTTP_404_NOT_FOUND);
         self.assertEqual(response.data,{"detail": "Student not found"})
 
         client.force_authenticate(user=user)
 
-        self.assertEqual(client.get("/learning/student/%s" % plain_jane_id).data,{
-            "id": plain_jane_id,
-            "first_name": "plain",
+        self.assertEqual(client.get("/learning/student/%s" % sane_jane_id).data,{
+            "id": sane_jane_id,
+            "first_name": "sane",
             "last_name": "jane",
             "age": 5,
             "words": ["he","it","she"]
@@ -453,29 +453,29 @@ class test_Django(SimpleTestCase):
 
         client.force_authenticate(user=loser)
 
-        response = client.post("/learning/student/%s" % plain_jane_id,{})
+        response = client.post("/learning/student/%s" % sane_jane_id,{})
 
         self.assertEqual(response.status_code,status.HTTP_404_NOT_FOUND);
         self.assertEqual(response.data,{"detail": "Student not found"})
 
         client.force_authenticate(user=user)
 
-        response = client.post("/learning/student/%s" % plain_jane_id,{
+        response = client.post("/learning/student/%s" % sane_jane_id,{
             "age": 6,
             "words": ["it","there"]
         }, format='json')
 
         self.assertEqual(response.data,{
-            "id": plain_jane_id,
-            "first_name": "plain",
+            "id": sane_jane_id,
+            "first_name": "sane",
             "last_name": "jane",
             "age": 6,
             "words": ["it","there"]
         })
 
-        self.assertEqual(client.get("/learning/student/%s" % plain_jane_id).data,{
-            "id": plain_jane_id,
-            "first_name": "plain",
+        self.assertEqual(client.get("/learning/student/%s" % sane_jane_id).data,{
+            "id": sane_jane_id,
+            "first_name": "sane",
             "last_name": "jane",
             "age": 6,
             "words": ["it","there"]
@@ -485,28 +485,28 @@ class test_Django(SimpleTestCase):
 
         client.force_authenticate(user=loser)
 
-        response = client.post("/learning/student/%s/append" % plain_jane_id,{})
+        response = client.post("/learning/student/%s/append" % sane_jane_id,{})
 
         self.assertEqual(response.status_code,status.HTTP_404_NOT_FOUND);
         self.assertEqual(response.data,{"detail": "Student not found"})
 
         client.force_authenticate(user=user)
 
-        response = client.post("/learning/student/%s/append" % plain_jane_id,{
+        response = client.post("/learning/student/%s/append" % sane_jane_id,{
             "words": ["here","everywhere"]
         }, format='json')
 
         self.assertEqual(response.data,{
-            "id": plain_jane_id,
-            "first_name": "plain",
+            "id": sane_jane_id,
+            "first_name": "sane",
             "last_name": "jane",
             "age": 6,
             "words": ["everywhere","here","it","there"]
         })
 
-        self.assertEqual(client.get("/learning/student/%s" % plain_jane_id).data,{
-            "id": plain_jane_id,
-            "first_name": "plain",
+        self.assertEqual(client.get("/learning/student/%s" % sane_jane_id).data,{
+            "id": sane_jane_id,
+            "first_name": "sane",
             "last_name": "jane",
             "age": 6,
             "words": ["everywhere","here","it","there"]
@@ -516,28 +516,28 @@ class test_Django(SimpleTestCase):
 
         client.force_authenticate(user=loser)
 
-        response = client.post("/learning/student/%s/remove" % plain_jane_id,{})
+        response = client.post("/learning/student/%s/remove" % sane_jane_id,{})
 
         self.assertEqual(response.status_code,status.HTTP_404_NOT_FOUND);
         self.assertEqual(response.data,{"detail": "Student not found"})
 
         client.force_authenticate(user=user)
 
-        response = client.post("/learning/student/%s/remove" % plain_jane_id,{
+        response = client.post("/learning/student/%s/remove" % sane_jane_id,{
             "words": ["here","there"]
         }, format='json')
 
         self.assertEqual(response.data,{
-            "id": plain_jane_id,
-            "first_name": "plain",
+            "id": sane_jane_id,
+            "first_name": "sane",
             "last_name": "jane",
             "age": 6,
             "words": ["everywhere","it"]
         })
 
-        self.assertEqual(client.get("/learning/student/%s" % plain_jane_id).data,{
-            "id": plain_jane_id,
-            "first_name": "plain",
+        self.assertEqual(client.get("/learning/student/%s" % sane_jane_id).data,{
+            "id": sane_jane_id,
+            "first_name": "sane",
             "last_name": "jane",
             "age": 6,
             "words": ["everywhere","it"]
@@ -564,8 +564,8 @@ class test_Django(SimpleTestCase):
                 "words": []
             },
             {
-                "id": plain_jane_id,
-                "first_name": "plain",
+                "id": sane_jane_id,
+                "first_name": "sane",
                 "last_name": "jane",
                 "age": 6,
                 "words": ["everywhere","it"]
@@ -576,14 +576,14 @@ class test_Django(SimpleTestCase):
 
         client.force_authenticate(user=loser)
 
-        response = client.delete("/learning/student/%s" % plain_jane_id)
+        response = client.delete("/learning/student/%s" % sane_jane_id)
 
         self.assertEqual(response.status_code,status.HTTP_404_NOT_FOUND);
         self.assertEqual(response.data,{"detail": "Student not found"})
 
         client.force_authenticate(user=user)
 
-        self.assertEqual(client.delete("/learning/student/%s" % plain_jane_id).data,{})
+        self.assertEqual(client.delete("/learning/student/%s" % sane_jane_id).data,{})
 
         self.assertEqual([dict(student) for student in client.get("/learning/student/").data],[
             {
