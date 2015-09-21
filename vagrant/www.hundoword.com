@@ -1,21 +1,31 @@
-<VirtualHost *:80>
+server {
 
-    WSGIPassAuthorization On
-    WSGIDaemonProcess learning threads=5 python-path=/home/vagrant/src/server/hundoword_django/:/home/vagrant/src/
-    WSGIScriptAlias /api /home/vagrant/src/server/hundoword_django/hundoword_django/wsgi.py
+	server_name 127.0.0.1 192.168.72.87;
 
-    <Directory /home/vagrant/src/server/hundoword_django/hundoword_django/>
-        WSGIProcessGroup learning
-        WSGIApplicationGroup %{GLOBAL}
-        Order deny,allow
-        Allow from all
-    </Directory>
+	sendfile off;
 
-    Alias /static /home/vagrant/src/server/hundoword_django/static
+	listen   80; ## listen for ipv4; this line is default and implied
 
-    <Directory /home/vagrant/src/server/hundoword_django/static>
-        # directives to effect the static directory
-        Options +Indexes
-    </Directory>
+	root /home/vagrant/src/client/www/;
 
-</VirtualHost>
+	location /api/javascript/ {
+		root /home/vagrant/src/;
+	}
+
+	location /test/api/javascript/ {
+		root /home/vagrant/src/;
+	}
+
+	location /admin/ {
+		proxy_pass http://127.0.0.1:8000/admin/;
+	}
+
+	location /static/ {
+		root /home/vagrant/src/server/hundoword_django/;
+	}
+
+	location /api/ {
+		proxy_pass http://127.0.0.1:8000/learning/;
+	}
+
+}
