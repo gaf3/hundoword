@@ -440,6 +440,71 @@ QUnit.test("Words", function(assert) {
 
     try {
 
+        entity.list();
+        assert.ok(false);
+
+    } catch (exception) {
+
+        assert.equal(exception.name,"HundoWord.APIException");
+        assert.equal(exception.message,"GET: http://192.168.72.87/api/stuff/ failed");
+        assert.deepEqual(exception.json,{});
+
+    }
+
+    try {
+
+        entity.select(0);
+        assert.ok(false);
+
+    } catch (exception) {
+
+        assert.equal(exception.name,"HundoWord.APIException");
+        assert.equal(exception.message,"GET: http://192.168.72.87/api/stuff/0/ failed");
+        assert.deepEqual(exception.json,{});
+
+    }
+
+    try {
+
+        entity.create({});
+        assert.ok(false);
+
+    } catch (exception) {
+
+        assert.equal(exception.name,"HundoWord.APIException");
+        assert.equal(exception.message,"POST: http://192.168.72.87/api/stuff/ failed");
+        assert.deepEqual(exception.json,{});
+
+    }
+
+    try {
+
+        entity.update(0,{});
+        assert.ok(false);
+
+    } catch (exception) {
+
+        assert.equal(exception.name,"HundoWord.APIException");
+        assert.equal(exception.message,"POST: http://192.168.72.87/api/stuff/0/ failed");
+        assert.deepEqual(exception.json,{});
+
+    }
+
+    try {
+
+        entity.delete(0);
+        assert.ok(false);
+
+    } catch (exception) {
+
+        assert.equal(exception.name,"HundoWord.APIException");
+        assert.equal(exception.message,"DELETE: http://192.168.72.87/api/stuff/0/ failed");
+        assert.deepEqual(exception.json,{});
+
+    }
+
+    try {
+
         entity.append(0,{});
         assert.ok(false);
 
@@ -467,7 +532,7 @@ QUnit.test("Words", function(assert) {
     // Check all failures with callback
 
     var list_fail = assert.async();
-    entity.append(0,{},
+    entity.list(
         function () {
             assert.ok(false);
         },
@@ -480,7 +545,7 @@ QUnit.test("Words", function(assert) {
     );
 
     var select_fail = assert.async();
-    entity.remove(0,{},
+    entity.select(0,
         function () {
             assert.ok(false);
         },
@@ -489,6 +554,71 @@ QUnit.test("Words", function(assert) {
         },
         function () {
             select_fail();
+        }
+    );
+
+    var create_fail = assert.async();
+    entity.create({},
+        function () {
+            assert.ok(false);
+        },
+        function (response) {
+            assert.equal(response.status,404);
+        },
+        function () {
+            create_fail();
+        }
+    );
+
+    var update_fail = assert.async();
+    entity.update(0,{},
+        function () {
+            assert.ok(false);
+        },
+        function (response) {
+            assert.equal(response.status,404);
+        },
+        function () {
+            update_fail();
+        }
+    );
+
+    var delete_fail = assert.async();
+    entity.delete(0,
+        function () {
+            assert.ok(false);
+        },
+        function (response) {
+            assert.equal(response.status,404);
+        },
+        function () {
+            delete_fail();
+        }
+    );
+
+    var append_fail = assert.async();
+    entity.append(0,{},
+        function () {
+            assert.ok(false);
+        },
+        function (response) {
+            assert.equal(response.status,404);
+        },
+        function () {
+            append_fail();
+        }
+    );
+
+    var remove_fail = assert.async();
+    entity.remove(0,{},
+        function () {
+            assert.ok(false);
+        },
+        function (response) {
+            assert.equal(response.status,404);
+        },
+        function () {
+            remove_fail();
         }
     );
 
