@@ -8,6 +8,11 @@ function make_user(username) {
 
 }
 
+function make_achievement(achievement) {
+
+    return hundoword_django_prefix + "-" + achievement
+
+}
 
 function check_user(api,username,password,email) {
 
@@ -90,16 +95,84 @@ function delete_users() {
 
 }
 
+function delete_achievements() {
+
+    var html;
+    var token;
+
+    html = $.ajax({url: hundoword_django_host + "/admin/",async: false}).responseText;
+
+    if ($(html).find("a[href='/admin/logout/']").attr('href')) {
+
+        $.ajax({url: hundoword_django_host + "/admin/logout/",async: false});
+        var html = $.ajax({url: hundoword_django_host + "/admin/",async: false}).responseText;
+
+    }
+
+    var token = $(html).find("input[name='csrfmiddlewaretoken']").attr('value');
+
+    if (!token) { throw "Couldn't get initial token"; }
+
+    var action = $(html).find("form").attr('action');
+
+    if (!action) { throw "Couldn't get initial action"; }
+
+    var html = $.ajax({
+        type: "POST",
+        url: hundoword_django_host + action,
+        data: {
+            "csrfmiddlewaretoken": token,
+            "username": "vagrant",
+            "password": "vagrant",
+            "next": "/admin/learning/achievement/?q=" + make_achievement("")
+        },
+        async: false
+    }).responseText;
+
+    var token = $(html).find("input[name='csrfmiddlewaretoken']").attr('value');
+    if (!token) { throw "Couldn't get search token"; }
+
+    $(html).find("input[name='_selected_action']").each(function() {
+
+        var achievement_id = $(this).attr('value');
+
+        if (!achievement_id) { throw "Couldn't get search achievement_id"; }
+
+        var html = $.ajax({
+            type: "POST",
+            dataType : "html",
+            url: hundoword_django_host + "/admin/learning/achievement/" + achievement_id + "/delete/",
+            data: {
+                "post": "yes",
+                "csrfmiddlewaretoken": token
+            },
+            async: false
+        }).responseText;
+
+        var success = $(html).find("li.success").html();
+
+        if (!((success.indexOf('The achievement "' + make_achievement("")) == 0) && (success.indexOf('" was deleted successfully.') > 0))) {
+            throw "Delete unsuccessful"; 
+        }
+
+    });
+
+    $.ajax({url: hundoword_django_host + "/admin/logout/",async: false});
+
+}
+
 QUnit.module("HundoWord");
 
 QUnit.module("HundoWord.API", {
 
     setup: function() {
         delete_users();
+        delete_achievements();
     },
 
     teardown: function() {
         delete_users();
+        delete_achievements();
     }
 
 });
@@ -210,36 +283,224 @@ QUnit.test("login", function(assert) {
 
 });
 
-QUnit.test("achievement", function(assert) {
+QUnit.test("Base", function(assert) {
 
     var api = new HundoWord.API(hundoword_django_host + "/api");
     check_user(api,"tester0","tester0","tester0@hundoword.com");
+    var entity = new HundoWord.Base(api,"stuff");
+
+    assert.equal(entity.build_url(),"http://192.168.72.87/api/stuff/");
+    assert.equal(entity.build_url(1),"http://192.168.72.87/api/stuff/1/");
+    assert.equal(entity.build_url(1,"do"),"http://192.168.72.87/api/stuff/1/do/");
+
+    // Check all failures with exceptions
 
     try {
 
-        api.achievement.select(-1);
+        entity.list();
         assert.ok(false);
 
     } catch (exception) {
 
         assert.equal(exception.name,"HundoWord.APIException");
-        assert.equal(exception.message,"Game failed");
-        assert.deepEqual(exception.json,{detail: "Game not found"});
+        assert.equal(exception.message,"GET: http://192.168.72.87/api/stuff/ failed");
+        assert.deepEqual(exception.json,{});
 
     }
 
-    var fail = assert.async();
-    api.achievement.select(-1,
+    try {
+
+        entity.select(0);
+        assert.ok(false);
+
+    } catch (exception) {
+
+        assert.equal(exception.name,"HundoWord.APIException");
+        assert.equal(exception.message,"GET: http://192.168.72.87/api/stuff/0/ failed");
+        assert.deepEqual(exception.json,{});
+
+    }
+
+    try {
+
+        entity.create({});
+        assert.ok(false);
+
+    } catch (exception) {
+
+        assert.equal(exception.name,"HundoWord.APIException");
+        assert.equal(exception.message,"POST: http://192.168.72.87/api/stuff/ failed");
+        assert.deepEqual(exception.json,{});
+
+    }
+
+    try {
+
+        entity.update(0,{});
+        assert.ok(false);
+
+    } catch (exception) {
+
+        assert.equal(exception.name,"HundoWord.APIException");
+        assert.equal(exception.message,"POST: http://192.168.72.87/api/stuff/0/ failed");
+        assert.deepEqual(exception.json,{});
+
+    }
+
+    try {
+
+        entity.delete(0);
+        assert.ok(false);
+
+    } catch (exception) {
+
+        assert.equal(exception.name,"HundoWord.APIException");
+        assert.equal(exception.message,"DELETE: http://192.168.72.87/api/stuff/0/ failed");
+        assert.deepEqual(exception.json,{});
+
+    }
+
+    // Check all failures with callback
+
+    var list_fail = assert.async();
+    entity.list(
         function () {
             assert.ok(false);
         },
         function (response) {
-            assert.deepEqual(response.responseJSON,{detail: "Game not found"});
+            assert.equal(response.status,404);
         },
         function () {
-            fail();
+            list_fail();
         }
     );
+
+    var select_fail = assert.async();
+    entity.select(0,
+        function () {
+            assert.ok(false);
+        },
+        function (response) {
+            assert.equal(response.status,404);
+        },
+        function () {
+            select_fail();
+        }
+    );
+
+    var create_fail = assert.async();
+    entity.create({},
+        function () {
+            assert.ok(false);
+        },
+        function (response) {
+            assert.equal(response.status,404);
+        },
+        function () {
+            create_fail();
+        }
+    );
+
+    var update_fail = assert.async();
+    entity.update(0,{},
+        function () {
+            assert.ok(false);
+        },
+        function (response) {
+            assert.equal(response.status,404);
+        },
+        function () {
+            update_fail();
+        }
+    );
+
+    var delete_fail = assert.async();
+    entity.delete(0,
+        function () {
+            assert.ok(false);
+        },
+        function (response) {
+            assert.equal(response.status,404);
+        },
+        function () {
+            delete_fail();
+        }
+    );
+
+});
+
+
+QUnit.test("Words", function(assert) {
+
+    var api = new HundoWord.API(hundoword_django_host + "/api");
+    check_user(api,"tester0","tester0","tester0@hundoword.com");
+    var entity = new HundoWord.Words(api,"stuff");
+
+    // Check all failures with exceptions
+
+    try {
+
+        entity.append(0,{});
+        assert.ok(false);
+
+    } catch (exception) {
+
+        assert.equal(exception.name,"HundoWord.APIException");
+        assert.equal(exception.message,"POST: http://192.168.72.87/api/stuff/0/append/ failed");
+        assert.deepEqual(exception.json,{});
+
+    }
+
+    try {
+
+        entity.remove(0,{});
+        assert.ok(false);
+
+    } catch (exception) {
+
+        assert.equal(exception.name,"HundoWord.APIException");
+        assert.equal(exception.message,"POST: http://192.168.72.87/api/stuff/0/remove/ failed");
+        assert.deepEqual(exception.json,{});
+
+    }
+
+    // Check all failures with callback
+
+    var list_fail = assert.async();
+    entity.append(0,{},
+        function () {
+            assert.ok(false);
+        },
+        function (response) {
+            assert.equal(response.status,404);
+        },
+        function () {
+            list_fail();
+        }
+    );
+
+    var select_fail = assert.async();
+    entity.remove(0,{},
+        function () {
+            assert.ok(false);
+        },
+        function (response) {
+            assert.equal(response.status,404);
+        },
+        function () {
+            select_fail();
+        }
+    );
+
+});
+
+QUnit.test("achievement", function(assert) {
+
+    var api = new HundoWord.API(hundoword_django_host + "/api");
+    check_user(api,"tester0","tester0","tester0@hundoword.com");
+
+
+    assert.ok(true);
 
 });
 

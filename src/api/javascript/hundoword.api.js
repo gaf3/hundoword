@@ -21,10 +21,105 @@ HundoWord.APIException = function(message,response) {
 HundoWord.APIException.prototype = Object.create(Error.prototype);
 HundoWord.APIException.prototype.constructor = HundoWord.APIException;
 
+// Base entity for others
+
+HundoWord.Base = function(api,path) {
+    this.api = api;
+    this.path = path;
+}
+
+// Use as constructor
+
+HundoWord.Base.prototype.constructor = HundoWord.Base;
+
+// Standard methods
+
+HundoWord.Base.prototype.build_url = function(id,action) {
+    return this.api.build_url(this.path,id,action);
+}
+HundoWord.Base.prototype.rest = function(type,url,data,success,error,complete) {
+    return this.api.rest(type,url,data,this.api.headers(),success,error,complete);
+}
+HundoWord.Base.prototype.list = function(success,error,complete) {
+    return this.rest("GET",this.build_url(),null,success,error,complete);
+}
+HundoWord.Base.prototype.select = function(id,success,error,complete) {
+    return this.rest("GET",this.build_url(id),null,success,error,complete);
+}
+HundoWord.Base.prototype.create = function(data,success,error,complete) {
+    return this.rest("POST",this.build_url(),data,success,error,complete);
+}
+HundoWord.Base.prototype.update = function(id,data,success,error,complete) {
+    return this.rest("POST",this.build_url(id),data,success,error,complete);
+}
+HundoWord.Base.prototype.delete = function(id,success,error,complete) {
+    return this.rest("DELETE",this.build_url(id),null,success,error,complete);
+}
+
+// Words entity for those that can append and remove words
+
+HundoWord.Words = function(api,path) {
+    HundoWord.Base.call(this,api,path);
+}
+
+HundoWord.Words.prototype = new HundoWord.Base();
+
+// Add append and remove
+
+HundoWord.Words.prototype.append = function(id,words,success,error,complete) {
+    return this.rest("POST",this.build_url(id,"append"),{words: (typeof words === 'string' ? [words] : words)},success,error,complete);
+}
+HundoWord.Words.prototype.remove = function(id,words,success,error,complete) {
+    return this.rest("POST",this.build_url(id,"remove"),{words: (typeof words === 'string' ? [words] : words)},success,error,complete);
+}
+
+// Achievement just has base
+
+HundoWord.Achievement = function(api) {
+    HundoWord.Base.call(this,api,"achievement");
+}
+
+HundoWord.Achievement.prototype = new HundoWord.Base();
+
+// Program has words base
+
+HundoWord.Program = function(api) {
+    HundoWord.Words.call(this,api,"program");
+}
+
+HundoWord.Program.prototype = new HundoWord.Words();
+
+// Student has words base and a few more methods
+
+HundoWord.Student = function(api) {
+    HundoWord.Words.call(this,api,"student");
+}
+
+HundoWord.Student.prototype = new HundoWord.Words();
+
+HundoWord.Student.prototype.position = function(id,data,success,error,complete) {
+    return this.rest("GET",this.build_url(id,"position"),null,success,error,complete);
+}
+HundoWord.Student.prototype.progress = function(id,data,success,error,complete) {
+    return this.rest("GET",this.build_url(id,"progress"),null,success,error,complete);
+}
+HundoWord.Student.prototype.attain = function(id,word,achievement,success,error,complete) {
+    return this.rest("POST",this.build_url(id,"attain"),{word: word,achievment: achievement},success,error,complete);
+}
+HundoWord.Student.prototype.yield = function(id,word,achievement,success,error,complete) {
+    return this.rest("POST",this.build_url(id,"yield"),{word: word,achievment: achievement},success,error,complete);
+}
+
+
 // API
 
 HundoWord.API = function(url) {
     this.url = url;
+
+    this.achievement = new HundoWord.Achievement(this);
+    this.program = new HundoWord.Program(this);
+    this.student = new HundoWord.Student(this);
+
 }
 
 // Use as constructor
@@ -138,94 +233,6 @@ HundoWord.API.prototype.login = function(username,password,success,error,complet
         throw new HundoWord.APIException("POST: " + this.build_url("token") + " failed",response);
     }
 
-}
-
-
-// Handles achievements
-
-HundoWord.API.prototype.achievement = {
-    list: function(success,error,complete) {
-        return this.rest("GET",this.build_url("achievement"),null,success,error,complete);
-    },
-    select: function(id,success,error,complete) {
-        alert(JSON.stringify(this));
-        return this.rest("GET",this.build_url("achievement",id),null,success,error,complete);
-    },
-    create: function(data,success,error,complete) {
-        return this.rest("POST",this.build_url("achievement"),data,success,error,complete);
-    },
-    update: function(id,data,success,error,complete) {
-        return this.rest("POST",this.build_url("achievement",id),data,success,error,complete);
-    },
-    delete: function(id,success,error,complete) {
-        return this.rest("DELETE",this.build_url("achievement",id),success,error,complete);
-    }
-}
-
-
-// Handles programs
-
-HundoWord.API.prototype.program = {
-    list: function(success,error,complete) {
-        return this.rest("GET",this.build_url("program"),null,success,error,complete);
-    },
-    select: function(id,success,error,complete) {
-        return this.rest("GET",this.build_url("program",id),null,success,error,complete);
-    },
-    create: function(data,success,error,complete) {
-        return this.rest("POST",this.build_url("program"),data,success,error,complete);
-    },
-    update: function(id,data,success,error,complete) {
-        return this.rest("POST",this.build_url("program",id),data,success,error,complete);
-    },
-    append: function(id,words,success,error,complete) {
-        return this.rest("POST",this.build_url("program",id,"append"),{words: (typeof words === 'string' ? [words] : words)},success,error,complete);
-    },
-    remove: function(id,data,success,error,complete) {
-        return this.rest("POST",this.build_url("program",id,"remove"),{words: (typeof words === 'string' ? [words] : words)},success,error,complete);
-    },
-    delete: function(id,success,error,complete) {
-        return this.rest("DELETE",this.build_url("program",id),success,error,complete);
-    }
-}
-
-
-// Handles students
-
-HundoWord.API.prototype.student = {
-    list: function(success,error,complete) {
-        return this.rest("GET",this.build_url("student"),null,success,error,complete);
-    },
-    select: function(id,success,error,complete) {
-        return this.rest("GET",this.build_url("student",id),null,success,error,complete);
-    },
-    position: function(id,success,error,complete) {
-        return this.rest("GET",this.build_url("student",id,"position"),null,success,error,complete);
-    },
-    progress: function(id,success,error,complete) {
-        return this.rest("GET",this.build_url("student",id,"progress"),null,success,error,complete);
-    },
-    create: function(data,success,error,complete) {
-        return this.rest("POST",this.build_url("student"),data,success,error,complete);
-    },
-    update: function(id,data,success,error,complete) {
-        return this.rest("POST",this.build_url("student",id),data,success,error,complete);
-    },
-    append: function(id,words,success,error,complete) {
-        return this.rest("POST",this.build_url("student",id,"append"),{words: (typeof words === 'string' ? [words] : words)},success,error,complete);
-    },
-    remove: function(id,words,success,error,complete) {
-        return this.rest("POST",this.build_url("student",id,"remove"),{words: (typeof words === 'string' ? [words] : words)},success,error,complete);
-    },
-    attain: function(id,word,achievement,success,error,complete) {
-        return this.rest("POST",this.build_url("student",id,"attain"),{word: word,achievment: achievement},success,error,complete);
-    },
-    yield: function(id,word,achievement,success,error,complete) {
-        return this.rest("POST",this.build_url("student",id,"yield"),{words: word,achievment: achievement},success,error,complete);
-    },
-    delete: function(id,success,error,complete) {
-        return this.rest("DELETE",this.build_url("student",id),success,error,complete);
-    }
 }
 
 
