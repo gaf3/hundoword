@@ -97,17 +97,17 @@ HundoWord.Student = function(api) {
 
 HundoWord.Student.prototype = new HundoWord.Words();
 
-HundoWord.Student.prototype.position = function(id,data,success,error,complete) {
-    return this.rest("GET",this.build_url(id,"position"),null,success,error,complete);
-}
-HundoWord.Student.prototype.progress = function(id,data,success,error,complete) {
-    return this.rest("GET",this.build_url(id,"progress"),null,success,error,complete);
-}
 HundoWord.Student.prototype.attain = function(id,word,achievement,success,error,complete) {
-    return this.rest("POST",this.build_url(id,"attain"),{word: word,achievment: achievement},success,error,complete);
+    return this.rest("POST",this.build_url(id,"attain"),{word: word,achievement: achievement},success,error,complete);
 }
 HundoWord.Student.prototype.yield = function(id,word,achievement,success,error,complete) {
-    return this.rest("POST",this.build_url(id,"yield"),{word: word,achievment: achievement},success,error,complete);
+    return this.rest("POST",this.build_url(id,"yield"),{word: word,achievement: achievement},success,error,complete);
+}
+HundoWord.Student.prototype.position = function(id,success,error,complete) {
+    return this.rest("GET",this.build_url(id,"position"),null,success,error,complete);
+}
+HundoWord.Student.prototype.progress = function(id,success,error,complete) {
+    return this.rest("GET",this.build_url(id,"progress"),null,success,error,complete);
 }
 
 

@@ -1064,3 +1064,452 @@ QUnit.test("delete", function(assert) {
     );
 
 });
+
+QUnit.module("HundoWord.Student", {
+
+    setup: function() {
+        delete_users();
+        delete_achievements();
+        delete_programs();
+    },
+
+    teardown: function() {
+        delete_users();
+        delete_achievements();
+        delete_programs();
+    }
+
+});
+
+QUnit.test("create", function(assert) {
+
+    var api = new HundoWord.API(hundoword_django_host + "/api");
+    check_user(api,"tester0","tester0","tester0@hundoword.com");
+
+    var sane_jane = api.student.create({first_name: "Sane", last_name: "Jane", age: 5,words:["fun","time"]});
+    assert.equal(sane_jane.first_name,"Sane");
+    assert.equal(sane_jane.last_name,"Jane");
+    assert.equal(sane_jane.age,5);
+    assert.deepEqual(sane_jane.words,["fun","time"]);
+
+    var pass = assert.async();
+    api.student.create({first_name: "Silly", last_name: "Billy", age: 3,words: ["base","time"]},
+        function (data) {
+            assert.equal(data.first_name,"Silly");
+            assert.equal(data.last_name,"Billy");
+            assert.equal(data.age,3);
+            assert.deepEqual(data.words,["base","time"]);
+            pass();
+        }
+    );
+
+});
+
+QUnit.test("select", function(assert) {
+
+    var api = new HundoWord.API(hundoword_django_host + "/api");
+    check_user(api,"tester0","tester0","tester0@hundoword.com");
+
+    var sane_jane = api.student.create({first_name: "Sane", last_name: "Jane", age: 5,words:["fun","time"]});
+
+    assert.deepEqual(
+        api.student.select(sane_jane.id),
+        {
+            id: sane_jane.id,
+            first_name: "Sane",
+            last_name: "Jane",
+            age: 5,
+            words: ["fun","time"]
+        }
+    );
+
+    var pass = assert.async();
+    api.student.select(sane_jane.id,
+        function (data) {
+            assert.deepEqual(
+                data,
+                {
+                    id: sane_jane.id,
+                    first_name: "Sane",
+                    last_name: "Jane",
+                    age: 5,
+                    words: ["fun","time"]
+                }
+            );
+            pass();
+        }
+    );
+
+});
+
+QUnit.test("list", function(assert) {
+
+    var api = new HundoWord.API(hundoword_django_host + "/api");
+    check_user(api,"tester0","tester0","tester0@hundoword.com");
+
+    var sane_jane = api.student.create({first_name: "Sane", last_name: "Jane", age: 5,words:["fun","time"]});
+    var silly_billy = api.student.create({first_name: "Silly", last_name: "Billy", age: 3,words: ["base","time"]});
+
+    assert.deepEqual(
+        api.student.list(),
+        [
+            {
+                id: silly_billy.id,
+                first_name: "Silly", 
+                last_name: "Billy",
+                age: 3,
+                words: ["base","time"]
+            },
+            {
+                id: sane_jane.id,
+                first_name: "Sane",
+                last_name: "Jane",
+                age: 5,
+                words: ["fun","time"]
+            }
+        ]
+    );
+
+    var pass = assert.async();
+    api.student.list(
+        function (data) {
+            assert.deepEqual(
+                data,
+                [
+                    {
+                        id: silly_billy.id,
+                        first_name: "Silly", 
+                        last_name: "Billy",
+                        age: 3,
+                        words: ["base","time"]
+                    },
+                    {
+                        id: sane_jane.id,
+                        first_name: "Sane",
+                        last_name: "Jane",
+                        age :5,
+                        words: ["fun","time"]
+                    }
+                ]
+            );
+            pass();
+        }
+    );
+
+});
+
+QUnit.test("update", function(assert) {
+
+    var api = new HundoWord.API(hundoword_django_host + "/api");
+    check_user(api,"tester0","tester0","tester0@hundoword.com");
+
+    var sane_jane = api.student.create({first_name: "Sane", last_name: "Jane", age: 5,words:["fun","time"]});
+
+    assert.deepEqual(
+        api.student.update(sane_jane.id,{age: 6}),
+        {
+            id: sane_jane.id,
+            first_name: "Sane", 
+            last_name: "Jane",
+            age: 6,
+            words: ["fun","time"]
+        }
+    );
+
+    assert.deepEqual(
+        api.student.select(sane_jane.id),
+        {
+            id: sane_jane.id,
+            first_name: "Sane", 
+            last_name: "Jane",
+            age: 6,
+            words: ["fun","time"]
+        }
+    );
+
+    var pass = assert.async();
+    api.student.update(sane_jane.id,{age: 5},
+        function (data) {
+            assert.deepEqual(
+                data,
+                {
+                    id: sane_jane.id,
+                    first_name: "Sane", 
+                    last_name: "Jane",
+                    age: 5,
+                    words: ["fun","time"]
+                }
+            );
+            pass();
+        }
+    );
+
+});
+
+QUnit.test("append", function(assert) {
+
+    var api = new HundoWord.API(hundoword_django_host + "/api");
+    check_user(api,"tester0","tester0","tester0@hundoword.com");
+
+    var sane_jane = api.student.create({first_name: "Sane", last_name: "Jane", age: 5,words:["fun","time"]});
+
+    assert.deepEqual(
+        api.student.append(sane_jane.id,["dee","lite"]),
+        {
+            id: sane_jane.id,
+            first_name: "Sane", 
+            last_name: "Jane",
+            age: 5,
+            words: ["dee","fun","lite","time"]
+        }
+    );
+
+    assert.deepEqual(
+        api.student.select(sane_jane.id),
+        {
+            id: sane_jane.id,
+            first_name: "Sane", 
+            last_name: "Jane",
+            age: 5,
+            words: ["dee","fun","lite","time"]
+        }
+    );
+
+    var pass = assert.async();
+    api.student.append(sane_jane.id,["groove"],
+        function (data) {
+            assert.deepEqual(
+                data,
+                {
+                    id: sane_jane.id,
+                    first_name: "Sane", 
+                    last_name: "Jane",
+                    age: 5,
+                    words: ["dee","fun","groove","lite","time"]
+                }
+            );
+            pass();
+        }
+    );
+
+});
+
+QUnit.test("remove", function(assert) {
+
+    var api = new HundoWord.API(hundoword_django_host + "/api");
+    check_user(api,"tester0","tester0","tester0@hundoword.com");
+
+    var sane_jane = api.student.create({first_name: "Sane", last_name: "Jane", age: 5,words:["dee","fun","groove","lite","time"]});
+
+    assert.deepEqual(
+        api.student.remove(sane_jane.id,["dee","lite"]),
+        {
+            id: sane_jane.id,
+            first_name: "Sane", 
+            last_name: "Jane",
+            age: 5,
+            words: ["fun","groove","time"]
+        }
+    );
+
+    assert.deepEqual(
+        api.student.select(sane_jane.id),
+        {
+            id: sane_jane.id,
+            first_name: "Sane", 
+            last_name: "Jane",
+            age: 5,
+            words: ["fun","groove","time"]
+        }
+    );
+
+    var pass = assert.async();
+    api.student.remove(sane_jane.id,["groove"],
+        function (data) {
+            assert.deepEqual(
+                data,
+                {
+                    id: sane_jane.id,
+                    first_name: "Sane", 
+                    last_name: "Jane",
+                    age: 5,
+                    words: ["fun","time"]
+                }
+            );
+            pass();
+        }
+    );
+
+});
+
+QUnit.test("attain", function(assert) {
+
+    var api = new HundoWord.API(hundoword_django_host + "/api");
+    check_user(api,"tester0","tester0","tester0@hundoword.com");
+
+    var sane_jane = api.student.create({first_name: "Sane", last_name: "Jane", age: 5,words:["fun","time"]});
+    var sight = api.achievement.create({name: make_achievement("Sight"), description: "See it"});
+    var sound = api.achievement.create({name: make_achievement("Sound"),description: "Hear it"});
+
+    var progress = api.student.attain(sane_jane.id,"fun",make_achievement("Sight"));
+
+    assert.equal(progress.word,"fun");
+    assert.equal(progress.achievement,make_achievement("Sight"));
+    assert.equal(progress.hold,true);
+
+    var pass = assert.async();
+    api.student.attain(sane_jane.id,"time",make_achievement("Sound"),
+        function (data) {
+            assert.equal(data.word,"time");
+            assert.equal(data.achievement,make_achievement("Sound"));
+            assert.equal(data.hold,true);
+            pass();
+        }
+    );
+
+});
+
+QUnit.test("yield", function(assert) {
+
+    var api = new HundoWord.API(hundoword_django_host + "/api");
+    check_user(api,"tester0","tester0","tester0@hundoword.com");
+
+    var sane_jane = api.student.create({first_name: "Sane", last_name: "Jane", age: 5,words:["fun","time"]});
+    var sight = api.achievement.create({name: make_achievement("Sight"), description: "See it"});
+    var sound = api.achievement.create({name: make_achievement("Sound"),description: "Hear it"});
+
+    var progress = api.student.yield(sane_jane.id,"fun",make_achievement("Sight"));
+
+    assert.equal(progress.word,"fun");
+    assert.equal(progress.achievement,make_achievement("Sight"));
+    assert.equal(progress.hold,false);
+
+    var pass = assert.async();
+    api.student.yield(sane_jane.id,"time",make_achievement("Sound"),
+        function (data) {
+            assert.equal(data.word,"time");
+            assert.equal(data.achievement,make_achievement("Sound"));
+            assert.equal(data.hold,false);
+            pass();
+        }
+    );
+
+});
+
+QUnit.test("position", function(assert) {
+
+    var api = new HundoWord.API(hundoword_django_host + "/api");
+    check_user(api,"tester0","tester0","tester0@hundoword.com");
+
+    var sane_jane = api.student.create({first_name: "Sane", last_name: "Jane", age: 5,words:["fun","time"]});
+    var sight = api.achievement.create({name: make_achievement("Sight"), description: "See it"});
+    var sound = api.achievement.create({name: make_achievement("Sound"),description: "Hear it"});
+
+    api.student.attain(sane_jane.id,"fun",make_achievement("Sight"));
+    api.student.attain(sane_jane.id,"time",make_achievement("Sound"));
+
+    assert.deepEqual(
+        api.student.position(sane_jane.id),
+        [
+            {
+                word: "fun",
+                achievements: [make_achievement("Sight")]
+            },
+            {
+                word: "time",
+                achievements: [make_achievement("Sound")]
+            }
+        ]
+    );
+
+    var pass = assert.async();
+    api.student.position(sane_jane.id,
+        function (data) {
+            assert.deepEqual(
+                data,
+                [
+                    {
+                        word: "fun",
+                        achievements: [make_achievement("Sight")]
+                    },
+                    {
+                        word: "time",
+                        achievements: [make_achievement("Sound")]
+                    }
+                ]
+            );
+            pass();
+        }
+    );
+
+});
+
+QUnit.test("progress", function(assert) {
+
+    var api = new HundoWord.API(hundoword_django_host + "/api");
+    check_user(api,"tester0","tester0","tester0@hundoword.com");
+
+    var sane_jane = api.student.create({first_name: "Sane", last_name: "Jane", age: 5,words:["fun","time"]});
+    var sight = api.achievement.create({name: make_achievement("Sight"), description: "See it"});
+    var sound = api.achievement.create({name: make_achievement("Sound"),description: "Hear it"});
+
+    api.student.attain(sane_jane.id,"fun",make_achievement("Sight"));
+    api.student.yield(sane_jane.id,"time",make_achievement("Sound"));
+
+    var progress = api.student.progress(sane_jane.id)
+
+    assert.equal(progress[0].word,"time");
+    assert.equal(progress[0].achievement,make_achievement("Sound"));
+    assert.equal(progress[0].hold,false);
+    assert.equal(progress[1].word,"fun");
+    assert.equal(progress[1].achievement,make_achievement("Sight"));
+    assert.equal(progress[1].hold,true);
+
+    var pass = assert.async();
+    api.student.progress(sane_jane.id,
+        function (data) {
+            assert.equal(data[0].word,"time");
+            assert.equal(data[0].achievement,make_achievement("Sound"));
+            assert.equal(data[0].hold,false);
+            assert.equal(data[1].word,"fun");
+            assert.equal(data[1].achievement,make_achievement("Sight"));
+            assert.equal(data[1].hold,true);
+            pass();
+        }
+    );
+
+});
+
+QUnit.test("delete", function(assert) {
+
+    var api = new HundoWord.API(hundoword_django_host + "/api");
+    check_user(api,"tester0","tester0","tester0@hundoword.com");
+
+    var sane_jane = api.student.create({first_name: "Sane", last_name: "Jane", age: 5,words:["fun","time"]});
+    var silly_billy = api.student.create({first_name: "Silly", last_name: "Billy", age: 3,words: ["base","time"]});
+
+    assert.deepEqual(api.student.delete(sane_jane.id),{});
+
+    assert.deepEqual(
+        api.student.list(),
+        [
+            {
+                id: silly_billy.id,
+                first_name: "Silly", 
+                last_name: "Billy",
+                age: 3,
+                words: ["base","time"]
+            }
+        ]
+    );
+
+    var pass = assert.async();
+    api.student.delete(silly_billy.id,
+        function (data) {
+            assert.deepEqual(data,{});
+            pass();
+        }
+    );
+
+});
+
