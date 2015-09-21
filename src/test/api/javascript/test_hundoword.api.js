@@ -529,13 +529,170 @@ QUnit.module("HundoWord.Achievement", {
 
 });
 
-QUnit.test("successes", function(assert) {
+QUnit.test("create", function(assert) {
 
     var api = new HundoWord.API(hundoword_django_host + "/api");
     check_user(api,"tester0","tester0","tester0@hundoword.com");
 
+    var sight = api.achievement.create({name: make_achievement("Sight"), description: "See it"});
+    assert.equal(sight.name,make_achievement("Sight"));
+    assert.equal(sight.description,"See it");
 
-    assert.ok(true);
+    var pass = assert.async();
+    api.achievement.create({name: make_achievement("Sound"), description: "Hear it"},
+        function (data) {
+            assert.equal(data.name,make_achievement("Sound"));
+            assert.equal(data.description,"Hear it");
+            pass();
+        }
+    );
 
 });
 
+QUnit.test("select", function(assert) {
+
+    var api = new HundoWord.API(hundoword_django_host + "/api");
+    check_user(api,"tester0","tester0","tester0@hundoword.com");
+
+    var sight = api.achievement.create({name: make_achievement("Sight"), description: "See it"});
+
+    assert.deepEqual(
+        api.achievement.select(sight.id),
+        {
+            id: sight.id,
+            name: make_achievement("Sight"),
+            description: "See it"
+        }
+    );
+
+    var pass = assert.async();
+    api.achievement.select(sight.id,
+        function (data) {
+            assert.equal(data.name,make_achievement("Sight"));
+            assert.equal(data.description,"See it");
+            pass();
+        }
+    );
+
+});
+
+QUnit.test("list", function(assert) {
+
+    var api = new HundoWord.API(hundoword_django_host + "/api");
+    check_user(api,"tester0","tester0","tester0@hundoword.com");
+
+    var sight = api.achievement.create({name: make_achievement("Sight"), description: "See it"});
+    var sound = api.achievement.create({name: make_achievement("Sound"),description: "Hear it"});
+
+    assert.deepEqual(
+        api.achievement.list(),
+        [
+            {
+                id: sight.id,
+                name: make_achievement("Sight"),
+                description: "See it"
+            },
+            {
+                id: sound.id,
+                name: make_achievement("Sound"),
+                description: "Hear it"
+            }
+        ]
+    );
+
+    var pass = assert.async();
+    api.achievement.list(
+        function (data) {
+            assert.deepEqual(
+                data,
+                [
+                    {
+                        id: sight.id,
+                        name: make_achievement("Sight"),
+                        description: "See it"
+                    },
+                    {
+                        id: sound.id,
+                        name: make_achievement("Sound"),
+                        description: "Hear it"
+                    }
+                ]
+            );
+            pass();
+        }
+    );
+
+});
+
+QUnit.test("update", function(assert) {
+
+    var api = new HundoWord.API(hundoword_django_host + "/api");
+    check_user(api,"tester0","tester0","tester0@hundoword.com");
+
+    var sight = api.achievement.create({name: make_achievement("Sight"), description: "See it"});
+
+    assert.deepEqual(
+        api.achievement.update(sight.id,{description: "View it"}),
+        {
+            id: sight.id,
+            name: make_achievement("Sight"),
+            description: "View it"
+        }
+    );
+
+    assert.deepEqual(
+        api.achievement.select(sight.id),
+        {
+            id: sight.id,
+            name: make_achievement("Sight"),
+            description: "View it"
+        }
+    );
+
+    var pass = assert.async();
+    api.achievement.update(sight.id,{description: "See it"},
+        function (data) {
+            assert.deepEqual(
+                data,
+                {
+                    id: sight.id,
+                    name: make_achievement("Sight"),
+                    description: "See it"
+                }
+            );
+            pass();
+        }
+    );
+
+});
+
+QUnit.test("delete", function(assert) {
+
+    var api = new HundoWord.API(hundoword_django_host + "/api");
+    check_user(api,"tester0","tester0","tester0@hundoword.com");
+
+    var sight = api.achievement.create({name: make_achievement("Sight"), description: "See it"});
+    var sound = api.achievement.create({name: make_achievement("Sound"),description: "Hear it"});
+
+    assert.deepEqual(api.achievement.delete(sight.id),{});
+
+    assert.deepEqual(
+        api.achievement.list(),
+        [
+            {
+                id: sound.id,
+                name: make_achievement("Sound"),
+                description: "Hear it"
+            }
+        ]
+    );
+
+    var pass = assert.async();
+    api.achievement.delete(sound.id,
+        function (data) {
+            assert.deepEqual(data,{});
+            pass();
+        }
+    );
+
+});
