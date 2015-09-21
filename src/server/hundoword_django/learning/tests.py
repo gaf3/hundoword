@@ -217,7 +217,7 @@ class test_Django(SimpleTestCase):
 
         # Delete
 
-        self.assertEqual(client.delete("/learning/achievement/%s" % plain_id).data,None)
+        self.assertEqual(client.delete("/learning/achievement/%s" % plain_id).data,{})
 
         self.assertEqual([dict(achievement) for achievement in client.get("/learning/achievement/").data],[
             {
@@ -367,7 +367,7 @@ class test_Django(SimpleTestCase):
 
         # Delete
 
-        self.assertEqual(client.delete("/learning/program/%s" % plain_id).data,None)
+        self.assertEqual(client.delete("/learning/program/%s" % plain_id).data,{})
 
         self.assertEqual([dict(program) for program in client.get("/learning/program/").data],[
             {
@@ -583,7 +583,7 @@ class test_Django(SimpleTestCase):
 
         client.force_authenticate(user=user)
 
-        self.assertEqual(client.delete("/learning/student/%s" % plain_jane_id).data,None)
+        self.assertEqual(client.delete("/learning/student/%s" % plain_jane_id).data,{})
 
         self.assertEqual([dict(student) for student in client.get("/learning/student/").data],[
             {

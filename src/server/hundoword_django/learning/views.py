@@ -123,7 +123,7 @@ def achievement(request,pk='',action=''):
 
             achievement = Achievement.objects.get(pk=pk)
             achievement.delete()
-            return Response()
+            return Response({})
 
     except Achievement.DoesNotExist as exception:
 
@@ -240,7 +240,7 @@ def program(request,pk='',action=''):
 
             program = Program.objects.get(pk=pk)
             program.delete()
-            return Response()
+            return Response({})
 
     except Program.DoesNotExist as exception:
 
@@ -411,7 +411,7 @@ def student(request,pk='',action=''):
 
             student = Student.objects.get(teacher=request.user,pk=pk)
             student.delete()
-            return Response()
+            return Response({})
 
     except Student.DoesNotExist as exception:
 
