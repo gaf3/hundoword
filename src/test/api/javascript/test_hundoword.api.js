@@ -249,15 +249,15 @@ QUnit.module("HundoWord.API", {
 
 QUnit.test("constructor", function(assert) {
 
-    var api = new HundoWord.API("learning");
+    var api = new HundoWord.API("learning/");
 
-    assert.equal(api.url,"learning");
+    assert.equal(api.url,"learning/");
 
 });
 
 QUnit.test("headers", function(assert) {
 
-    var api = new HundoWord.API("learning.com");
+    var api = new HundoWord.API("learning.com/");
     api.token = "funspot"
 
     assert.deepEqual(api.headers(),{authorization: "Token funspot"});
@@ -266,7 +266,7 @@ QUnit.test("headers", function(assert) {
 
 QUnit.test("build_url", function(assert) {
 
-    var api = new HundoWord.API("learning.com");
+    var api = new HundoWord.API("learning.com/");
 
     assert.equal(api.build_url("stuff"),"learning.com/stuff/");
     assert.equal(api.build_url("stuff",1),"learning.com/stuff/1/");
@@ -277,7 +277,7 @@ QUnit.test("build_url", function(assert) {
 
 QUnit.test("register", function(assert) {
 
-    var api = new HundoWord.API(hundoword_django_host + "/api");
+    var api = new HundoWord.API(hundoword_django_host + "/api/");
 
     try {
 
@@ -309,7 +309,7 @@ QUnit.test("register", function(assert) {
 
 QUnit.test("login", function(assert) {
 
-    var api = new HundoWord.API(hundoword_django_host + "/api");
+    var api = new HundoWord.API(hundoword_django_host + "/api/");
 
     try {
 
@@ -367,7 +367,7 @@ QUnit.module("HundoWord.Base", {
 
 QUnit.test("failures", function(assert) {
 
-    var api = new HundoWord.API(hundoword_django_host + "/api");
+    var api = new HundoWord.API(hundoword_django_host + "/api/");
     check_user(api,"tester0","tester0","tester0@hundoword.com");
     var entity = new HundoWord.Base(api,"stuff");
 
@@ -525,7 +525,7 @@ QUnit.module("HundoWord.Words", {
 
 QUnit.test("failures", function(assert) {
 
-    var api = new HundoWord.API(hundoword_django_host + "/api");
+    var api = new HundoWord.API(hundoword_django_host + "/api/");
     check_user(api,"tester0","tester0","tester0@hundoword.com");
     var entity = new HundoWord.Words(api,"stuff");
 
@@ -603,7 +603,7 @@ QUnit.module("HundoWord.Achievement", {
 
 QUnit.test("create", function(assert) {
 
-    var api = new HundoWord.API(hundoword_django_host + "/api");
+    var api = new HundoWord.API(hundoword_django_host + "/api/");
     check_user(api,"tester0","tester0","tester0@hundoword.com");
 
     var sight = api.achievement.create({name: make_achievement("Sight"), description: "See it"});
@@ -623,7 +623,7 @@ QUnit.test("create", function(assert) {
 
 QUnit.test("select", function(assert) {
 
-    var api = new HundoWord.API(hundoword_django_host + "/api");
+    var api = new HundoWord.API(hundoword_django_host + "/api/");
     check_user(api,"tester0","tester0","tester0@hundoword.com");
 
     var sight = api.achievement.create({name: make_achievement("Sight"), description: "See it"});
@@ -656,7 +656,7 @@ QUnit.test("select", function(assert) {
 
 QUnit.test("list", function(assert) {
 
-    var api = new HundoWord.API(hundoword_django_host + "/api");
+    var api = new HundoWord.API(hundoword_django_host + "/api/");
     check_user(api,"tester0","tester0","tester0@hundoword.com");
 
     var sight = api.achievement.create({name: make_achievement("Sight"), description: "See it"});
@@ -704,7 +704,7 @@ QUnit.test("list", function(assert) {
 
 QUnit.test("update", function(assert) {
 
-    var api = new HundoWord.API(hundoword_django_host + "/api");
+    var api = new HundoWord.API(hundoword_django_host + "/api/");
     check_user(api,"tester0","tester0","tester0@hundoword.com");
 
     var sight = api.achievement.create({name: make_achievement("Sight"), description: "See it"});
@@ -746,7 +746,7 @@ QUnit.test("update", function(assert) {
 
 QUnit.test("delete", function(assert) {
 
-    var api = new HundoWord.API(hundoword_django_host + "/api");
+    var api = new HundoWord.API(hundoword_django_host + "/api/");
     check_user(api,"tester0","tester0","tester0@hundoword.com");
 
     var sight = api.achievement.create({name: make_achievement("Sight"), description: "See it"});
@@ -791,7 +791,7 @@ QUnit.module("HundoWord.Program", {
 
 QUnit.test("create", function(assert) {
 
-    var api = new HundoWord.API(hundoword_django_host + "/api");
+    var api = new HundoWord.API(hundoword_django_host + "/api/");
     check_user(api,"tester0","tester0","tester0@hundoword.com");
 
     var sight = api.program.create({name: make_program("Fundamentals"), description: "Fun time",words:["fun","time"]});
@@ -813,7 +813,7 @@ QUnit.test("create", function(assert) {
 
 QUnit.test("select", function(assert) {
 
-    var api = new HundoWord.API(hundoword_django_host + "/api");
+    var api = new HundoWord.API(hundoword_django_host + "/api/");
     check_user(api,"tester0","tester0","tester0@hundoword.com");
 
     var sight = api.program.create({name: make_program("Fundamentals"), description: "Fun time",words:["fun","time"]});
@@ -848,7 +848,7 @@ QUnit.test("select", function(assert) {
 
 QUnit.test("list", function(assert) {
 
-    var api = new HundoWord.API(hundoword_django_host + "/api");
+    var api = new HundoWord.API(hundoword_django_host + "/api/");
     check_user(api,"tester0","tester0","tester0@hundoword.com");
 
     var sight = api.program.create({name: make_program("Fundamentals"), description: "Fun time",words:["fun","time"]});
@@ -900,7 +900,7 @@ QUnit.test("list", function(assert) {
 
 QUnit.test("update", function(assert) {
 
-    var api = new HundoWord.API(hundoword_django_host + "/api");
+    var api = new HundoWord.API(hundoword_django_host + "/api/");
     check_user(api,"tester0","tester0","tester0@hundoword.com");
 
     var sight = api.program.create({name: make_program("Fundamentals"), description: "Fun time",words:["fun","time"]});
@@ -945,7 +945,7 @@ QUnit.test("update", function(assert) {
 
 QUnit.test("append", function(assert) {
 
-    var api = new HundoWord.API(hundoword_django_host + "/api");
+    var api = new HundoWord.API(hundoword_django_host + "/api/");
     check_user(api,"tester0","tester0","tester0@hundoword.com");
 
     var sight = api.program.create({name: make_program("Fundamentals"), description: "Fun time",words:["fun","time"]});
@@ -990,7 +990,7 @@ QUnit.test("append", function(assert) {
 
 QUnit.test("remove", function(assert) {
 
-    var api = new HundoWord.API(hundoword_django_host + "/api");
+    var api = new HundoWord.API(hundoword_django_host + "/api/");
     check_user(api,"tester0","tester0","tester0@hundoword.com");
 
     var sight = api.program.create({name: make_program("Fundamentals"), description: "Fun time",words:["dee","fun","groove","lite","time"]});
@@ -1035,7 +1035,7 @@ QUnit.test("remove", function(assert) {
 
 QUnit.test("delete", function(assert) {
 
-    var api = new HundoWord.API(hundoword_django_host + "/api");
+    var api = new HundoWord.API(hundoword_django_host + "/api/");
     check_user(api,"tester0","tester0","tester0@hundoword.com");
 
     var sight = api.program.create({name: make_program("Fundamentals"), description: "Fun time",words:["fun","time"]});
@@ -1083,7 +1083,7 @@ QUnit.module("HundoWord.Student", {
 
 QUnit.test("create", function(assert) {
 
-    var api = new HundoWord.API(hundoword_django_host + "/api");
+    var api = new HundoWord.API(hundoword_django_host + "/api/");
     check_user(api,"tester0","tester0","tester0@hundoword.com");
 
     var sane_jane = api.student.create({first_name: "Sane", last_name: "Jane", age: 5,words:["fun","time"]});
@@ -1107,7 +1107,7 @@ QUnit.test("create", function(assert) {
 
 QUnit.test("select", function(assert) {
 
-    var api = new HundoWord.API(hundoword_django_host + "/api");
+    var api = new HundoWord.API(hundoword_django_host + "/api/");
     check_user(api,"tester0","tester0","tester0@hundoword.com");
 
     var sane_jane = api.student.create({first_name: "Sane", last_name: "Jane", age: 5,words:["fun","time"]});
@@ -1144,7 +1144,7 @@ QUnit.test("select", function(assert) {
 
 QUnit.test("list", function(assert) {
 
-    var api = new HundoWord.API(hundoword_django_host + "/api");
+    var api = new HundoWord.API(hundoword_django_host + "/api/");
     check_user(api,"tester0","tester0","tester0@hundoword.com");
 
     var sane_jane = api.student.create({first_name: "Sane", last_name: "Jane", age: 5,words:["fun","time"]});
@@ -1200,7 +1200,7 @@ QUnit.test("list", function(assert) {
 
 QUnit.test("update", function(assert) {
 
-    var api = new HundoWord.API(hundoword_django_host + "/api");
+    var api = new HundoWord.API(hundoword_django_host + "/api/");
     check_user(api,"tester0","tester0","tester0@hundoword.com");
 
     var sane_jane = api.student.create({first_name: "Sane", last_name: "Jane", age: 5,words:["fun","time"]});
@@ -1248,7 +1248,7 @@ QUnit.test("update", function(assert) {
 
 QUnit.test("append", function(assert) {
 
-    var api = new HundoWord.API(hundoword_django_host + "/api");
+    var api = new HundoWord.API(hundoword_django_host + "/api/");
     check_user(api,"tester0","tester0","tester0@hundoword.com");
 
     var sane_jane = api.student.create({first_name: "Sane", last_name: "Jane", age: 5,words:["fun","time"]});
@@ -1296,7 +1296,7 @@ QUnit.test("append", function(assert) {
 
 QUnit.test("remove", function(assert) {
 
-    var api = new HundoWord.API(hundoword_django_host + "/api");
+    var api = new HundoWord.API(hundoword_django_host + "/api/");
     check_user(api,"tester0","tester0","tester0@hundoword.com");
 
     var sane_jane = api.student.create({first_name: "Sane", last_name: "Jane", age: 5,words:["dee","fun","groove","lite","time"]});
@@ -1344,7 +1344,7 @@ QUnit.test("remove", function(assert) {
 
 QUnit.test("attain", function(assert) {
 
-    var api = new HundoWord.API(hundoword_django_host + "/api");
+    var api = new HundoWord.API(hundoword_django_host + "/api/");
     check_user(api,"tester0","tester0","tester0@hundoword.com");
 
     var sane_jane = api.student.create({first_name: "Sane", last_name: "Jane", age: 5,words:["fun","time"]});
@@ -1371,7 +1371,7 @@ QUnit.test("attain", function(assert) {
 
 QUnit.test("yield", function(assert) {
 
-    var api = new HundoWord.API(hundoword_django_host + "/api");
+    var api = new HundoWord.API(hundoword_django_host + "/api/");
     check_user(api,"tester0","tester0","tester0@hundoword.com");
 
     var sane_jane = api.student.create({first_name: "Sane", last_name: "Jane", age: 5,words:["fun","time"]});
@@ -1398,7 +1398,7 @@ QUnit.test("yield", function(assert) {
 
 QUnit.test("position", function(assert) {
 
-    var api = new HundoWord.API(hundoword_django_host + "/api");
+    var api = new HundoWord.API(hundoword_django_host + "/api/");
     check_user(api,"tester0","tester0","tester0@hundoword.com");
 
     var sane_jane = api.student.create({first_name: "Sane", last_name: "Jane", age: 5,words:["fun","time"]});
@@ -1446,7 +1446,7 @@ QUnit.test("position", function(assert) {
 
 QUnit.test("progress", function(assert) {
 
-    var api = new HundoWord.API(hundoword_django_host + "/api");
+    var api = new HundoWord.API(hundoword_django_host + "/api/");
     check_user(api,"tester0","tester0","tester0@hundoword.com");
 
     var sane_jane = api.student.create({first_name: "Sane", last_name: "Jane", age: 5,words:["fun","time"]});
@@ -1482,7 +1482,7 @@ QUnit.test("progress", function(assert) {
 
 QUnit.test("delete", function(assert) {
 
-    var api = new HundoWord.API(hundoword_django_host + "/api");
+    var api = new HundoWord.API(hundoword_django_host + "/api/");
     check_user(api,"tester0","tester0","tester0@hundoword.com");
 
     var sane_jane = api.student.create({first_name: "Sane", last_name: "Jane", age: 5,words:["fun","time"]});

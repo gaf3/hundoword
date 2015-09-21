@@ -138,7 +138,7 @@ HundoWord.API.prototype.headers = function() {
 
 HundoWord.API.prototype.build_url = function(path,id,action) {
 
-    var url = this.url + "/" + path + "/";
+    var url = this.url + path + "/";
 
     if (typeof id !== 'undefined') {
         url += id + "/";
