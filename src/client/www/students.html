@@ -1,0 +1,28 @@
+{{#def.Header}}
+<div class="uk-overflow-container">
+    <table class="uk-table uk-table-hover">
+        <thead>
+            <tr>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Age</th>
+                <th>Words</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{~it.students :student}}
+            <tr OnClick="Learning.go('student/select',{{=student.id}})">
+                <td>{{=student.first_name}}</td>
+                <td>{{=student.last_name}}</td>
+                <td>{{=student.age}}</td>
+                <td>{{=Learning.current.controller.words_string(student.words)}}</td>
+            </tr>
+            {{~}}
+        </tbody>
+    </table>
+</div>
+<br/>
+<button OnClick="Learning.go('student/new')" class="uk-button uk-button-primary">
+    <i class="uk-icon-plus"></i> New
+</button>
+{{#def.Footer}}

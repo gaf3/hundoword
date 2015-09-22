@@ -1,81 +1,67 @@
-Learning.controller("Play",null,{
-    clear: function() {
-        clearTimeout(this.application.timeout);
+Learning.controller("Achievement","Changeable",{
+    list: function() {
+        achievements: hwAPI.achievement.list($.proxy(this.listed,this));
     },
-    playable: function() {
-        this.it = {codes: hwAPI.run(null,"playable")};
+    listed: function(achievements) {
+        this.it = {achievements: achievements};
         this.application.render(this.it);
-        this.clear();
-        this.application.timeout = setTimeout($.proxy(this.playable,this),30000);
     },
-    create: function(code_id) {
-        hwAPI.run(null,null,{"code_id": code_id});
-        this.application.go('play/current');
+    select: function() {
+        hwAPI.achievement.select(this.application.current.path.achievement_id,$.proxy(this.selected,this));
     },
-    joinable: function() {
-        this.it = {runs: hwAPI.run(null,"joinable")};
+    selected: function(achievement) {
+        this.it = {achievement: achievement};
         this.application.render(this.it);
-        this.clear();
-        this.application.timeout = setTimeout($.proxy(this.joinable,this),5000);
-    },
-    join: function(run_id) {
-        hwAPI.run(run_id,"join");
-        this.application.go('play/current');
-    },
-    current: function() {
-        this.it = {runs: hwAPI.run(null,"current")};
+    },    
+    new: function() {
+        this.it = {achievement: {}};
         this.application.render(this.it);
-        this.clear();
-        this.application.timeout = setTimeout($.proxy(this.current,this),5000);
+        this.changing();
     },
-    leave: function(run_id) {
-        hwAPI.run(run_id,"leave");
-        this.application.go('play/join');
+    edit: function() {
+        this.changing();
     },
-    public: function(run_id) {
-        hwAPI.run(run_id,"public");
-        this.application.refresh();
+    save: function() {
+        var achievement_id = $("#achievement_id").val();
+        var achievement = {
+            name: $("#name").val(), 
+            description: $("#description").val()
+        };
+        if (achievement_id) {
+            hwAPI.achievement.update(achievement_id,achievement,$.proxy(this.updated,this));
+        } else {
+            hwAPI.achievement.create(achievement,$.proxy(this.created,this));
+        }
     },
-    private: function(run_id) {
-        hwAPI.run(run_id,"private");
-        this.application.refresh();
-    },
-    start: function(run_id) {
-        hwAPI.run(run_id,"start");
-        this.application.refresh();
-    },
-    play: function(run_id) {
-        alert('Coming soon!');
-    },
-    watchable: function() {
-        this.it = {runs: hwAPI.run(null,"watchable")};
+    updated: function(achievement) {
+        this.it = {achievement: achievement};
         this.application.render(this.it);
-        this.clear();
-        this.application.timeout = setTimeout($.proxy(this.watchable,this),5000);
+    }, 
+    created: function(achievement) {
+        this.application.go('achievement/select',achievement.id);
     },
-    watch: function(run_id) {
-        alert('Coming soon!');
+    cancel: function() {
+        var achievement_id = $("#achievement_id").val();
+        if (achievement_id) {
+            this.selecting();
+        } else {
+            this.application.go('achievement');
+        }
     },
-    history: function() {
-        this.it = {runs: hwAPI.run(null,"history")};
-        this.application.render(this.it);
-        this.clear();
-        this.application.timeout = setTimeout($.proxy(this.history,this),30000);
+    delete: function() {
+        if (confirm("Are you sure?") == true) {
+            hwAPI.achievement.delete(this.application.current.path.achievement_id,$.proxy(this.deleted,this));
+        }
+    },
+    deleted: function() {
+        this.application.go('achievement');
     }
 });
 
-Learning.partial("PlayTabs",Learning.load("play/tabs"));
+Learning.template("Achievements",Learning.load("achievements"),null,Learning.partials);
+Learning.template("Achievement",Learning.load("achievement"),null,Learning.partials);
 
-Learning.template("New",Learning.load("play/new"),null,Learning.partials);
-Learning.template("Join",Learning.load("play/join"),null,Learning.partials);
-Learning.template("Current",Learning.load("play/current"),null,Learning.partials);
-Learning.template("Watch",Learning.load("play/watch"),null,Learning.partials);
-Learning.template("History",Learning.load("play/history"),null,Learning.partials);
-
-Learning.route("play","/play/",null,null,function() {this.application.go('play/join')});
-Learning.route("play/new","/play/new/","New","Play","playable","clear");
-Learning.route("play/join","/play/join/","Join","Play","joinable","clear");
-Learning.route("play/current","/play/current/","Current","Play","current","clear");
-Learning.route("play/watch","/play/watch/","Watch","Play","watchable","clear");
-Learning.route("play/history","/play/history/","History","Play","history","clear");
+Learning.route("achievement","/achievement/","Achievements","Achievement","list");
+Learning.route("achievement/select","/achievement/{achievement_id:^\\d+$}","Achievement","Achievement","select");
+Learning.route("achievement/new","/achievement/new/","Achievement","Achievement","new");
 
