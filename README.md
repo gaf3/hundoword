@@ -30,16 +30,6 @@ vagrant ssh
 
 This will create an Ubuntu server and map the vagrant user's src directory to the checked out src directory.  It'll also map 192.168.72.87 locally to the VM.
 
-# Web Interface
-
-## Client 
-
-In development as in hasn't written a single line yet. 
-
-## Admin 
-
-Go to http://192.168.72.87/admin/ to get at the database directly.  This has accounts, words, etc. 
-
 # Data
 
 * Achievements - What a student can do to identify or understand a word.
@@ -59,7 +49,7 @@ Go to http://192.168.72.87/admin/ to get at the database directly.  This has acc
   * user
   * key
 * Student
-  * teacher - User that managers the students progress
+  * teacher - User that managers the students progress (defaults to user)
   * first_name
   * last_name 
   * age
@@ -73,6 +63,26 @@ Go to http://192.168.72.87/admin/ to get at the database directly.  This has acc
   * word
   * hold - Whether attained or yielded
   * at - The date and time of the progress
+
+# Web
+
+## Client 
+
+Go to http://192.168.72.87 for the web site.  It's JavaScript interactive site so there's #'s before all the links.
+
+* #/ - Home: Just a basic splash screen
+* #/regsiter/ - Register: Register a new user
+* #/login/ - Login: Log in as an existing user
+* #/achievement/ - Achievements: List existing achievements or create a new one
+* #/achievement/<id> - Achievement: Selecting existing achievement, edit or delete.
+* #/program/ - Programs: List existing programs or create a new one
+* #/program/<id> - Program: Selecting existing program, edit or delete.
+* #/student/ - Students: List existing students or create a new one
+* #/student/<id> - Student: Selecting existing student, edit or delete.
+
+## Admin 
+
+Go to http://192.168.72.87/admin/ to get at the database directly.  This has accounts, words, etc. 
 
 # API
 
