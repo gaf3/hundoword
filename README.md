@@ -68,17 +68,17 @@ This will create an Ubuntu server and map the vagrant user's src directory to th
 
 ## Client 
 
-Go to http://192.168.72.87 for the web site.  It's JavaScript interactive site so there's #'s before all the links.
+Go to http://192.168.72.87/ for the web site.  It's JavaScript interactive site so there's #'s before all the links.
 
-* #/ - Home: Just a basic splash screen
-* #/regsiter/ - Register: Register a new user
-* #/login/ - Login: Log in as an existing user
-* #/achievement/ - Achievements: List existing achievements or create a new one
-* #/achievement/<id> - Achievement: Selecting existing achievement, edit or delete.
-* #/program/ - Programs: List existing programs or create a new one
-* #/program/<id> - Program: Selecting existing program, edit or delete.
-* #/student/ - Students: List existing students or create a new one
-* #/student/<id> - Student: Selecting existing student, edit or delete.
+* `#/` - Home: Just a basic splash screen
+* `#/regsiter/` - Register: Register a new user
+* `#/login/` - Login: Log in as an existing user
+* `#/achievement/` - Achievements: List existing achievements or create a new one
+* `#/achievement/<id>` - Achievement: Selecting existing achievement using id, edit or delete.
+* `#/program/` - Programs: List existing programs or create a new one
+* `#/program/<id>` - Program: Selecting existing program using id, edit or delete.
+* `#/student/` - Students: List existing students or create a new one
+* `#/student/<id>` - Student: Selecting existing student using id, edit or delete.
 
 ## Admin 
 
