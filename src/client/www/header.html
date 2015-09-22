@@ -1,0 +1,32 @@
+<div class="uk-container uk-container-center uk-margin-top uk-margin-large-bottom">
+    <nav class="uk-navbar uk-margin-bottom">
+        <ul class="uk-navbar-nav">
+            <li {{? Learning.current.paths[0] == '' }}class="uk-active"{{?}}>
+                <a href="{{=Learning.link('home')}}">Home</a>
+            </li>
+            {{? hwAPI.username }}
+            <li {{? Learning.current.paths[0] == 'achievement' }}class="uk-active"{{?}}>
+                <a href="{{=Learning.link('achievement')}}">Achievements</a>
+            </li>
+            <li {{? Learning.current.paths[0] == 'program' }}class="uk-active"{{?}}>
+                <a href="{{=Learning.link('program')}}">Programs</a>
+            </li>
+            <li {{? Learning.current.paths[0] == 'student' }}class="uk-active"{{?}}>
+                <a href="{{=Learning.link('student')}}">Students</a>
+            </li>
+            <li {{? Learning.current.paths[0] == 'logout' }}class="uk-active"{{?}}>
+                <a href="{{=Learning.link('logout')}}">Logout</a>
+            </li>
+            <li>
+                <a href="{{=Learning.link('home')}}">{{= hwAPI.username}}</a>
+            </li>
+            {{??}}
+            <li {{? Learning.current.paths[0] == 'login' }}class="uk-active"{{?}}>
+                <a href="{{=Learning.link('login')}}">Login</a>
+            </li>
+            <li {{? Learning.current.paths[0] == 'register' }}class="uk-active"{{?}}>
+                <a href="{{=Learning.link('register')}}">Register</a>
+            </li>
+            {{?}}
+        </ul>
+    </nav>

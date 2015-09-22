@@ -1,0 +1,27 @@
+{{#def.Header}}
+<div class="uk-vertical-align uk-text-center uk-height-1-1">
+    <div class="uk-vertical-align-middle" style="width: 250px;">
+        <div id="failed" class="uk-alert uk-alert-danger" style="display: none">
+            Register failed.
+        </div>
+        <form class="uk-panel uk-panel-box uk-form">
+            <div class="uk-form-row">
+                <input id="email" placeholder="Email" type="text" class="uk-width-1-1 uk-form-large"/>
+            </div>
+            <div class="uk-form-row">
+                <input id="password" placeholder="Password" type="password" class="uk-width-1-1 uk-form-large"/>
+            </div>
+            <div class="uk-form-row">
+                <input id="confirm" placeholder="Confirm" type="password" class="uk-width-1-1 uk-form-large"/>
+            </div>
+            <div class="uk-form-row">
+                <button onClick="Learning.controllers.User.register()" class="uk-width-1-1 uk-button uk-button-primary uk-button-large">Register</button>
+            </div>
+            <div class="uk-form-row uk-text-small">
+                <input type="checkbox" name="remember" class="uk-float-left"> Remember Me
+                <!--a class="uk-float-right uk-link uk-link-muted" href="#">Forgot Password?</a-->
+            </div>
+        </form>
+    </div>
+</div>
+{{#def.Footer}}

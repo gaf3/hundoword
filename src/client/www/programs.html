@@ -1,0 +1,26 @@
+{{#def.Header}}
+<div class="uk-overflow-container">
+    <table class="uk-table uk-table-hover">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Words</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{~it.programs :program}}
+            <tr OnClick="Learning.go('program/select',{{=program.id}})">
+                <td>{{=program.name}}</td>
+                <td>{{=program.description}}</td>
+                <td>{{=Learning.current.controller.words_string(program.words)}}</td>
+            </tr>
+            {{~}}
+        </tbody>
+    </table>
+</div>
+<br/>
+<button OnClick="Learning.go('program/new')" class="uk-button uk-button-primary">
+    <i class="uk-icon-plus"></i> New
+</button>
+{{#def.Footer}}

@@ -1,0 +1,71 @@
+{{#def.Header}}
+<div class="uk-overflow-container">
+    <form class="uk-form uk-form-horizontal">
+        <div class="selecting">
+            <button OnClick="Learning.go('student')" class="uk-button uk-button-primary">
+                <i class="uk-icon-bars"></i> List
+            </button>
+            <button OnClick="Learning.current.controller.edit()" class="uk-button uk-button-primary">
+                <i class="uk-icon-pencil"></i> Edit
+            </button>
+            <button OnClick="Learning.current.controller.delete()" class="uk-button uk-button-primary">
+                <i class="uk-icon-times"></i> Delete
+            </button>
+        </div>
+        <div class="changing" style="display: none">
+            <button OnClick="Learning.current.controller.save()" class="uk-button uk-button-primary">
+                <i class="uk-icon-pencil"></i> Save
+            </button>
+            <button OnClick="Learning.current.controller.cancel()" class="uk-button uk-button-primary">
+                <i class="uk-icon-cross"></i> Cancel
+            </button>
+        </div>
+        <br/>
+        <input type="hidden" id="student_id" value="{{=it.student.id || ""}}"/>
+        <div class="uk-form-row">
+            <label class="uk-form-label" for="student-first-name">First Name</label>
+            <div class="uk-form-controls">
+                <div class="selecting">
+                    <span>{{=it.student.first_name}}</span>
+                </div>
+                <div class="changing" style="display: none">
+                    <input id='first_name' value='{{!it.student.first_name || ""}}' type="text" placeholder="First name or initial" class="uk-form-width-large"/>
+                </div>
+            </div>
+        </div>
+        <div class="uk-form-row">
+            <label class="uk-form-label" for="student-name">Last Name</label>
+            <div class="uk-form-controls">
+                <div class="selecting">
+                    <span>{{=it.student.last_name}}</span>
+                </div>
+                <div class="changing" style="display: none">
+                    <input id='last_name' value='{{!it.student.last_name || ""}}' type="text" placeholder="Last name or initial" class="uk-form-width-large"/>
+                </div>
+            </div>
+        </div>
+        <div class="uk-form-row">
+            <label class="uk-form-label" for="student-age">Age</label>
+            <div class="uk-form-controls">
+                <div class="selecting">
+                    <span>{{=it.student.age}}</span>
+                </div>
+                <div class="changing" style="display: none">
+                    <input id='age' value='{{!it.student.age || ""}}' type="text" placeholder="Age in years" class="uk-form-width-large"/>
+                </div>
+            </div>
+        </div>
+        <div class="uk-form-row">
+            <label class="uk-form-label" for="student-description">Words</label>
+            <div class="uk-form-controls">
+                <div class="selecting">
+                    <span>{{=Learning.current.controller.words_string(it.student.words)}}</span>
+                </div>
+                <div class="changing" style="display: none">
+                    <textarea id='words' placeholder="Enter words separated by spaces or commas or both. #yolo" class="uk-form-width-large">{{=Learning.current.controller.words_string(it.student.words)}}</textarea>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+{{#def.Footer}}
