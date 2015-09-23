@@ -233,6 +233,30 @@ function delete_programs() {
 
 }
 
+function filter_achievements(achievements) {
+    filtered = [];
+
+    for (var achievement = 0; achievement < achievements.length; achievement++) {
+        if (achievements[achievement].name.startsWith(make_achievement(""))) {
+            filtered.push(achievements[achievement]);
+        }
+    }
+
+    return filtered;
+}
+
+function filter_programs(programs) {
+    filtered = [];
+
+    for (var program = 0; program < programs.length; program++) {
+        if (programs[program].name.startsWith(make_program(""))) {
+            filtered.push(programs[program]);
+        }
+    }
+
+    return filtered;
+}
+
 QUnit.module("HundoWord");
 
 QUnit.module("HundoWord.API", {
@@ -271,6 +295,7 @@ QUnit.test("build_url", function(assert) {
     assert.equal(api.build_url("stuff"),"learning.com/stuff/");
     assert.equal(api.build_url("stuff",1),"learning.com/stuff/1/");
     assert.equal(api.build_url("stuff",1,"do"),"learning.com/stuff/1/do/");
+    assert.equal(api.build_url("stuff",1,"do",{people: "things"}),"learning.com/stuff/1/do/?people=things");
 
 });
 
@@ -374,6 +399,7 @@ QUnit.test("failures", function(assert) {
     assert.equal(entity.build_url(),"http://192.168.72.87/api/stuff/");
     assert.equal(entity.build_url(1),"http://192.168.72.87/api/stuff/1/");
     assert.equal(entity.build_url(1,"do"),"http://192.168.72.87/api/stuff/1/do/");
+    assert.equal(entity.build_url(1,"do",{people: "things"}),"http://192.168.72.87/api/stuff/1/do/?people=things");
 
     // Check all failures with exceptions
 
@@ -663,7 +689,7 @@ QUnit.test("list", function(assert) {
     var sound = api.achievement.create({name: make_achievement("Sound"),description: "Hear it"});
 
     assert.deepEqual(
-        api.achievement.list(),
+        filter_achievements(api.achievement.list()),
         [
             {
                 id: sight.id,
@@ -682,7 +708,7 @@ QUnit.test("list", function(assert) {
     api.achievement.list(
         function (data) {
             assert.deepEqual(
-                data,
+                filter_achievements(data),
                 [
                     {
                         id: sight.id,
@@ -755,7 +781,7 @@ QUnit.test("delete", function(assert) {
     assert.deepEqual(api.achievement.delete(sight.id),{});
 
     assert.deepEqual(
-        api.achievement.list(),
+        filter_achievements(api.achievement.list()),
         [
             {
                 id: sound.id,
@@ -855,7 +881,7 @@ QUnit.test("list", function(assert) {
     var sound = api.program.create({name: make_program("Basics"), description: "Base time",words: ["base","time"]});
 
     assert.deepEqual(
-        api.program.list(),
+        filter_programs(api.program.list()),
         [
             {
                 id: sound.id,
@@ -876,7 +902,7 @@ QUnit.test("list", function(assert) {
     api.program.list(
         function (data) {
             assert.deepEqual(
-                data,
+                filter_programs(data),
                 [
                     {
                         id: sound.id,
@@ -1044,7 +1070,7 @@ QUnit.test("delete", function(assert) {
     assert.deepEqual(api.program.delete(sight.id),{});
 
     assert.deepEqual(
-        api.program.list(),
+        filter_programs(api.program.list()),
         [
             {
                 id: sound.id,
@@ -1422,8 +1448,32 @@ QUnit.test("position", function(assert) {
         ]
     );
 
+    assert.deepEqual(
+        api.student.position(sane_jane.id,["fun","time"]),
+        [
+            {
+                word: "fun",
+                achievements: [make_achievement("Sight")]
+            },
+            {
+                word: "time",
+                achievements: [make_achievement("Sound")]
+            }
+        ]
+    );
+
+    assert.deepEqual(
+        api.student.position(sane_jane.id,["fun"]),
+        [
+            {
+                word: "fun",
+                achievements: [make_achievement("Sight")]
+            }
+        ]
+    );
+
     var pass = assert.async();
-    api.student.position(sane_jane.id,
+    api.student.position(sane_jane.id,null,
         function (data) {
             assert.deepEqual(
                 data,

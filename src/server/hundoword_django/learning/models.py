@@ -6,7 +6,7 @@ from django.contrib.auth.models import User
 class Achievement(models.Model):
 
     name = models.CharField(max_length=32,unique=True)
-    description = models.CharField(max_length=255,default="")
+    description = models.CharField(max_length=255,blank=True,default="")
 
     class Meta:
         ordering = ['name']
@@ -18,7 +18,7 @@ class Achievement(models.Model):
 class Program(models.Model):
 
     name = models.CharField(max_length=128,unique=True)
-    description = models.CharField(max_length=255,default="")
+    description = models.CharField(max_length=255,blank=True,default="")
 
     class Meta:
         ordering = ['name']
@@ -43,9 +43,9 @@ class ProgramWord(models.Model):
 class Student(models.Model):
 
     teacher = models.ForeignKey(User)
-    first_name = models.CharField(max_length=128)
-    last_name = models.CharField(max_length=128)
-    age = models.IntegerField(blank=True, null=True)
+    first_name = models.CharField(max_length=128,blank=True,default="")
+    last_name = models.CharField(max_length=128,blank=True,default="")
+    age = models.IntegerField(blank=True,null=True)
 
     class Meta:
         ordering = ['teacher','last_name','first_name']

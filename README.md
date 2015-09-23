@@ -56,7 +56,7 @@ This will create an Ubuntu server and map the vagrant user's src directory to th
 * StudentWord - Word a student is working on
   * student
   * word
-  * achivements - achievements student currently holds with the word (many to many)
+  * achievements - achievements student currently holds with the word (many to many)
 * Progress - Event when a student attains or yields an achievement with a word
   * student 
   * achievement
@@ -74,11 +74,12 @@ Go to http://192.168.72.87/ for the web site.  It's JavaScript interactive site 
 * `#/regsiter/` - Register: Register a new user
 * `#/login/` - Login: Log in as an existing user
 * `#/achievement/` - Achievements: List existing achievements or create a new one
-* `#/achievement/<id>` - Achievement: Selecting existing achievement using id, edit or delete.
+* `#/achievement/<id>/` - Achievement: Selecting existing achievement using id, edit or delete.
 * `#/program/` - Programs: List existing programs or create a new one
-* `#/program/<id>` - Program: Selecting existing program using id, edit or delete.
+* `#/program/<id>/` - Program: Selecting existing program using id, edit or delete.
 * `#/student/` - Students: List existing students or create a new one
-* `#/student/<id>` - Student: Selecting existing student using id, edit or delete.
+* `#/student/<id>/` - Student: Selecting existing student using id, edit or delete.
+* `#/student/<id>/position/` - Position: Where a student stands on each of their words' achievements.
 
 ## Admin 
 
@@ -89,8 +90,6 @@ Go to http://192.168.72.87/admin/ to get at the database directly.  This has acc
 The RESTful API is located at http://192.168.72.87/api/ and all arguments are JSON. It'll be used to drive the client. 
 
 There is also a JavaScript wrapper for the API in `src/api/javascript/hundoword.api.js`.  
-
-The tests for the JavaScript API are located at `http://192.168.72.87/test/api/javascript/`. 
 
 The examples below assume the api was created as: 
 
@@ -244,12 +243,13 @@ In all JavaScript API functions, the arguments success, error, and complete are 
       * words - Array of words (string)
     * JavaScript - `api.student.select(id,success,error,complete)`
   * Position - Retrieves Student Position with words and Achievements using id
-    * Request - `GET http://192.168.72.87/api/student/<id>/position/`
+    * Request - `GET http://192.168.72.87/api/student/<id>/position/?words=<word>,<word>`
+      * words = Only return position for these words
     * Response - `200 Ok`
       * Array - ordered by word
         * word 
         * achievments - Array of strings
-    * JavaScript - `api.student.position(id,success,error,complete)`
+    * JavaScript - `api.student.position(id,words[],success,error,complete)`
   * Progress - Retrieves Student Progress with words and Achievements using id
     * Request - `GET http://192.168.72.87/api/student/<id>/progress/`
     * Response - `200 Ok`
@@ -346,10 +346,34 @@ cd ~/src/server/hundoword_django/
 ./server.sh
 ```
 
-Then go to http://192.168.72.87:8000/admin/ to use the development server for admin and http://192.168.72.87:8000/learning for the API.  Note there's no api/ on this. 
+All the same URL's will work because there's an Nginx reverse proxy. 
 
 To turn off the server and have Apache take over again, just ctrl-C in the window you started the server and then:
 
 ```bash
 sudo service apache2 start
 ```
+
+# Testing
+
+Make sure you're using Django in Development mode above.  Trust me, it'll save you a lot of headaches. 
+
+## RESTful API
+
+```bash
+cd ~/src/server/hundoword_django/
+./coverage.sh
+```
+
+This creates a test database and executes calls again it, not the main database.  It creates/destroys the database before/after after bank of tests, not every test, because that would be slow.
+
+It'll also generate a nice coverage report as the name implies. 
+
+## JavaScript API
+
+Go to `http://192.168.72.87/test/api/javascript/` and wait.  You might want to get a sandwich. 
+
+This uses the existing database, but puts prefixes of 'api-js-test-' before all Users, Achievements, and Programs. It creates/destroys these Users, Achievements, and Programs before/after every test and it's slow.  
+
+The reason for this is the JavaScript API supports and even encourages asynchronous usage. It's hard to test creates, checks, updates, deletes, in a single bank of tests if things are asynchronous. 
+

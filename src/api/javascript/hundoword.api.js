@@ -34,8 +34,8 @@ HundoWord.Base.prototype.constructor = HundoWord.Base;
 
 // Standard methods
 
-HundoWord.Base.prototype.build_url = function(id,action) {
-    return this.api.build_url(this.path,id,action);
+HundoWord.Base.prototype.build_url = function(id,action,parameters) {
+    return this.api.build_url(this.path,id,action,parameters);
 }
 HundoWord.Base.prototype.rest = function(type,url,data,success,error,complete) {
     return this.api.rest(type,url,data,this.api.headers(),success,error,complete);
@@ -103,8 +103,8 @@ HundoWord.Student.prototype.attain = function(id,word,achievement,success,error,
 HundoWord.Student.prototype.yield = function(id,word,achievement,success,error,complete) {
     return this.rest("POST",this.build_url(id,"yield"),{word: word,achievement: achievement},success,error,complete);
 }
-HundoWord.Student.prototype.position = function(id,success,error,complete) {
-    return this.rest("GET",this.build_url(id,"position"),null,success,error,complete);
+HundoWord.Student.prototype.position = function(id,words,success,error,complete) {
+    return this.rest("GET",this.build_url(id,"position",words ? {words: words.join(',')} : undefined),null,success,error,complete);
 }
 HundoWord.Student.prototype.progress = function(id,success,error,complete) {
     return this.rest("GET",this.build_url(id,"progress"),null,success,error,complete);
@@ -136,7 +136,7 @@ HundoWord.API.prototype.headers = function() {
 
 // Builds URL off Community base
 
-HundoWord.API.prototype.build_url = function(path,id,action) {
+HundoWord.API.prototype.build_url = function(path,id,action,parameters) {
 
     var url = this.url + path + "/";
 
@@ -146,6 +146,10 @@ HundoWord.API.prototype.build_url = function(path,id,action) {
 
     if (typeof action !== 'undefined') {
         url += action + "/";
+    }
+
+    if (typeof parameters !== 'undefined') {
+        url += "?" + $.param(parameters);
     }
 
     return url;

@@ -26,6 +26,6 @@ Learning.controller("Changeable",null,{
         return list ? list.join(" ") : "";
     },
     words_array: function(text) {
-        return text ? text.replace(/,+/," ").replace(/\s+/," ").replace(/^ | $/,"").split(" ") : [];
+        return text ? text.replace(/,+/g," ").replace(/\s+/g," ").replace(/^ | $/,"").split(" ") : [];
     }
 });
