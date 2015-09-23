@@ -1,29 +1,11 @@
 {{#def.Header}}
 <div class="uk-overflow-container">
+    <h2>Program - {{=it.program.id ? it.program.name : "New"}}</h2>
     <form class="uk-form uk-form-horizontal">
-        <div class="selecting">
-            <button OnClick="Learning.go('program')" class="uk-button uk-button-primary">
-                <i class="uk-icon-bars"></i> List
-            </button>
-            <button OnClick="Learning.current.controller.edit()" class="uk-button uk-button-primary">
-                <i class="uk-icon-pencil"></i> Edit
-            </button>
-            <button OnClick="Learning.current.controller.delete()" class="uk-button uk-button-primary">
-                <i class="uk-icon-times"></i> Delete
-            </button>
-        </div>
-        <div class="changing" style="display: none">
-            <button OnClick="Learning.current.controller.save()" class="uk-button uk-button-primary">
-                <i class="uk-icon-pencil"></i> Save
-            </button>
-            <button OnClick="Learning.current.controller.cancel()" class="uk-button uk-button-primary">
-                <i class="uk-icon-cross"></i> Cancel
-            </button>
-        </div>
-        <br/>
+
         <input type="hidden" id="program_id" value="{{=it.program.id || ""}}"/>
         <div class="uk-form-row">
-            <label class="uk-form-label" for="program-name">Name</label>
+            <label class="uk-form-label">Name</label>
             <div class="uk-form-controls">
                 <div class="selecting">
                     <span>{{=it.program.name}}</span>
@@ -54,6 +36,23 @@
                     <textarea id='words' placeholder="Enter words separated by spaces or commas or both. #yolo" class="uk-form-width-large">{{=Learning.current.controller.words_string(it.program.words)}}</textarea>
                 </div>
             </div>
+        </div>
+        <br/>
+        <div class="selecting">
+            <button OnClick="Learning.current.controller.edit()" class="uk-button uk-button-primary">
+                <i class="uk-icon-pencil"></i> Edit
+            </button>
+            <button OnClick="Learning.current.controller.delete()" class="uk-button uk-button-primary">
+                <i class="uk-icon-times"></i> Delete
+            </button>
+        </div>
+        <div class="changing" style="display: none">
+            <button OnClick="Learning.current.controller.save()" class="uk-button uk-button-primary">
+                <i class="uk-icon-check"></i> Save
+            </button>
+            <button OnClick="Learning.current.controller.cancel()" class="uk-button uk-button-primary">
+                <i class="uk-icon-times"></i> Cancel
+            </button>
         </div>
     </form>
 </div>

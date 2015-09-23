@@ -758,6 +758,24 @@ class test_Django(SimpleTestCase):
             }
         ])
 
+        self.assertEqual(client.get("/learning/student/%s/position?words=here,there" % silly_billy_id).data,[
+            {
+                "word": "here",
+                "achievements": ["Sight"]
+            },
+            {
+                "word": "there",
+                "achievements": []
+            }
+        ])
+
+        self.assertEqual(client.get("/learning/student/%s/position?words=here" % silly_billy_id).data,[
+            {
+                "word": "here",
+                "achievements": ["Sight"]
+            }
+        ])
+
         # Progress
 
         client.force_authenticate(user=loser)

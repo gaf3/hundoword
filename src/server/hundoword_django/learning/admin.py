@@ -1,8 +1,16 @@
 from django.contrib import admin
 from learning.models import *
 
-admin.site.register(Program)
+class AchievementAdmin(admin.ModelAdmin):
+    list_display = ('name','description')
+    search_fields = ['name']
+
+class ProgramAdmin(admin.ModelAdmin):
+    list_display = ('name','description')
+    search_fields = ['name']
+
+admin.site.register(Achievement,AchievementAdmin)
+admin.site.register(Program,ProgramAdmin)
 admin.site.register(ProgramWord)
 admin.site.register(Student)
-admin.site.register(Achievement)
 admin.site.register(StudentWord)

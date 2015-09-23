@@ -102,6 +102,8 @@ def achievement(request,pk='',action=''):
             serializer = AchievementSerializer(achievement)
             return Response(serializer.data)
 
+        # Update
+
         elif request.method == 'POST' and pk:
 
             achievement = Achievement.objects.get(pk=pk)
@@ -114,6 +116,8 @@ def achievement(request,pk='',action=''):
                 return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
 
             else: # pragma: no cover
+
+                print "What?"
 
                 return errors_response(serializer)
 
@@ -320,7 +324,11 @@ def student(request,pk='',action=''):
 
             elif action == "position": 
 
-                serializer = PositionSerializer(student.words.all(), many=True)
+                if "words" in request.GET:
+                    serializer = PositionSerializer(student.words.filter(word__in=request.GET["words"].split(",")), many=True)
+                else:
+                    serializer = PositionSerializer(student.words.all(), many=True)
+
                 return Response(serializer.data)
 
             # Progress
