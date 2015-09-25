@@ -322,7 +322,7 @@ In all JavaScript API functions, the arguments success, error, and complete are 
       * achievement (id)
       * hold = True - The Achievement was attained
       * at - Date and time (YYYY-MM-DDTHH:MM:SSZ)
-    * JavaScript - `api.student.attain(id,word,achievement,success,error,complete)`
+    * JavaScript - `api.student.attain(id,word,achievement,at,success,error,complete)`
   * Yield - Yields an achievement for a word for a Student
     * Request - `POST http://192.168.72.87/api/student/<id>/yield/`
       * word
@@ -332,7 +332,7 @@ In all JavaScript API functions, the arguments success, error, and complete are 
       * achievement (id)
       * hold = False - The Achievement was yielded
       * at - Date and time (YYYY-MM-DDTHH:MM:SSZ)
-    * JavaScript - `api.student.yield(id,word,achievement,success,error,complete)`
+    * JavaScript - `api.student.yield(id,word,achievement,at,success,error,complete)`
   * Position - Retrieves Student Position with words and Achievements using id
     * Request - `GET http://192.168.72.87/api/student/<id>/position/?words=<word>,<word>`
       * words = Only return position for these words
@@ -354,7 +354,7 @@ In all JavaScript API functions, the arguments success, error, and complete are 
         * achievement
         * hold - Whether the Achieveent was attained or yielded
         * at - Date and time 
-    * JavaScript - `api.student.progress(id,success,error,complete)`
+    * JavaScript - `api.student.progress(id,words[],achievements[],hold,from,to,success,error,complete)`
   * Delete - Deletes a Student
     * Request - `DELETE http://192.168.72.87/api/student/<id>/`
     * Response - `200 Ok`
