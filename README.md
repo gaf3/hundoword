@@ -96,7 +96,7 @@ There's already an existing user/pass: vagrant/vagrant or you can create a new o
 
 ## Admin 
 
-Go to http://192.168.72.87/admin/ to get at the database directly.  This has accounts, words, etc. 
+Go to http://192.168.72.87/admin/ to get at the database directly.  This has accounts, words, etc. Use user/pass: vagrant/vagrant to log in.
 
 # API
 
@@ -104,7 +104,7 @@ Go to http://192.168.72.87/admin/ to get at the database directly.  This has acc
 
 The RESTful API is located at http://192.168.72.87/api/ and all arguments are JSON. It's used to drive the client. 
 
-There's already an existing user/pass: vagrant/vagrant or you can use a new one you created through the web site. 
+There's already an existing user/pass: vagrant/vagrant or you can use a new one if you created one through the web site. 
 
 ## JavaScript
 
