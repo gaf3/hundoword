@@ -9,5 +9,5 @@ urlpatterns = patterns('',
     url(r'^program/(?P<pk>-?\d+|)/?$', views.program, name='program'),
     url(r'^program/(?P<pk>-?\d+|)/(?P<action>-?append|remove)/?$', views.program, name='program_action'),
     url(r'^student/(?P<pk>-?\d+|)/?$', views.student, name='student'),
-    url(r'^student/(?P<pk>-?\d+|)/(?P<action>-?append|remove|attain|yield|position|progress)/?$', views.student, name='student_action'),
+    url(r'^student/(?P<pk>-?\d+|)/(?P<action>-?append|remove|attain|yield|position|history)/?$', views.student, name='student_action'),
 )

@@ -1,16 +1,10 @@
 Learning.controller("Student","Changeable",{
     list: function() {
-        students: hwAPI.student.list($.proxy(this.listed,this));
-    },
-    listed: function(students) {
-        this.it = {students: students};
+        this.it = {students: hwAPI.student.list()};
         this.application.render(this.it);
     },
     select: function() {
-        hwAPI.student.select(this.application.current.path.student_id,$.proxy(this.selected,this));
-    },
-    selected: function(student) {
-        this.it = {student: student};
+        this.it = {student: hwAPI.student.select(this.application.current.path.student_id)};
         this.application.render(this.it);
     },    
     new: function() {
@@ -30,17 +24,11 @@ Learning.controller("Student","Changeable",{
             words: this.words_array($("#words").val())
         };
         if (student_id) {
-            hwAPI.student.update(student_id,student,$.proxy(this.updated,this));
+            this.it = {student: hwAPI.student.update(student_id,student)};
         } else {
-            hwAPI.student.create(student,$.proxy(this.created,this));
+            this.it = {student: hwAPI.student.create(student)};
         }
-    },
-    updated: function(student) {
-        this.it = {student: student};
         this.application.render(this.it);
-    }, 
-    created: function(student) {
-        this.application.go('student/select',student.id);
     },
     cancel: function() {
         var student_id = $("#student_id").val();
@@ -52,47 +40,96 @@ Learning.controller("Student","Changeable",{
     },
     delete: function() {
         if (confirm("Are you sure?") == true) {
-            hwAPI.student.delete(this.application.current.path.student_id,$.proxy(this.deleted,this));
+            hwAPI.student.delete(this.application.current.path.student_id);
+            this.application.go('student');
         }
-    },
-    deleted: function() {
-        this.application.go('student');
     },
     position: function() {
-        hwAPI.student.select(this.application.current.path.student_id,$.proxy(this.position_selected,this));
-    },
-    position_selected: function(student) {
-        this.it = {student: student};
-        hwAPI.achievement.list($.proxy(this.position_achievements,this));
-    },
-    position_achievements: function(achievements) {
-        this.it.achievements = achievements;
+        this.it = {
+            student: hwAPI.student.select(this.application.current.path.student_id),
+            achievements: hwAPI.achievement.list()
+        };
+        var words = null;
         if (this.application.current.query.words) {
-            hwAPI.student.position(this.application.current.path.student_id,this.words_array(this.application.current.query.words),$.proxy(this.positioned,this));
-        } else {
-            hwAPI.student.position(this.application.current.path.student_id,null,$.proxy(this.positioned,this));
+            words = this.words_array(this.application.current.query.words);
         }
-    },
-    positioned: function(positions) {
-        this.it.positions = positions
+        this.it.positions = hwAPI.student.position(this.application.current.path.student_id,words);
         this.application.render(this.it);
     },
-    position_change: function(event) {
-        event.preventDefault();
-        var word = $(event.target).data("word");
-        var achievement = $(event.target).data("achievement");
-        if ($(event.target).prop("checked")) {
-            hwAPI.student.attain(this.application.current.path.student_id,word,achievement,$.proxy(this.position_changed,this));
+    position_search: function() {
+        var parameters = {};
+        var words = $("#words").val();
+        if (words.length) {
+            parameters["words"] = this.words_array(words).join(",");
+        }
+        if ($.isEmptyObject(parameters)) {
+            this.application.go('student/position',this.application.current.path.student_id);
         } else {
-            hwAPI.student.yield(this.application.current.path.student_id,word,achievement,$.proxy(this.position_changed,this));
+            this.application.go('student/position',this.application.current.path.student_id,parameters);
         }
     },
-    position_changed: function(position) {
-        $("[data-word='" + position.word + "'][data-achievement='" + position.achievement + "']").prop("checked",position.hold);
+    progress: function(event,word,achievement) {
+        if ($(event.target).prop("checked")) {
+            hwAPI.student.attain(this.application.current.path.student_id,word,achievement);
+        } else {
+            hwAPI.student.yield(this.application.current.path.student_id,word,achievement);
+        }
     },
-    position_search: function() {
-        this.application.go('student/position',this.application.current.path.student_id,{words: this.words_array($("#words").val()).join(",")});
-    }
+    history: function() {
+        this.it = {
+            student: hwAPI.student.select(this.application.current.path.student_id),
+            achievements: hwAPI.achievement.list(),
+            achievement_names: {}
+        };
+        for (var achievement = 0; achievement < this.it.achievements.length; achievement++) {
+            this.it.achievement_names[this.it.achievements[achievement].id] = this.it.achievements[achievement].name;
+        }
+        var words = null;
+        if (this.application.current.query.words) {
+            words = this.words_array(this.application.current.query.words);
+        }
+        var achievements = null;
+        if (this.application.current.query.achievements) {
+            achievements = this.words_array(this.application.current.query.achievements);
+        }
+        var from = null;
+        if (this.application.current.query.from) {
+            from = this.application.current.query.from;
+        }
+        var to = null;
+        if (this.application.current.query.to) {
+            to = this.application.current.query.to;
+        }
+        this.it.history = hwAPI.student.history(this.application.current.path.student_id,words,achievements,from,to);
+        this.application.render(this.it);
+    },
+    history_search: function() {
+        var parameters = {};
+        var words = $("#words").val();
+        if (words.length) {
+            parameters["words"] = this.words_array(words).join(",");
+        }
+        var achievements = [];
+        $("input[name='achievements']:checked").each(function () {
+            achievements.push($(this).val());
+        });
+        if (achievements.length) {
+            parameters["achievements"] = achievements.join(",");
+        }
+        var from = $("#from").val();
+        if (from) {
+            parameters["from"] = from;
+        }
+        var to = $("#to").val();
+        if (to) {
+            parameters["to"] = to;
+        }
+        if ($.isEmptyObject(parameters)) {
+            this.application.go('student/history',this.application.current.path.student_id);
+        } else {
+            this.application.go('student/history',this.application.current.path.student_id,parameters);
+        }
+    },
 });
 
 Learning.partial("StudentTabs",Learning.load("student-tabs"));
@@ -100,11 +137,12 @@ Learning.partial("StudentTabs",Learning.load("student-tabs"));
 Learning.template("Students",Learning.load("students"),null,Learning.partials);
 Learning.template("Student",Learning.load("student"),null,Learning.partials);
 Learning.template("Position",Learning.load("position"),null,Learning.partials);
+Learning.template("History",Learning.load("history"),null,Learning.partials);
 
 Learning.route("student","/student/","Students","Student","list");
 Learning.route("student/select","/student/{student_id:^\\d+$}/","Student","Student","select");
 Learning.route("student/new","/student/new/","Student","Student","new");
 Learning.route("student/position","/student/{student_id:^\\d+$}/position/","Position","Student","position");
-Learning.route("student/progress","/student/{student_id:^\\d+$}/progress/","Student","Student","select");
+Learning.route("student/history","/student/{student_id:^\\d+$}/history/","History","Student","history");
 Learning.route("student/chart","/student/{student_id:^\\d+$}/chart/","Student","Student","select");
 Learning.route("student/games","/student/{student_id:^\\d+$}/games/","Student","Student","select");

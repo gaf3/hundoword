@@ -80,16 +80,12 @@ class StudentSerializer(serializers.ModelSerializer):
 
 class PositionSerializer(serializers.ModelSerializer):
 
-    achievements = serializers.StringRelatedField(many=True)
-
     class Meta:
         model = StudentWord
         fields = ('word','achievements')
 
 
 class ProgressSerializer(serializers.ModelSerializer):
-
-    achievement = serializers.StringRelatedField()
 
     class Meta:
         model = Progress

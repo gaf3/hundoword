@@ -97,17 +97,38 @@ HundoWord.Student = function(api) {
 
 HundoWord.Student.prototype = new HundoWord.Words();
 
-HundoWord.Student.prototype.attain = function(id,word,achievement,success,error,complete) {
-    return this.rest("POST",this.build_url(id,"attain"),{word: word,achievement: achievement},success,error,complete);
+HundoWord.Student.prototype.attain = function(id,word,achievement,at,success,error,complete) {
+    var parameters = {word: word,achievement: achievement};
+    if (at) {
+        parameters["at"] = at;
+    }
+    return this.rest("POST",this.build_url(id,"attain"),parameters,success,error,complete);
 }
-HundoWord.Student.prototype.yield = function(id,word,achievement,success,error,complete) {
-    return this.rest("POST",this.build_url(id,"yield"),{word: word,achievement: achievement},success,error,complete);
+HundoWord.Student.prototype.yield = function(id,word,achievement,at,success,error,complete) {
+    var parameters = {word: word,achievement: achievement};
+    if (at) {
+        parameters["at"] = at;
+    }
+    return this.rest("POST",this.build_url(id,"yield"),parameters,success,error,complete);
 }
 HundoWord.Student.prototype.position = function(id,words,success,error,complete) {
     return this.rest("GET",this.build_url(id,"position",words ? {words: words.join(',')} : undefined),null,success,error,complete);
 }
-HundoWord.Student.prototype.progress = function(id,success,error,complete) {
-    return this.rest("GET",this.build_url(id,"progress"),null,success,error,complete);
+HundoWord.Student.prototype.history = function(id,words,achievements,from,to,success,error,complete) {
+    var parameters = {};
+    if (words) {
+        parameters["words"] = words.join(',');
+    }
+    if (achievements) {
+        parameters["achievements"] = achievements.join(',');
+    }
+    if (from) {
+        parameters["from"] = from;
+    }
+    if (to) {
+        parameters["to"] = to;
+    }
+    return this.rest("GET",this.build_url(id,"history",parameters),null,success,error,complete);
 }
 
 
@@ -148,7 +169,7 @@ HundoWord.API.prototype.build_url = function(path,id,action,parameters) {
         url += action + "/";
     }
 
-    if (typeof parameters !== 'undefined') {
+    if (typeof parameters !== 'undefined' && ! $.isEmptyObject(parameters)) {
         url += "?" + $.param(parameters);
     }
 

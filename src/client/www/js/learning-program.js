@@ -1,16 +1,10 @@
 Learning.controller("Program","Changeable",{
     list: function() {
-        programs: hwAPI.program.list($.proxy(this.listed,this));
-    },
-    listed: function(programs) {
-        this.it = {programs: programs};
+        this.it = {programs: hwAPI.program.list()};
         this.application.render(this.it);
     },
     select: function() {
-        hwAPI.program.select(this.application.current.path.program_id,$.proxy(this.selected,this));
-    },
-    selected: function(program) {
-        this.it = {program: program};
+        this.it = {program: hwAPI.program.select(this.application.current.path.program_id)};
         this.application.render(this.it);
     },    
     new: function() {
@@ -29,17 +23,11 @@ Learning.controller("Program","Changeable",{
             words: this.words_array($("#words").val())
         };
         if (program_id) {
-            hwAPI.program.update(program_id,program,$.proxy(this.updated,this));
+            this.it = {program: hwAPI.program.update(program_id,program)};
         } else {
-            hwAPI.program.create(program,$.proxy(this.created,this));
+            this.it = {program: hwAPI.program.create(program)};
         }
-    },
-    updated: function(program) {
-        this.it = {program: program};
         this.application.render(this.it);
-    }, 
-    created: function(program) {
-        this.application.go('program/select',program.id);
     },
     cancel: function() {
         var program_id = $("#program_id").val();
@@ -51,11 +39,9 @@ Learning.controller("Program","Changeable",{
     },
     delete: function() {
         if (confirm("Are you sure?") == true) {
-            hwAPI.program.delete(this.application.current.path.program_id,$.proxy(this.deleted,this));
+            hwAPI.program.delete(this.application.current.path.program_id);
+            this.application.go('program');
         }
-    },
-    deleted: function() {
-        this.application.go('program');
     }
 });
 

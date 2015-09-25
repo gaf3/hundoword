@@ -70,16 +70,29 @@ This will create an Ubuntu server and map the vagrant user's src directory to th
 
 Go to http://192.168.72.87/ for the web site.  It's JavaScript interactive site so there's #'s before all the links.
 
+There's already an existing user/pass: vagrant/vagrant or you can create a new one. 
+
 * `#/` - Home: Just a basic splash screen
 * `#/regsiter/` - Register: Register a new user
 * `#/login/` - Login: Log in as an existing user
 * `#/achievement/` - Achievements: List existing achievements or create a new one
 * `#/achievement/<id>/` - Achievement: Selecting existing achievement using id, edit or delete.
+  * id - Achievement to select
 * `#/program/` - Programs: List existing programs or create a new one
 * `#/program/<id>/` - Program: Selecting existing program using id, edit or delete.
+  * id - Program to select
 * `#/student/` - Students: List existing students or create a new one
 * `#/student/<id>/` - Student: Selecting existing student using id, edit or delete.
-* `#/student/<id>/position/` - Position: Where a student stands on each of their words' achievements.
+  * id - Student to select
+* `#/student/<id>/position/words=<word>,<word>` - Position: Where a student stands on each of their words' achievements.
+  * id - Student to select
+  * words - Only show position for these words
+* `#/student/<id>/history/words=<word>,<word>&achievements=<achievement_id>,<achievement_id>&from=<from>&to=<to>` - Position: Where a student stands on each of their words' achievements.
+  * id - Student to select
+  * words - Only show history for these words
+  * achievements - Only show history for these achievements (by id)
+  * from - Only show history from this date (YYYY-MM-DD)
+  * to - Only show history to this date (YYYY-MM-DD)
 
 ## Admin 
 
@@ -87,9 +100,15 @@ Go to http://192.168.72.87/admin/ to get at the database directly.  This has acc
 
 # API
 
-The RESTful API is located at http://192.168.72.87/api/ and all arguments are JSON. It'll be used to drive the client. 
+## RESTful
 
-There is also a JavaScript wrapper for the API in `src/api/javascript/hundoword.api.js`.  
+The RESTful API is located at http://192.168.72.87/api/ and all arguments are JSON. It's used to drive the client. 
+
+There's already an existing user/pass: vagrant/vagrant or you can use a new one you created through the web site. 
+
+## JavaScript
+
+There is also a JavaScript wrapper for the RESTful API in `src/api/javascript/hundoword.api.js`.  
 
 The examples below assume the api was created as: 
 
@@ -98,6 +117,8 @@ var api = new HundoWord.API("http://192.168.72.87/api/");
 ```
 
 In all JavaScript API functions, the arguments success, error, and complete are optional callback functions.  If unspecified, the JavaScript API functions will return the data structures returned by the RESTful API and any errors will throw a `HundoWord.APIException` which has a text message and the full repsonse object. 
+
+### Endpoints / Functions
 
 * register - Register a new User
   * Request - `POST http://192.168.72.87/api/register/`
@@ -242,23 +263,6 @@ In all JavaScript API functions, the arguments success, error, and complete are 
       * age
       * words - Array of words (string)
     * JavaScript - `api.student.select(id,success,error,complete)`
-  * Position - Retrieves Student Position with words and Achievements using id
-    * Request - `GET http://192.168.72.87/api/student/<id>/position/?words=<word>,<word>`
-      * words = Only return position for these words
-    * Response - `200 Ok`
-      * Array - ordered by word
-        * word 
-        * achievments - Array of strings
-    * JavaScript - `api.student.position(id,words[],success,error,complete)`
-  * Progress - Retrieves Student Progress with words and Achievements using id
-    * Request - `GET http://192.168.72.87/api/student/<id>/progress/`
-    * Response - `200 Ok`
-      * Array - ordered by at descending
-        * word 
-        * achievement
-        * hold - Whether the Achieveent was attained or yielded
-        * at - Date and time 
-    * JavaScript - `api.student.progress(id,success,error,complete)`
   * Create - Creates a Student
     * Request - `POST http://192.168.72.87/api/student/`
       * first_name
@@ -315,9 +319,9 @@ In all JavaScript API functions, the arguments success, error, and complete are 
       * achievement - Name of achievement
     * Response - `202 Accepted`
       * word 
-      * achievement
-      * hold = True - The Achieveent was attained
-      * at - Date and time 
+      * achievement (id)
+      * hold = True - The Achievement was attained
+      * at - Date and time (YYYY-MM-DDTHH:MM:SSZ)
     * JavaScript - `api.student.attain(id,word,achievement,success,error,complete)`
   * Yield - Yields an achievement for a word for a Student
     * Request - `POST http://192.168.72.87/api/student/<id>/yield/`
@@ -325,10 +329,32 @@ In all JavaScript API functions, the arguments success, error, and complete are 
       * achievement - Name of achievement
     * Response - `202 Accepted`
       * word 
-      * achievement
-      * hold = False - The Achieveent was yielded
-      * at - Date and time 
+      * achievement (id)
+      * hold = False - The Achievement was yielded
+      * at - Date and time (YYYY-MM-DDTHH:MM:SSZ)
     * JavaScript - `api.student.yield(id,word,achievement,success,error,complete)`
+  * Position - Retrieves Student Position with words and Achievements using id
+    * Request - `GET http://192.168.72.87/api/student/<id>/position/?words=<word>,<word>`
+      * words = Only return position for these words
+    * Response - `200 Ok`
+      * Array - ordered by word
+        * word 
+        * achievments - Array of strings
+    * JavaScript - `api.student.position(id,words,success,error,complete)`
+      * words - Array of words to return data for
+  * History - Retrieves Student History with words and Achievements using id
+    * Request - `GET http://192.168.72.87/api/student/<id>/history/?words=<word>,<word>&achievements=<achievement>,<achievement>`
+      * words = Only return progress for these words
+      * achievements - Only show history for these achievements (by id)
+      * from - Only show history from this date (YYYY-MM-DD)
+      * to - Only show history to this date (YYYY-MM-DD)
+    * Response - `200 Ok`
+      * Array - ordered by at descending
+        * word 
+        * achievement
+        * hold - Whether the Achieveent was attained or yielded
+        * at - Date and time 
+    * JavaScript - `api.student.progress(id,success,error,complete)`
   * Delete - Deletes a Student
     * Request - `DELETE http://192.168.72.87/api/student/<id>/`
     * Response - `200 Ok`
@@ -377,3 +403,4 @@ This uses the existing database, but puts prefixes of 'api-js-test-' before all 
 
 The reason for this is the JavaScript API supports and even encourages asynchronous usage. It's hard to test creates, checks, updates, deletes, in a single bank of tests if things are asynchronous. 
 
+IMPORTANT: If you've used the API through the browser and then run the JavaScript API tests, you'll get a ton of errors.  You have to compeltely close the browser and reopen it for the tests to work. I know it's stupid but that's BasicAuth for ya. 

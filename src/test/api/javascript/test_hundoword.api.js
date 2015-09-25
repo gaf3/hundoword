@@ -1,6 +1,8 @@
 
 var hundoword_django_host = window.location.protocol + "//" + window.location.hostname;
-var hundoword_django_prefix = "api-js-test"
+var hundoword_django_prefix = "api-js-test";
+
+document.execCommand("ClearAuthenticationCache");
 
 function make_user(username) {
 
@@ -97,7 +99,7 @@ function delete_users() {
 
     });
 
-    $.ajax({url: hundoword_django_host + "/admin/logout/",async: false});
+    $.ajax({url: hundoword_django_host + "/admin/logout/",async: false}).responseText;
 
 }
 
@@ -1377,18 +1379,20 @@ QUnit.test("attain", function(assert) {
     var sight = api.achievement.create({name: make_achievement("Sight"), description: "See it"});
     var sound = api.achievement.create({name: make_achievement("Sound"),description: "Hear it"});
 
-    var progress = api.student.attain(sane_jane.id,"fun",make_achievement("Sight"));
+    var progress = api.student.attain(sane_jane.id,"fun",sight.id,"2015-09-22T00:00:00Z");
 
     assert.equal(progress.word,"fun");
-    assert.equal(progress.achievement,make_achievement("Sight"));
+    assert.equal(progress.achievement,sight.id);
     assert.equal(progress.hold,true);
+    assert.equal(progress.at,"2015-09-22T00:00:00Z");
 
     var pass = assert.async();
-    api.student.attain(sane_jane.id,"time",make_achievement("Sound"),
+    api.student.attain(sane_jane.id,"time",sound.id,"2015-09-23T00:00:00Z",
         function (data) {
             assert.equal(data.word,"time");
-            assert.equal(data.achievement,make_achievement("Sound"));
+            assert.equal(data.achievement,sound.id);
             assert.equal(data.hold,true);
+            assert.equal(data.at,"2015-09-23T00:00:00Z");
             pass();
         }
     );
@@ -1404,18 +1408,20 @@ QUnit.test("yield", function(assert) {
     var sight = api.achievement.create({name: make_achievement("Sight"), description: "See it"});
     var sound = api.achievement.create({name: make_achievement("Sound"),description: "Hear it"});
 
-    var progress = api.student.yield(sane_jane.id,"fun",make_achievement("Sight"));
+    var progress = api.student.yield(sane_jane.id,"fun",sight.id,"2015-09-22T00:00:00Z");
 
     assert.equal(progress.word,"fun");
-    assert.equal(progress.achievement,make_achievement("Sight"));
+    assert.equal(progress.achievement,sight.id);
     assert.equal(progress.hold,false);
+    assert.equal(progress.at,"2015-09-22T00:00:00Z");
 
     var pass = assert.async();
-    api.student.yield(sane_jane.id,"time",make_achievement("Sound"),
+    api.student.yield(sane_jane.id,"time",sound.id,"2015-09-23T00:00:00Z",
         function (data) {
             assert.equal(data.word,"time");
-            assert.equal(data.achievement,make_achievement("Sound"));
+            assert.equal(data.achievement,sound.id);
             assert.equal(data.hold,false);
+            assert.equal(data.at,"2015-09-23T00:00:00Z");
             pass();
         }
     );
@@ -1431,19 +1437,19 @@ QUnit.test("position", function(assert) {
     var sight = api.achievement.create({name: make_achievement("Sight"), description: "See it"});
     var sound = api.achievement.create({name: make_achievement("Sound"),description: "Hear it"});
 
-    api.student.attain(sane_jane.id,"fun",make_achievement("Sight"));
-    api.student.attain(sane_jane.id,"time",make_achievement("Sound"));
+    api.student.attain(sane_jane.id,"fun",sight.id);
+    api.student.attain(sane_jane.id,"time",sound.id);
 
     assert.deepEqual(
         api.student.position(sane_jane.id),
         [
             {
                 word: "fun",
-                achievements: [make_achievement("Sight")]
+                achievements: [sight.id]
             },
             {
                 word: "time",
-                achievements: [make_achievement("Sound")]
+                achievements: [sound.id]
             }
         ]
     );
@@ -1453,11 +1459,11 @@ QUnit.test("position", function(assert) {
         [
             {
                 word: "fun",
-                achievements: [make_achievement("Sight")]
+                achievements: [sight.id]
             },
             {
                 word: "time",
-                achievements: [make_achievement("Sound")]
+                achievements: [sound.id]
             }
         ]
     );
@@ -1467,7 +1473,7 @@ QUnit.test("position", function(assert) {
         [
             {
                 word: "fun",
-                achievements: [make_achievement("Sight")]
+                achievements: [sight.id]
             }
         ]
     );
@@ -1480,11 +1486,11 @@ QUnit.test("position", function(assert) {
                 [
                     {
                         word: "fun",
-                        achievements: [make_achievement("Sight")]
+                        achievements: [sight.id]
                     },
                     {
                         word: "time",
-                        achievements: [make_achievement("Sound")]
+                        achievements: [sound.id]
                     }
                 ]
             );
@@ -1494,7 +1500,7 @@ QUnit.test("position", function(assert) {
 
 });
 
-QUnit.test("progress", function(assert) {
+QUnit.test("history", function(assert) {
 
     var api = new HundoWord.API(hundoword_django_host + "/api/");
     check_user(api,"tester0","tester0","tester0@hundoword.com");
@@ -1503,27 +1509,61 @@ QUnit.test("progress", function(assert) {
     var sight = api.achievement.create({name: make_achievement("Sight"), description: "See it"});
     var sound = api.achievement.create({name: make_achievement("Sound"),description: "Hear it"});
 
-    api.student.attain(sane_jane.id,"fun",make_achievement("Sight"));
-    api.student.yield(sane_jane.id,"time",make_achievement("Sound"));
+    api.student.attain(sane_jane.id,"fun",sight.id,"2015-09-22T00:00:00Z");
+    api.student.yield(sane_jane.id,"time",sound.id,"2015-09-23T00:00:00Z");
 
-    var progress = api.student.progress(sane_jane.id)
+    var history = api.student.history(sane_jane.id)
 
-    assert.equal(progress[0].word,"time");
-    assert.equal(progress[0].achievement,make_achievement("Sound"));
-    assert.equal(progress[0].hold,false);
-    assert.equal(progress[1].word,"fun");
-    assert.equal(progress[1].achievement,make_achievement("Sight"));
-    assert.equal(progress[1].hold,true);
+    assert.equal(history.length,2);
+    assert.equal(history[0].word,"time");
+    assert.equal(history[0].achievement,sound.id);
+    assert.equal(history[0].hold,false);
+    assert.equal(history[0].at,"2015-09-23T00:00:00Z");
+    assert.equal(history[1].word,"fun");
+    assert.equal(history[1].achievement,sight.id);
+    assert.equal(history[1].hold,true);
+    assert.equal(history[1].at,"2015-09-22T00:00:00Z");
+
+    api.student.attain(sane_jane.id,"fun",sound.id,"2015-09-24T00:00:00Z");
+
+    var history = api.student.history(sane_jane.id,["fun"])
+
+    assert.equal(history.length,2);
+    assert.equal(history[0].word,"fun");
+    assert.equal(history[0].achievement,sound.id);
+    assert.equal(history[0].hold,true);
+    assert.equal(history[1].word,"fun");
+    assert.equal(history[1].achievement,sight.id);
+    assert.equal(history[1].hold,true);
+
+    var history = api.student.history(sane_jane.id,["fun"],[sight.id]);
+
+    assert.equal(history.length,1);
+    assert.equal(history[0].word,"fun");
+    assert.equal(history[0].achievement,sight.id);
+    assert.equal(history[0].hold,true);
+
+    var history = api.student.history(sane_jane.id,null,null,"2015-09-24");
+
+    assert.equal(history[0].word,"fun");
+    assert.equal(history[0].achievement,sound.id);
+    assert.equal(history[0].hold,true);
+    assert.equal(history[0].at,"2015-09-24T00:00:00Z");
+
+    var history = api.student.history(sane_jane.id,null,null,null,"2015-09-23");
+
+    assert.equal(history.length,1);
+    assert.equal(history[0].word,"fun");
+    assert.equal(history[0].achievement,sight.id);
+    assert.equal(history[0].hold,true);
 
     var pass = assert.async();
-    api.student.progress(sane_jane.id,
+    api.student.history(sane_jane.id,["fun"],[sight.id],null,null,
         function (data) {
-            assert.equal(data[0].word,"time");
-            assert.equal(data[0].achievement,make_achievement("Sound"));
-            assert.equal(data[0].hold,false);
-            assert.equal(data[1].word,"fun");
-            assert.equal(data[1].achievement,make_achievement("Sight"));
-            assert.equal(data[1].hold,true);
+            assert.equal(data.length,1);
+            assert.equal(data[0].word,"fun");
+            assert.equal(data[0].achievement,sight.id);
+            assert.equal(data[0].hold,true);
             pass();
         }
     );

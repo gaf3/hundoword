@@ -3,17 +3,17 @@
     <li class="{{? !it.student.id }}uk-disabled{{?? Learning.current.route.name == 'student/select' }}uk-active{{?}}">
         <a href="{{=Learning.link('student/select',it.student.id)}}">Info</a>
     </li>
+    <li class="{{? !it.student.id }}uk-disabled{{?? Learning.current.route.name == 'student/games' }}uk-active{{?}}">
+        <a href="{{=Learning.link('student/games',it.student.id)}}">Games</a>
+    </li>
     <li class="{{? !it.student.id }}uk-disabled{{?? Learning.current.route.name == 'student/position' }}uk-active{{?}}">
         <a href="{{=Learning.link('student/position',it.student.id)}}">Position</a>
-    </li>
-    <li class="{{? !it.student.id }}uk-disabled{{?? Learning.current.route.name == 'student/progress' }}uk-active{{?}}">
-        <a href="{{=Learning.link('student/progress',it.student.id)}}">Progress</a>
     </li>
     <li class="{{? !it.student.id }}uk-disabled{{?? Learning.current.route.name == 'student/chart' }}uk-active{{?}}">
         <a href="{{=Learning.link('student/chart',it.student.id)}}">Chart</a>
     </li>
-    <li class="{{? !it.student.id }}uk-disabled{{?? Learning.current.route.name == 'student/games' }}uk-active{{?}}">
-        <a href="{{=Learning.link('student/games',it.student.id)}}">Games</a>
+    <li class="{{? !it.student.id }}uk-disabled{{?? Learning.current.route.name == 'student/history' }}uk-active{{?}}">
+        <a href="{{=Learning.link('student/history',it.student.id)}}">History</a>
     </li>
 </ul>
 <br/>

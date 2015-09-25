@@ -1,8 +1,11 @@
 import sys
 import traceback
+import datetime
+import pytz
 
 from django.db import transaction
 from django.db.models import Q
+from django.utils.timezone import get_current_timezone
 
 from rest_framework import status, permissions
 from rest_framework.decorators import api_view, permission_classes
@@ -333,9 +336,25 @@ def student(request,pk='',action=''):
 
             # Progress
 
-            elif action == "progress": 
+            elif action == "history": 
 
-                serializer = ProgressSerializer(student.progress.all(), many=True)
+                filter = {
+                    "student": Student.objects.get(teacher=request.user,pk=pk)
+                }
+
+                if "words" in request.GET:
+                    filter["word__in"] = request.GET["words"].split(",")
+
+                if "achievements" in request.GET:
+                    filter["achievement__in"] = request.GET["achievements"].split(",")
+
+                if "from" in request.GET:
+                    filter["at__gte"] = pytz.utc.localize(datetime.datetime.strptime(request.GET["from"], '%Y-%m-%d'))
+
+                if "to" in request.GET:
+                    filter["at__lt"] = pytz.utc.localize(datetime.datetime.strptime(request.GET["to"], '%Y-%m-%d'))
+
+                serializer = ProgressSerializer(Progress.objects.filter(**filter), many=True)
                 return Response(serializer.data)
 
         elif request.method == 'POST' and pk:
@@ -393,11 +412,16 @@ def student(request,pk='',action=''):
 
                 word = request.DATA["word"]
                 student_word = StudentWord.objects.get(student=student,word=word)
-                achievement = Achievement.objects.get(name=request.DATA["achievement"])
+                achievement = Achievement.objects.get(pk=request.DATA["achievement"])
+                at = None
+                if "at" in request.DATA:
+                    at = pytz.utc.localize(datetime.datetime.strptime(request.DATA["at"], '%Y-%m-%dT%H:%M:%SZ'))
 
                 with transaction.atomic():
 
                     progress = Progress(student=student,achievement=achievement,word=word,hold=(action == "attain"))
+                    if at is not None:
+                        progress.at = at
                     progress.save()
 
                     if action == "attain" and achievement not in student_word.achievements.all():
