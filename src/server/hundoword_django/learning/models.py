@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils import timezone
 
 # Create your models here.
 
@@ -48,6 +49,7 @@ class Student(models.Model):
     age = models.IntegerField(blank=True,null=True)
 
     class Meta:
+        unique_together = (('teacher', 'last_name', 'first_name'),)
         ordering = ['teacher','last_name','first_name']
 
     def __unicode__(self):
@@ -74,7 +76,7 @@ class Progress(models.Model):
     achievement = models.ForeignKey(Achievement)
     word = models.CharField(max_length=128)
     hold = models.BooleanField()
-    at = models.DateTimeField('date/time',auto_now_add=True)
+    at = models.DateTimeField('date/time',blank=True,default=timezone.now)
 
     class Meta:
         ordering = ['-id']

@@ -620,7 +620,7 @@ class test_Django(SimpleTestCase):
 
         response = client.post("/learning/student/%s/attain" % silly_billy_id,{
             "word": "here",
-            "achievement": "Sight"
+            "achievement": 0
         }, format='json')
 
         self.assertEqual(response.status_code,status.HTTP_404_NOT_FOUND);
@@ -633,32 +633,37 @@ class test_Django(SimpleTestCase):
 
         response = client.post("/learning/student/%s/attain" % silly_billy_id,{
             "word": "here",
-            "achievement": "Sight"
+            "achievement": 0
         }, format='json')
 
         self.assertEqual(response.status_code,status.HTTP_404_NOT_FOUND);
         self.assertEqual(response.data,{"detail": "Achievement not found"})
 
-        Achievement(name="Sight").save()
+        achievement = Achievement(name="Sight")
+        achievement.save()
+        sight_id = achievement.id
 
         response = client.post("/learning/student/%s/attain" % silly_billy_id,{
             "word": "here",
-            "achievement": "Sight"
+            "achievement": sight_id,
+            "at": "2015-09-20T00:00:00Z"
         }, format='json')
 
         self.assertEqual(response.status_code,status.HTTP_202_ACCEPTED);
         self.assertEqual(response.data["word"],"here")
-        self.assertEqual(response.data["achievement"],"Sight")
+        self.assertEqual(response.data["achievement"],sight_id)
         self.assertEqual(response.data["hold"],True)
+        self.assertEqual(response.data["at"],"2015-09-20T00:00:00Z")
 
         response = client.post("/learning/student/%s/attain" % silly_billy_id,{
             "word": "here",
-            "achievement": "Sight"
+            "achievement": sight_id,
+            "at": "2015-09-21T00:00:00Z"
         }, format='json')
 
         self.assertEqual(response.status_code,status.HTTP_202_ACCEPTED);
         self.assertEqual(response.data["word"],"here")
-        self.assertEqual(response.data["achievement"],"Sight")
+        self.assertEqual(response.data["achievement"],sight_id)
         self.assertEqual(response.data["hold"],True)
 
         # Yield 
@@ -690,7 +695,7 @@ class test_Django(SimpleTestCase):
 
         response = client.post("/learning/student/%s/yield" % silly_billy_id,{
             "word": "there",
-            "achievement": "Spell"
+            "achievement": 0
         }, format='json')
 
         self.assertEqual(response.status_code,status.HTTP_404_NOT_FOUND);
@@ -703,37 +708,42 @@ class test_Django(SimpleTestCase):
 
         response = client.post("/learning/student/%s/yield" % silly_billy_id,{
             "word": "there",
-            "achievement": "Spell"
+            "achievement": 0
         }, format='json')
 
         self.assertEqual(response.status_code,status.HTTP_404_NOT_FOUND);
         self.assertEqual(response.data,{"detail": "Achievement not found"})
 
-        Achievement(name="Spell").save()
+        achievement = Achievement(name="Spell")
+        achievement.save()
+        spell_id = achievement.id
 
         response = client.post("/learning/student/%s/attain" % silly_billy_id,{
             "word": "there",
-            "achievement": "Spell"
+            "achievement": spell_id,
+            "at": "2015-09-22T00:00:00Z"
         }, format='json')
 
         response = client.post("/learning/student/%s/yield" % silly_billy_id,{
             "word": "there",
-            "achievement": "Spell"
+            "achievement": spell_id,
+            "at": "2015-09-23T00:00:00Z"
         }, format='json')
 
         self.assertEqual(response.status_code,status.HTTP_202_ACCEPTED);
         self.assertEqual(response.data["word"],"there")
-        self.assertEqual(response.data["achievement"],"Spell")
+        self.assertEqual(response.data["achievement"],spell_id)
         self.assertEqual(response.data["hold"],False)
 
         response = client.post("/learning/student/%s/yield" % silly_billy_id,{
             "word": "there",
-            "achievement": "Spell"
+            "achievement": spell_id,
+            "at": "2015-09-24T00:00:00Z"
         }, format='json')
 
         self.assertEqual(response.status_code,status.HTTP_202_ACCEPTED);
         self.assertEqual(response.data["word"],"there")
-        self.assertEqual(response.data["achievement"],"Spell")
+        self.assertEqual(response.data["achievement"],spell_id)
         self.assertEqual(response.data["hold"],False)
 
         # Position
@@ -750,7 +760,7 @@ class test_Django(SimpleTestCase):
         self.assertEqual(client.get("/learning/student/%s/position" % silly_billy_id).data,[
             {
                 "word": "here",
-                "achievements": ["Sight"]
+                "achievements": [sight_id]
             },
             {
                 "word": "there",
@@ -761,7 +771,7 @@ class test_Django(SimpleTestCase):
         self.assertEqual(client.get("/learning/student/%s/position?words=here,there" % silly_billy_id).data,[
             {
                 "word": "here",
-                "achievements": ["Sight"]
+                "achievements": [sight_id]
             },
             {
                 "word": "there",
@@ -772,51 +782,246 @@ class test_Django(SimpleTestCase):
         self.assertEqual(client.get("/learning/student/%s/position?words=here" % silly_billy_id).data,[
             {
                 "word": "here",
-                "achievements": ["Sight"]
+                "achievements": [sight_id]
             }
         ])
 
-        # Progress
+        # History
 
         client.force_authenticate(user=loser)
 
-        response = client.get("/learning/student/%s/progress" % silly_billy_id)
+        response = client.get("/learning/student/%s/history" % silly_billy_id)
 
         self.assertEqual(response.status_code,status.HTTP_404_NOT_FOUND);
         self.assertEqual(response.data,{"detail": "Student not found"})
 
         client.force_authenticate(user=user)
 
-        progress = [dict(event) for event in client.get("/learning/student/%s/progress" % silly_billy_id).data]
+        history = [dict(progress) for progress in client.get("/learning/student/%s/history" % silly_billy_id).data]
 
-        for event in progress:
-            del event['at']
-
-        self.assertItemsEqual(progress,[
+        self.assertItemsEqual(history,[
             {
                 "word": "there",
-                "achievement": "Spell",
-                "hold": False
+                "achievement": spell_id,
+                "hold": False,
+                "at": "2015-09-24T00:00:00Z"
             },
             {
                 "word": "there",
-                "achievement": "Spell",
-                "hold": False
+                "achievement": spell_id,
+                "hold": False,
+                "at": "2015-09-23T00:00:00Z"
             },
             {
                 "word": "there",
-                "achievement": "Spell",
-                "hold": True
+                "achievement": spell_id,
+                "hold": True,
+                "at": "2015-09-22T00:00:00Z"
             },
             {
                 "word": "here",
-                "achievement": "Sight",
-                "hold": True
+                "achievement": sight_id,
+                "hold": True,
+                "at": "2015-09-21T00:00:00Z"
             },
             {
                 "word": "here",
-                "achievement": "Sight",
+                "achievement": sight_id,
+                "hold": True,
+                "at": "2015-09-20T00:00:00Z"
+            }
+        ])
+
+        history = [dict(progress) for progress in client.get("/learning/student/%s/history/?words=here,there" % silly_billy_id).data]
+
+        self.assertItemsEqual(history,[
+            {
+                "word": "there",
+                "achievement": spell_id,
+                "hold": False,
+                "at": "2015-09-24T00:00:00Z"
+            },
+            {
+                "word": "there",
+                "achievement": spell_id,
+                "hold": False,
+                "at": "2015-09-23T00:00:00Z"
+            },
+            {
+                "word": "there",
+                "achievement": spell_id,
+                "hold": True,
+                "at": "2015-09-22T00:00:00Z"
+            },
+            {
+                "word": "here",
+                "achievement": sight_id,
+                "hold": True,
+                "at": "2015-09-21T00:00:00Z"
+            },
+            {
+                "word": "here",
+                "achievement": sight_id,
+                "hold": True,
+                "at": "2015-09-20T00:00:00Z"
+            }
+        ])
+
+        history = [dict(progress) for progress in client.get("/learning/student/%s/history/?words=here" % silly_billy_id).data]
+
+        self.assertItemsEqual(history,[
+            {
+                "word": "here",
+                "achievement": sight_id,
+                "hold": True,
+                "at": "2015-09-21T00:00:00Z"
+            },
+            {
+                "word": "here",
+                "achievement": sight_id,
+                "hold": True,
+                "at": "2015-09-20T00:00:00Z"
+            }
+        ])
+
+        response = client.post("/learning/student/%s/attain" % silly_billy_id,{
+            "word": "here",
+            "achievement": spell_id,
+            "at": "2015-09-25T00:00:00Z"
+        }, format='json')
+
+        history = [dict(progress) for progress in client.get("/learning/student/%s/history/?achievements=%s,%s" % (silly_billy_id,sight_id,spell_id)).data]
+
+        self.assertItemsEqual(history,[
+            {
+                "word": "here",
+                "achievement": spell_id,
+                "hold": True,
+                "at": "2015-09-25T00:00:00Z"
+            },
+            {
+                "word": "there",
+                "achievement": spell_id,
+                "hold": False,
+                "at": "2015-09-24T00:00:00Z"
+            },
+            {
+                "word": "there",
+                "achievement": spell_id,
+                "hold": False,
+                "at": "2015-09-23T00:00:00Z"
+            },
+            {
+                "word": "there",
+                "achievement": spell_id,
+                "hold": True,
+                "at": "2015-09-22T00:00:00Z"
+            },
+            {
+                "word": "here",
+                "achievement": sight_id,
+                "hold": True,
+                "at": "2015-09-21T00:00:00Z"
+            },
+            {
+                "word": "here",
+                "achievement": sight_id,
+                "hold": True,
+                "at": "2015-09-20T00:00:00Z"
+            }
+        ])
+
+        history = [dict(progress) for progress in client.get("/learning/student/%s/history/?achievements=%s" % (silly_billy_id,spell_id)).data]
+
+        self.assertItemsEqual(history,[
+            {
+                "word": "here",
+                "achievement": spell_id,
+                "hold": True,
+                "at": "2015-09-25T00:00:00Z"
+            },
+            {
+                "word": "there",
+                "achievement": spell_id,
+                "hold": False,
+                "at": "2015-09-24T00:00:00Z"
+            },
+            {
+                "word": "there",
+                "achievement": spell_id,
+                "hold": False,
+                "at": "2015-09-23T00:00:00Z"
+            },
+            {
+                "word": "there",
+                "achievement": spell_id,
+                "hold": True,
+                "at": "2015-09-22T00:00:00Z"
+            }
+        ])
+
+        history = [dict(progress) for progress in client.get("/learning/student/%s/history/?achievements=%s" % (silly_billy_id,spell_id)).data]
+
+        self.assertItemsEqual(history,[
+            {
+                "word": "here",
+                "achievement": spell_id,
+                "hold": True,
+                "at": "2015-09-25T00:00:00Z"
+            },
+            {
+                "word": "there",
+                "achievement": spell_id,
+                "hold": False,
+                "at": "2015-09-24T00:00:00Z"
+            },
+            {
+                "word": "there",
+                "achievement": spell_id,
+                "hold": False,
+                "at": "2015-09-23T00:00:00Z"
+            },
+            {
+                "word": "there",
+                "achievement": spell_id,
+                "hold": True,
+                "at": "2015-09-22T00:00:00Z"
+            }
+        ])
+
+        history = [dict(progress) for progress in client.get("/learning/student/%s/history/?words=here&achievements=%s" % (silly_billy_id,spell_id)).data]
+
+        for progress in history:
+            del progress['at']
+
+        self.assertItemsEqual(history,[
+            {
+                "word": "here",
+                "achievement": spell_id,
                 "hold": True
+            }
+        ])
+
+        history = [dict(progress) for progress in client.get("/learning/student/%s/history/?from=2015-09-21&to=2015-09-24" % (silly_billy_id)).data]
+
+        self.assertItemsEqual(history,[
+            {
+                "word": "there",
+                "achievement": spell_id,
+                "hold": False,
+                "at": "2015-09-23T00:00:00Z"
+            },
+            {
+                "word": "there",
+                "achievement": spell_id,
+                "hold": True,
+                "at": "2015-09-22T00:00:00Z"
+            },
+            {
+                "word": "here",
+                "achievement": sight_id,
+                "hold": True,
+                "at": "2015-09-21T00:00:00Z"
             }
         ])
 

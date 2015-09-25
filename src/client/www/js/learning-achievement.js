@@ -1,16 +1,10 @@
 Learning.controller("Achievement","Changeable",{
     list: function() {
-        achievements: hwAPI.achievement.list($.proxy(this.listed,this));
-    },
-    listed: function(achievements) {
-        this.it = {achievements: achievements};
+        this.it = {achievements: hwAPI.achievement.list()};
         this.application.render(this.it);
     },
     select: function() {
-        hwAPI.achievement.select(this.application.current.path.achievement_id,$.proxy(this.selected,this));
-    },
-    selected: function(achievement) {
-        this.it = {achievement: achievement};
+        this.it = {achievement: hwAPI.achievement.select(this.application.current.path.achievement_id)};
         this.application.render(this.it);
     },    
     new: function() {
@@ -25,20 +19,15 @@ Learning.controller("Achievement","Changeable",{
         var achievement_id = $("#achievement_id").val();
         var achievement = {
             name: $("#name").val(), 
-            description: $("#description").val()
+            description: $("#description").val(),
+            words: this.words_array($("#words").val())
         };
         if (achievement_id) {
-            hwAPI.achievement.update(achievement_id,achievement,$.proxy(this.updated,this));
+            this.it = {achievement: hwAPI.achievement.update(achievement_id,achievement)};
         } else {
-            hwAPI.achievement.create(achievement,$.proxy(this.created,this));
+            this.it = {achievement: hwAPI.achievement.create(achievement)};
         }
-    },
-    updated: function(achievement) {
-        this.it = {achievement: achievement};
         this.application.render(this.it);
-    }, 
-    created: function(achievement) {
-        this.application.go('achievement/select',achievement.id);
     },
     cancel: function() {
         var achievement_id = $("#achievement_id").val();
@@ -50,11 +39,9 @@ Learning.controller("Achievement","Changeable",{
     },
     delete: function() {
         if (confirm("Are you sure?") == true) {
-            hwAPI.achievement.delete(this.application.current.path.achievement_id,$.proxy(this.deleted,this));
+            hwAPI.achievement.delete(this.application.current.path.achievement_id);
+            this.application.go('achievement');
         }
-    },
-    deleted: function() {
-        this.application.go('achievement');
     }
 });
 

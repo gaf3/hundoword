@@ -2,11 +2,11 @@
 <div class="uk-overflow-container">
     {{#def.StudentTabs}}
     <form class="uk-form">
-        <div style="text-align: right;">
+        <div>
             <fieldset data-uk-margin>
                 <strong>Words</strong>
                 <input id="words" value="{{=Learning.current.query.words ? Learning.current.query.words.replace(/,/g,' ') : ''}}" type="text">
-                <button OnClick="Learning.current.controller.position_search()" class="uk-button uk-button-primary">
+                <button OnClick="Learning.current.controller.position_search();" class="uk-button uk-button-primary">
                     <i class="uk-icon-search"></i>
                 </button>
             </fieldset>
@@ -28,9 +28,8 @@
                     {{~it.achievements :achievement}}
                     <td>
                         <input 
-                            type="checkbox" OnClick="Learning.current.controller.position_change(event)" 
-                            data-word="{{=position.word}}" data-achievement="{{=achievement.name}}" 
-                            {{? position.achievements.indexOf(achievement.name) > -1 }}checked{{?}}
+                            type="checkbox" OnClick="Learning.current.controller.progress(event,'{{=position.word}}',{{=achievement.id}})" 
+                            {{? position.achievements.indexOf(achievement.id) > -1 }}checked{{?}}
                         >
                     </td>
                     {{~}}
