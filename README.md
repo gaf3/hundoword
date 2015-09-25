@@ -344,7 +344,7 @@ In all JavaScript API functions, the arguments success, error, and complete are 
       * words - Array of words to return data for
   * History - Retrieves Student History with words and Achievements using id
     * Request - `GET http://192.168.72.87/api/student/<id>/history/?words=<word>,<word>&achievements=<achievement>,<achievement>`
-      * words = Only return progress for these words
+      * words = Only return history for these words
       * achievements - Only show history for these achievements (by id)
       * from - Only show history from this date (YYYY-MM-DD)
       * to - Only show history to this date (YYYY-MM-DD)
@@ -354,7 +354,7 @@ In all JavaScript API functions, the arguments success, error, and complete are 
         * achievement
         * hold - Whether the Achieveent was attained or yielded
         * at - Date and time 
-    * JavaScript - `api.student.progress(id,words[],achievements[],hold,from,to,success,error,complete)`
+    * JavaScript - `api.student.history(id,words[],achievements[],hold,from,to,success,error,complete)`
   * Delete - Deletes a Student
     * Request - `DELETE http://192.168.72.87/api/student/<id>/`
     * Response - `200 Ok`
