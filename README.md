@@ -102,18 +102,18 @@ Go to http://192.168.72.87/admin/ to get at the database directly.  This has acc
 
 ## RESTful
 
-The RESTful API is located at http://192.168.72.87/api/ and all arguments are JSON. It's used to drive the client. 
+The RESTful API is located at http://192.168.72.87/api/v0/ and all arguments are JSON. It's used to drive the client. 
 
 There's already an existing user/pass: vagrant/vagrant or you can use a new one if you created one through the web site. 
 
 ## JavaScript
 
-There is also a JavaScript wrapper for the RESTful API in `src/api/javascript/hundoword.api.js`.  
+There is also a JavaScript wrapper for the RESTful API in `src/api/v0/javascript/hundoword.api.js`.  
 
 The examples below assume the api was created as: 
 
 ```javascript
-var api = new HundoWord.API("http://192.168.72.87/api/");
+var api = new HundoWord.API("http://192.168.72.87/api/v0/");
 ```
 
 In all JavaScript API functions, the arguments success, error, and complete are optional callback functions.  If unspecified, the JavaScript API functions will return the data structures returned by the RESTful API and any errors will throw a `HundoWord.APIException` which has a text message and the full repsonse object. 
@@ -121,7 +121,7 @@ In all JavaScript API functions, the arguments success, error, and complete are 
 ### Endpoints / Functions
 
 * register - Register a new User
-  * Request - `POST http://192.168.72.87/api/register/`
+  * Request - `POST http://192.168.72.87/api/v0/register/`
     * username 
     * password
     * email - Must be valid format
@@ -130,7 +130,7 @@ In all JavaScript API functions, the arguments success, error, and complete are 
     * email
   * JavaScript - `api.register(username,password,email,success,error,complete)`
 * token - Logs in and recieves the token for future communication.
-  * Request - `POST http://192.168.72.87/api/token/`
+  * Request - `POST http://192.168.72.87/api/v0/token/`
     * username 
     * password
   * Response - `200 Ok`
@@ -139,7 +139,7 @@ In all JavaScript API functions, the arguments success, error, and complete are 
     * Doesn't return anything if successful, but save the token for all future requests. 
 * achievement
   * List  - Retrieves list of Achievements
-    * Request - `GET http://192.168.72.87/api/achievement/`
+    * Request - `GET http://192.168.72.87/api/v0/achievement/`
     * Response - `200 Ok`
       * Array
         * id
@@ -147,14 +147,14 @@ In all JavaScript API functions, the arguments success, error, and complete are 
         * description
     * JavaScript - `api.achievement.list(success,error,complete)`
   * Select - Retrieves an Achievement using id
-    * Request - `GET http://192.168.72.87/api/achievement/<id>/`
+    * Request - `GET http://192.168.72.87/api/v0/achievement/<id>/`
     * Response - `200 Ok`
       * id
       * name
       * description
     * JavaScript - `api.achievement.select(id,success,error,complete)`
   * Create - Creates an Achievement
-    * Request - `POST http://192.168.72.87/api/achievement/`
+    * Request - `POST http://192.168.72.87/api/v0/achievement/`
       * name
       * description
     * Response - `201 Created`
@@ -164,7 +164,7 @@ In all JavaScript API functions, the arguments success, error, and complete are 
     * JavaScript - `api.achievement.create(data,success,error,complete)`
       * data - object to be posted
   * Update - Updates an Achievement
-    * Request - `POST http://192.168.72.87/api/achievement/<id>/`
+    * Request - `POST http://192.168.72.87/api/v0/achievement/<id>/`
       * name (optional)
       * description (optional)
     * Response - `202 Accepted`
@@ -174,12 +174,12 @@ In all JavaScript API functions, the arguments success, error, and complete are 
     * JavaScript - `api.achievement.update(id,data,success,error,complete)`
       * data - object to be posted
   * Delete - Deletes an Achievement
-    * Request - `DELETE http://192.168.72.87/api/achievement/<id>/`
+    * Request - `DELETE http://192.168.72.87/api/v0/achievement/<id>/`
     * Response - `200 Ok`
     * JavaScript - `api.achievement.delete(id,success,error,complete)`
 * program
   * List  - Retrieves list of Programs
-    * Request - `GET http://192.168.72.87/api/program/`
+    * Request - `GET http://192.168.72.87/api/v0/program/`
     * Response - `200 Ok`
       * Array
         * id
@@ -188,7 +188,7 @@ In all JavaScript API functions, the arguments success, error, and complete are 
         * words - Array of words in the program (string)
     * JavaScript - `api.program.list(success,error,complete)`
   * Select - Retrieves Program using id
-    * Request - `GET http://192.168.72.87/api/program/<id>/`
+    * Request - `GET http://192.168.72.87/api/v0/program/<id>/`
     * Response - `200 Ok`
       * id
       * name
@@ -196,7 +196,7 @@ In all JavaScript API functions, the arguments success, error, and complete are 
       * words - Array of words (string)
     * JavaScript - `api.program.select(id,success,error,complete)`
   * Create - Creates a Program
-    * Request - `POST http://192.168.72.87/api/program/`
+    * Request - `POST http://192.168.72.87/api/v0/program/`
       * name
       * description
       * words - Array of words (string) - Duplicates are ignored, no warning
@@ -208,7 +208,7 @@ In all JavaScript API functions, the arguments success, error, and complete are 
     * JavaScript - `api.program.create(data,success,error,complete)`
       * data - object to be posted
   * Update - Updates a Program
-    * Request - `POST http://192.168.72.87/api/program/<id>/`
+    * Request - `POST http://192.168.72.87/api/v0/program/<id>/`
       * name (optional)
       * description (optional)
       * words - Array of words (string) - Will overwrite existing list, dupes ignored
@@ -220,7 +220,7 @@ In all JavaScript API functions, the arguments success, error, and complete are 
     * JavaScript - `api.program.update(id,data,success,error,complete)`
       * data - object to be posted
   * Append - Adds words to a Program
-    * Request - `POST http://192.168.72.87/api/program/<id>/append/`
+    * Request - `POST http://192.168.72.87/api/v0/program/<id>/append/`
       * words - Array of words (string) - Will be added to existing list, dupes already existing ignored
     * Response- `202 Accepted`
       * id
@@ -230,7 +230,7 @@ In all JavaScript API functions, the arguments success, error, and complete are 
     * JavaScript - `api.program.append(id,words,success,error,complete)`
       * words - array of words to append
   * Remove - Removes words to a Program
-    * Request - `POST http://192.168.72.87/api/program/<id>/remove/`
+    * Request - `POST http://192.168.72.87/api/v0/program/<id>/remove/`
       * words - Array of words (string) - Will be removed from existing list, dupes ignored
     * Response - `202 Accepted`
       * id
@@ -240,12 +240,12 @@ In all JavaScript API functions, the arguments success, error, and complete are 
     * JavaScript - `api.program.remove(id,words,success,error,complete)`
       * words - array of words to remove
   * Delete - Deletes a Program
-    * Request - `DELETE http://192.168.72.87/api/program/<id>/`
+    * Request - `DELETE http://192.168.72.87/api/v0/program/<id>/`
     * Response - `200 Ok`
     * JavaScript - `api.program.delete(id,success,error,complete)`
 * student
   * List  - Retrieves list of Students
-    * Request - `GET http://192.168.72.87/api/student/`
+    * Request - `GET http://192.168.72.87/api/v0/student/`
     * Response - `200 Ok`
       * Array
         * id
@@ -255,7 +255,7 @@ In all JavaScript API functions, the arguments success, error, and complete are 
         * words - Array of words to learn (string)
     * JavaScript - `api.student.list(success,error,complete)`
   * Select - Retrieves Student using id
-    * Request - `GET http://192.168.72.87/api/student/<id>/`
+    * Request - `GET http://192.168.72.87/api/v0/student/<id>/`
     * Response - `200 Ok`
       * id
       * first_name
@@ -264,7 +264,7 @@ In all JavaScript API functions, the arguments success, error, and complete are 
       * words - Array of words (string)
     * JavaScript - `api.student.select(id,success,error,complete)`
   * Create - Creates a Student
-    * Request - `POST http://192.168.72.87/api/student/`
+    * Request - `POST http://192.168.72.87/api/v0/student/`
       * first_name
       * last_name
       * age
@@ -278,7 +278,7 @@ In all JavaScript API functions, the arguments success, error, and complete are 
     * JavaScript - `api.student.create(data,success,error,complete)`
       * data - object to be posted
   * Update - Updates a Student
-    * Request - `POST http://192.168.72.87/api/student/<id>/`
+    * Request - `POST http://192.168.72.87/api/v0/student/<id>/`
       * first_name - (optional)
       * last_name - (optional)
       * age - (optional)
@@ -292,7 +292,7 @@ In all JavaScript API functions, the arguments success, error, and complete are 
     * JavaScript - `api.student.update(id,data,success,error,complete)`
       * data - object to be posted
   * Append - Adds words to a Student
-    * Request - `POST http://192.168.72.87/api/student/<id>/append/`
+    * Request - `POST http://192.168.72.87/api/v0/student/<id>/append/`
       * words - Array of words (string) - Will be added to existing list, dupes already existing ignored
     * Response - `202 Accepted`
       * id
@@ -303,7 +303,7 @@ In all JavaScript API functions, the arguments success, error, and complete are 
     * JavaScript - `api.student.append(id,words,success,error,complete)`
       * words - array of words to append
   * Remove - Removes words to a Student
-    * Request - `POST http://192.168.72.87/api/student/<id>/append/`
+    * Request - `POST http://192.168.72.87/api/v0/student/<id>/append/`
       * words - Array of words (string) - Will be removed from existing list, dupes ignored
     * Response - `202 Accepted`
       * id
@@ -314,7 +314,7 @@ In all JavaScript API functions, the arguments success, error, and complete are 
     * JavaScript - `api.student.remove(id,words,success,error,complete)`
       * words - array of words to remove
   * Attain - Attains an achievement for a word for a Student and updates Position as well
-    * Request - `POST http://192.168.72.87/api/student/<id>/attain/`
+    * Request - `POST http://192.168.72.87/api/v0/student/<id>/attain/`
       * word
       * achievement - Name of achievement
     * Response - `202 Accepted`
@@ -324,7 +324,7 @@ In all JavaScript API functions, the arguments success, error, and complete are 
       * at - Date and time (YYYY-MM-DDTHH:MM:SSZ)
     * JavaScript - `api.student.attain(id,word,achievement,at,success,error,complete)`
   * Yield - Yields an achievement for a word for a Student
-    * Request - `POST http://192.168.72.87/api/student/<id>/yield/`
+    * Request - `POST http://192.168.72.87/api/v0/student/<id>/yield/`
       * word
       * achievement - Name of achievement
     * Response - `202 Accepted`
@@ -334,7 +334,7 @@ In all JavaScript API functions, the arguments success, error, and complete are 
       * at - Date and time (YYYY-MM-DDTHH:MM:SSZ)
     * JavaScript - `api.student.yield(id,word,achievement,at,success,error,complete)`
   * Position - Retrieves Student Position with words and Achievements using id
-    * Request - `GET http://192.168.72.87/api/student/<id>/position/?words=<word>,<word>`
+    * Request - `GET http://192.168.72.87/api/v0/student/<id>/position/?words=<word>,<word>`
       * words = Only return position for these words
     * Response - `200 Ok`
       * Array - ordered by word
@@ -343,7 +343,7 @@ In all JavaScript API functions, the arguments success, error, and complete are 
     * JavaScript - `api.student.position(id,words,success,error,complete)`
       * words - Array of words to return data for
   * History - Retrieves Student History with words and Achievements using id
-    * Request - `GET http://192.168.72.87/api/student/<id>/history/?words=<word>,<word>&achievements=<achievement>,<achievement>`
+    * Request - `GET http://192.168.72.87/api/v0/student/<id>/history/?words=<word>,<word>&achievements=<achievement>,<achievement>`
       * words = Only return history for these words
       * achievements - Only show history for these achievements (by id)
       * from - Only show history from this date (YYYY-MM-DD)
@@ -356,7 +356,7 @@ In all JavaScript API functions, the arguments success, error, and complete are 
         * at - Date and time 
     * JavaScript - `api.student.history(id,words[],achievements[],hold,from,to,success,error,complete)`
   * Delete - Deletes a Student
-    * Request - `DELETE http://192.168.72.87/api/student/<id>/`
+    * Request - `DELETE http://192.168.72.87/api/v0/student/<id>/`
     * Response - `200 Ok`
     * JavaScript - `api.student.delete(id,success,error,complete)`
 
@@ -397,7 +397,7 @@ It'll also generate a nice coverage report as the name implies.
 
 ## JavaScript API
 
-Go to `http://192.168.72.87/test/api/javascript/` and wait.  You might want to get a sandwich. 
+Go to `http://192.168.72.87/test/api/v0/javascript/` and wait.  You might want to get a sandwich. 
 
 This uses the existing database, but puts prefixes of 'api-js-test-' before all Users, Achievements, and Programs. It creates/destroys these Users, Achievements, and Programs before/after every test and it's slow.  
 
