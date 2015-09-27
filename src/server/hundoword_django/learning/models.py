@@ -60,6 +60,7 @@ class StudentWord(models.Model):
 
     student = models.ForeignKey(Student,related_name='words')
     word = models.CharField(max_length=128)
+    focus = models.BooleanField(default=False)
     achievements = models.ManyToManyField(Achievement)
 
     class Meta:

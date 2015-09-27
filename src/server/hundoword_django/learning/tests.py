@@ -595,6 +595,123 @@ class test_Django(SimpleTestCase):
             }
         ])
 
+        # Focus 
+
+        client.force_authenticate(user=loser)
+
+        response = client.post("/learning/v0/student/%s/focus" % silly_billy_id,{}, format='json')
+
+        self.assertEqual(response.status_code,status.HTTP_404_NOT_FOUND);
+        self.assertEqual(response.data,{"detail": "Student not found"})
+
+        client.force_authenticate(user=user)
+
+        response = client.post("/learning/v0/student/%s/focus" % silly_billy_id,{}, format='json')
+
+        self.assertEqual(response.status_code,status.HTTP_400_BAD_REQUEST);
+        self.assertEqual(response.data,{"words": ["This field is required."]})
+
+        response = client.post("/learning/v0/student/%s/append" % silly_billy_id,{
+            "words": ["here"]
+        }, format='json')
+        self.assertEqual(response.status_code,status.HTTP_202_ACCEPTED);
+
+        response = client.post("/learning/v0/student/%s/focus" % silly_billy_id,{
+            "words": ["here","there"]
+        }, format='json')
+
+        self.assertEqual(response.status_code,status.HTTP_404_NOT_FOUND);
+        self.assertEqual(response.data,{"detail": "Words not found","words": ["there"]})
+
+        response = client.post("/learning/v0/student/%s/append" % silly_billy_id,{
+            "words": ["there","everywhere"]
+        }, format='json')
+        self.assertEqual(response.status_code,status.HTTP_202_ACCEPTED);
+
+        response = client.post("/learning/v0/student/%s/focus" % silly_billy_id,{
+            "words": ["here","there"]
+        }, format='json')
+
+        self.assertEqual(response.status_code,status.HTTP_202_ACCEPTED);
+        self.assertEqual(response.data,[
+            {
+                "word": "here",
+                "focus": True,
+                "achievements": []
+            },
+            {
+                "word": "there",
+                "focus": True,
+                "achievements": []
+            }
+        ])
+
+        response = client.post("/learning/v0/student/%s/remove" % silly_billy_id,{
+            "words": ["here","there","everywhere"]
+        }, format='json')
+        self.assertEqual(response.status_code,status.HTTP_202_ACCEPTED);
+
+        # Blur 
+
+        client.force_authenticate(user=loser)
+
+        response = client.post("/learning/v0/student/%s/blur" % silly_billy_id,{}, format='json')
+
+        self.assertEqual(response.status_code,status.HTTP_404_NOT_FOUND);
+        self.assertEqual(response.data,{"detail": "Student not found"})
+
+        client.force_authenticate(user=user)
+
+        response = client.post("/learning/v0/student/%s/blur" % silly_billy_id,{}, format='json')
+
+        self.assertEqual(response.status_code,status.HTTP_400_BAD_REQUEST);
+        self.assertEqual(response.data,{"words": ["This field is required."]})
+
+        response = client.post("/learning/v0/student/%s/append" % silly_billy_id,{
+            "words": ["here"]
+        }, format='json')
+        self.assertEqual(response.status_code,status.HTTP_202_ACCEPTED);
+
+        response = client.post("/learning/v0/student/%s/blur" % silly_billy_id,{
+            "words": ["here","there"]
+        }, format='json')
+
+        self.assertEqual(response.status_code,status.HTTP_404_NOT_FOUND);
+        self.assertEqual(response.data,{"detail": "Words not found","words": ["there"]})
+
+        response = client.post("/learning/v0/student/%s/append" % silly_billy_id,{
+            "words": ["there","everywhere"]
+        }, format='json')
+        self.assertEqual(response.status_code,status.HTTP_202_ACCEPTED);
+
+        response = client.post("/learning/v0/student/%s/focus" % silly_billy_id,{
+            "words": ["here","there"]
+        }, format='json')
+        self.assertEqual(response.status_code,status.HTTP_202_ACCEPTED);
+
+        response = client.post("/learning/v0/student/%s/blur" % silly_billy_id,{
+            "words": ["here","there"]
+        }, format='json')
+
+        self.assertEqual(response.status_code,status.HTTP_202_ACCEPTED);
+        self.assertEqual(response.data,[
+            {
+                "word": "here",
+                "focus": False,
+                "achievements": []
+            },
+            {
+                "word": "there",
+                "focus": False,
+                "achievements": []
+            }
+        ])
+
+        response = client.post("/learning/v0/student/%s/remove" % silly_billy_id,{
+            "words": ["here","there","everywhere"]
+        }, format='json')
+        self.assertEqual(response.status_code,status.HTTP_202_ACCEPTED);
+
         # Attain 
 
         client.force_authenticate(user=loser)
@@ -757,13 +874,20 @@ class test_Django(SimpleTestCase):
 
         client.force_authenticate(user=user)
 
+        response = client.post("/learning/v0/student/%s/focus" % silly_billy_id,{
+            "words": ["here"]
+        }, format='json')
+        self.assertEqual(response.status_code,status.HTTP_202_ACCEPTED);
+
         self.assertEqual(client.get("/learning/v0/student/%s/position" % silly_billy_id).data,[
             {
                 "word": "here",
+                "focus": True,
                 "achievements": [sight_id]
             },
             {
                 "word": "there",
+                "focus": False,
                 "achievements": []
             }
         ])
@@ -771,10 +895,12 @@ class test_Django(SimpleTestCase):
         self.assertEqual(client.get("/learning/v0/student/%s/position?words=here,there" % silly_billy_id).data,[
             {
                 "word": "here",
+                "focus": True,
                 "achievements": [sight_id]
             },
             {
                 "word": "there",
+                "focus": False,
                 "achievements": []
             }
         ])
@@ -782,7 +908,24 @@ class test_Django(SimpleTestCase):
         self.assertEqual(client.get("/learning/v0/student/%s/position?words=here" % silly_billy_id).data,[
             {
                 "word": "here",
+                "focus": True,
                 "achievements": [sight_id]
+            }
+        ])
+
+        self.assertEqual(client.get("/learning/v0/student/%s/position?focus=true" % silly_billy_id).data,[
+            {
+                "word": "here",
+                "focus": True,
+                "achievements": [sight_id]
+            }
+        ])
+
+        self.assertEqual(client.get("/learning/v0/student/%s/position?focus=false" % silly_billy_id).data,[
+            {
+                "word": "there",
+                "focus": False,
+                "achievements": []
             }
         ])
 

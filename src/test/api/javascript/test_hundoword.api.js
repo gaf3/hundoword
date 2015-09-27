@@ -1370,6 +1370,92 @@ QUnit.test("remove", function(assert) {
 
 });
 
+QUnit.test("focus", function(assert) {
+
+    var api = new HundoWord.API(hundoword_django_host + "/api/v0/");
+    check_user(api,"tester0","tester0","tester0@hundoword.com");
+
+    var sane_jane = api.student.create({first_name: "Sane", last_name: "Jane", age: 5,words:["fun","time","party"]});
+
+    assert.deepEqual(
+        api.student.focus(sane_jane.id,["fun","time"]),
+        [
+            {
+                word: "fun",
+                focus: true,
+                achievements: []
+            },
+            {
+                word: "time",
+                focus: true,
+                achievements: []
+            }
+        ]
+    );
+
+    var pass = assert.async();
+    api.student.focus(sane_jane.id,["party"],
+        function (data) {
+            assert.deepEqual(
+                data,
+                [
+                    {
+                        word: "party",
+                        focus: true,
+                        achievements: []
+                    }
+                ]
+            );
+            pass();
+        }
+    );
+
+});
+
+QUnit.test("blur", function(assert) {
+
+    var api = new HundoWord.API(hundoword_django_host + "/api/v0/");
+    check_user(api,"tester0","tester0","tester0@hundoword.com");
+
+    var sane_jane = api.student.create({first_name: "Sane", last_name: "Jane", age: 5,words:["fun","time","party"]});
+
+    api.student.focus(sane_jane.id,["fun","time","party"])
+
+    assert.deepEqual(
+        api.student.blur(sane_jane.id,["fun","time"]),
+        [
+            {
+                word: "fun",
+                focus: false,
+                achievements: []
+            },
+            {
+                word: "time",
+                focus: false,
+                achievements: []
+            }
+        ]
+    );
+
+    var pass = assert.async();
+    api.student.blur(sane_jane.id,["party"],
+        function (data) {
+            assert.deepEqual(
+                data,
+                [
+                    {
+                        word: "party",
+                        focus: false,
+                        achievements: []
+                    }
+                ]
+            );
+            pass();
+        }
+    );
+
+});
+
 QUnit.test("attain", function(assert) {
 
     var api = new HundoWord.API(hundoword_django_host + "/api/v0/");
@@ -1439,16 +1525,19 @@ QUnit.test("position", function(assert) {
 
     api.student.attain(sane_jane.id,"fun",sight.id);
     api.student.attain(sane_jane.id,"time",sound.id);
+    api.student.focus(sane_jane.id,["fun"]);
 
     assert.deepEqual(
         api.student.position(sane_jane.id),
         [
             {
                 word: "fun",
+                focus: true,
                 achievements: [sight.id]
             },
             {
                 word: "time",
+                focus: false,
                 achievements: [sound.id]
             }
         ]
@@ -1459,10 +1548,12 @@ QUnit.test("position", function(assert) {
         [
             {
                 word: "fun",
+                focus: true,
                 achievements: [sight.id]
             },
             {
                 word: "time",
+                focus: false,
                 achievements: [sound.id]
             }
         ]
@@ -1473,23 +1564,48 @@ QUnit.test("position", function(assert) {
         [
             {
                 word: "fun",
+                focus: true,
                 achievements: [sight.id]
             }
         ]
     );
 
+    assert.deepEqual(
+        api.student.position(sane_jane.id,null,true),
+        [
+            {
+                word: "fun",
+                focus: true,
+                achievements: [sight.id]
+            }
+        ]
+    );
+
+    assert.deepEqual(
+        api.student.position(sane_jane.id,null,false),
+        [
+            {
+                word: "time",
+                focus: false,
+                achievements: [sound.id]
+            }
+        ]
+    );
+
     var pass = assert.async();
-    api.student.position(sane_jane.id,null,
+    api.student.position(sane_jane.id,null,null,
         function (data) {
             assert.deepEqual(
                 data,
                 [
                     {
                         word: "fun",
+                        focus: true,
                         achievements: [sight.id]
                     },
                     {
                         word: "time",
+                        focus: false,
                         achievements: [sound.id]
                     }
                 ]

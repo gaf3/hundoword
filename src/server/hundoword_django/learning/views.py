@@ -327,11 +327,17 @@ def student(request,pk='',action=''):
 
             elif action == "position": 
 
-                if "words" in request.GET:
-                    serializer = PositionSerializer(student.words.filter(word__in=request.GET["words"].split(",")), many=True)
-                else:
-                    serializer = PositionSerializer(student.words.all(), many=True)
+                filter = {
+                    "student": Student.objects.get(teacher=request.user,pk=pk)
+                }
 
+                if "words" in request.GET:
+                    filter["word__in"] = request.GET["words"].split(",")
+
+                if "focus" in request.GET:
+                    filter["focus"] = request.GET["focus"].lower() == "true"
+
+                serializer = PositionSerializer(StudentWord.objects.filter(**filter), many=True)
                 return Response(serializer.data)
 
             # Progress
@@ -400,6 +406,22 @@ def student(request,pk='',action=''):
                 student.words.filter(word__in=request.DATA["words"]).delete()
 
                 serializer = StudentSerializer(student)
+                return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+
+            elif action in ["focus","blur"]: 
+
+                if 'words' not in request.DATA:
+                    return Response({"words": ["This field is required."]}, status=status.HTTP_400_BAD_REQUEST)
+
+                student_words = StudentWord.objects.filter(student=student,word__in=request.DATA["words"])
+
+                missing = set(request.DATA["words"]) - set([student_word.word for student_word in student_words])
+
+                if missing:
+                    return Response({"detail": "Words not found","words": list(missing)}, status=status.HTTP_404_NOT_FOUND)
+
+                student_words.update(focus=action == "focus")
+                serializer = PositionSerializer(student_words, many=True)
                 return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
 
             elif action in ["attain","yield"]: 
