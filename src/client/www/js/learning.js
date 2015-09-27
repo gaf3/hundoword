@@ -1,6 +1,6 @@
 window.Learning = new DoTRoute.Application();
 
-window.hwAPI = new HundoWord.API(window.location.protocol + "//" + window.location.host + "/api/");
+window.hwAPI = new HundoWord.API(window.location.protocol + "//" + window.location.host + "/api/v0/");
 
 Learning.load = function (name) {
     return $.ajax({url: name + ".html", async: false}).responseText;
