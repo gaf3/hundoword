@@ -88,7 +88,7 @@ class test_Django(SimpleTestCase):
 
         client = APIClient()
 
-        response = client.post("/learning/register/",{
+        response = client.post("/learning/v0/register/",{
             "username": "tester",
             "password": "tester"
         }, format='json')
@@ -96,7 +96,7 @@ class test_Django(SimpleTestCase):
         self.assertEqual(response.status_code,status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data,{"email": ["This field is required."]})
 
-        response = client.post("/learning/register/",{
+        response = client.post("/learning/v0/register/",{
             "username": "tester",
             "password": "tester",
             "email": "tester@tester.com"
@@ -116,7 +116,7 @@ class test_Django(SimpleTestCase):
 
         client = APIClient()
 
-        response = client.post("/learning/register/",{
+        response = client.post("/learning/v0/register/",{
             "username": "tester",
             "password": "tester",
             "email": "tester@tester.com"
@@ -127,7 +127,7 @@ class test_Django(SimpleTestCase):
         user = User.objects.get(username="tester")
         token = Token.objects.get(user=user)
 
-        response = client.post("/learning/token/",{
+        response = client.post("/learning/v0/token/",{
             "username": "tester",
             "password": "tester"
         }, format='json')
@@ -146,12 +146,12 @@ class test_Django(SimpleTestCase):
 
         # Create
 
-        response = client.post("/learning/achievement/",{}, format='json')
+        response = client.post("/learning/v0/achievement/",{}, format='json')
 
         self.assertEqual(response.status_code,status.HTTP_400_BAD_REQUEST);
         self.assertEqual(response.data,{"name": ["This field is required."]})
 
-        response = client.post("/learning/achievement/",{
+        response = client.post("/learning/v0/achievement/",{
             "name": "plain",
             "description": "Plain ol' example"
         }, format='json')
@@ -167,12 +167,12 @@ class test_Django(SimpleTestCase):
 
         # Select
 
-        response = client.get("/learning/achievement/0")
+        response = client.get("/learning/v0/achievement/0")
 
         self.assertEqual(response.status_code,status.HTTP_404_NOT_FOUND);
         self.assertEqual(response.data,{"detail": "Achievement not found"})
 
-        self.assertEqual(client.get("/learning/achievement/%s" % plain_id).data,{
+        self.assertEqual(client.get("/learning/v0/achievement/%s" % plain_id).data,{
             "id": plain_id,
             "name": "plain",
             "description": "Plain ol' example"
@@ -180,7 +180,7 @@ class test_Django(SimpleTestCase):
 
         # Update 
 
-        response = client.post("/learning/achievement/%s" % plain_id,{
+        response = client.post("/learning/v0/achievement/%s" % plain_id,{
             "description": "Plain old example"
         }, format='json')
 
@@ -190,7 +190,7 @@ class test_Django(SimpleTestCase):
             "description": "Plain old example"
         })
 
-        self.assertEqual(client.get("/learning/achievement/%s" % plain_id).data,{
+        self.assertEqual(client.get("/learning/v0/achievement/%s" % plain_id).data,{
             "id": plain_id,
             "name": "plain",
             "description": "Plain old example"
@@ -202,7 +202,7 @@ class test_Django(SimpleTestCase):
         achievement.save()
         jane_id = achievement.pk
 
-        self.assertEqual([dict(achievement) for achievement in client.get("/learning/achievement/").data],[
+        self.assertEqual([dict(achievement) for achievement in client.get("/learning/v0/achievement/").data],[
             {
                 "id": jane_id,
                 "name": "jane",
@@ -217,9 +217,9 @@ class test_Django(SimpleTestCase):
 
         # Delete
 
-        self.assertEqual(client.delete("/learning/achievement/%s" % plain_id).data,{})
+        self.assertEqual(client.delete("/learning/v0/achievement/%s" % plain_id).data,{})
 
-        self.assertEqual([dict(achievement) for achievement in client.get("/learning/achievement/").data],[
+        self.assertEqual([dict(achievement) for achievement in client.get("/learning/v0/achievement/").data],[
             {
                 "id": jane_id,
                 "name": "jane",
@@ -236,24 +236,24 @@ class test_Django(SimpleTestCase):
 
         # Words validation
 
-        response = client.post("/learning/program/",{"words": "oops"}, format='json')
+        response = client.post("/learning/v0/program/",{"words": "oops"}, format='json')
 
         self.assertEqual(response.status_code,status.HTTP_400_BAD_REQUEST);
         self.assertEqual(response.data,{"words": ["Must be an array."]})
 
-        response = client.post("/learning/program/",{"words": [0]}, format='json')
+        response = client.post("/learning/v0/program/",{"words": [0]}, format='json')
 
         self.assertEqual(response.status_code,status.HTTP_400_BAD_REQUEST);
         self.assertEqual(response.data,{"words": ["All array items be be strings."]})
 
         # Create
 
-        response = client.post("/learning/program/",{}, format='json')
+        response = client.post("/learning/v0/program/",{}, format='json')
 
         self.assertEqual(response.status_code,status.HTTP_400_BAD_REQUEST);
         self.assertEqual(response.data,{"name": ["This field is required."]})
 
-        response = client.post("/learning/program/",{
+        response = client.post("/learning/v0/program/",{
             "name": "plain",
             "description": "Plain ol' example",
             "words": ["he","she","it","it"]
@@ -271,12 +271,12 @@ class test_Django(SimpleTestCase):
 
         # Select
 
-        response = client.get("/learning/program/0")
+        response = client.get("/learning/v0/program/0")
 
         self.assertEqual(response.status_code,status.HTTP_404_NOT_FOUND);
         self.assertEqual(response.data,{"detail": "Program not found"})
 
-        self.assertEqual(client.get("/learning/program/%s" % plain_id).data,{
+        self.assertEqual(client.get("/learning/v0/program/%s" % plain_id).data,{
             "id": plain_id,
             "name": "plain",
             "description": "Plain ol' example",
@@ -285,7 +285,7 @@ class test_Django(SimpleTestCase):
 
         # Update 
 
-        response = client.post("/learning/program/%s" % plain_id,{
+        response = client.post("/learning/v0/program/%s" % plain_id,{
             "description": "Plain old example",
             "words": ["it","there"]
         }, format='json')
@@ -297,7 +297,7 @@ class test_Django(SimpleTestCase):
             "words": ["it","there"]
         })
 
-        self.assertEqual(client.get("/learning/program/%s" % plain_id).data,{
+        self.assertEqual(client.get("/learning/v0/program/%s" % plain_id).data,{
             "id": plain_id,
             "name": "plain",
             "description": "Plain old example",
@@ -306,7 +306,7 @@ class test_Django(SimpleTestCase):
 
         # Append 
 
-        response = client.post("/learning/program/%s/append" % plain_id,{
+        response = client.post("/learning/v0/program/%s/append" % plain_id,{
             "words": ["here","everywhere"]
         }, format='json')
 
@@ -317,7 +317,7 @@ class test_Django(SimpleTestCase):
             "words": ["everywhere","here","it","there"]
         })
 
-        self.assertEqual(client.get("/learning/program/%s" % plain_id).data,{
+        self.assertEqual(client.get("/learning/v0/program/%s" % plain_id).data,{
             "id": plain_id,
             "name": "plain",
             "description": "Plain old example",
@@ -326,7 +326,7 @@ class test_Django(SimpleTestCase):
 
         # Remove 
 
-        response = client.post("/learning/program/%s/remove" % plain_id,{
+        response = client.post("/learning/v0/program/%s/remove" % plain_id,{
             "words": ["here","there"]
         }, format='json')
 
@@ -337,7 +337,7 @@ class test_Django(SimpleTestCase):
             "words": ["everywhere","it"]
         })
 
-        self.assertEqual(client.get("/learning/program/%s" % plain_id).data,{
+        self.assertEqual(client.get("/learning/v0/program/%s" % plain_id).data,{
             "id": plain_id,
             "name": "plain",
             "description": "Plain old example",
@@ -350,7 +350,7 @@ class test_Django(SimpleTestCase):
         program.save()
         jane_id = program.pk
 
-        self.assertEqual([dict(program) for program in client.get("/learning/program/").data],[
+        self.assertEqual([dict(program) for program in client.get("/learning/v0/program/").data],[
             {
                 "id": jane_id,
                 "name": "jane",
@@ -367,9 +367,9 @@ class test_Django(SimpleTestCase):
 
         # Delete
 
-        self.assertEqual(client.delete("/learning/program/%s" % plain_id).data,{})
+        self.assertEqual(client.delete("/learning/v0/program/%s" % plain_id).data,{})
 
-        self.assertEqual([dict(program) for program in client.get("/learning/program/").data],[
+        self.assertEqual([dict(program) for program in client.get("/learning/v0/program/").data],[
             {
                 "id": jane_id,
                 "name": "jane",
@@ -390,29 +390,29 @@ class test_Django(SimpleTestCase):
 
         # Words validation
 
-        response = client.post("/learning/student/",{"words": "oops"}, format='json')
+        response = client.post("/learning/v0/student/",{"words": "oops"}, format='json')
 
         self.assertEqual(response.status_code,status.HTTP_400_BAD_REQUEST);
         self.assertEqual(response.data,{"words": ["Must be an array."]})
 
-        response = client.post("/learning/student/",{"words": [0]}, format='json')
+        response = client.post("/learning/v0/student/",{"words": [0]}, format='json')
 
         self.assertEqual(response.status_code,status.HTTP_400_BAD_REQUEST);
         self.assertEqual(response.data,{"words": ["All array items be be strings."]})
 
         # Create
 
-        response = client.post("/learning/student/",{}, format='json')
+        response = client.post("/learning/v0/student/",{}, format='json')
 
         self.assertEqual(response.status_code,status.HTTP_400_BAD_REQUEST);
         self.assertEqual(response.data,{"first_name": ["This field is required."]})
 
-        response = client.post("/learning/student/",{"first_name": "sane"}, format='json')
+        response = client.post("/learning/v0/student/",{"first_name": "sane"}, format='json')
 
         self.assertEqual(response.status_code,status.HTTP_400_BAD_REQUEST);
         self.assertEqual(response.data,{"last_name": ["This field is required."]})
 
-        response = client.post("/learning/student/",{
+        response = client.post("/learning/v0/student/",{
             "first_name": "sane",
             "last_name": "jane",
             "age": 5,
@@ -434,14 +434,14 @@ class test_Django(SimpleTestCase):
 
         client.force_authenticate(user=loser)
 
-        response = client.get("/learning/student/%s" % sane_jane_id)
+        response = client.get("/learning/v0/student/%s" % sane_jane_id)
 
         self.assertEqual(response.status_code,status.HTTP_404_NOT_FOUND);
         self.assertEqual(response.data,{"detail": "Student not found"})
 
         client.force_authenticate(user=user)
 
-        self.assertEqual(client.get("/learning/student/%s" % sane_jane_id).data,{
+        self.assertEqual(client.get("/learning/v0/student/%s" % sane_jane_id).data,{
             "id": sane_jane_id,
             "first_name": "sane",
             "last_name": "jane",
@@ -453,14 +453,14 @@ class test_Django(SimpleTestCase):
 
         client.force_authenticate(user=loser)
 
-        response = client.post("/learning/student/%s" % sane_jane_id,{})
+        response = client.post("/learning/v0/student/%s" % sane_jane_id,{})
 
         self.assertEqual(response.status_code,status.HTTP_404_NOT_FOUND);
         self.assertEqual(response.data,{"detail": "Student not found"})
 
         client.force_authenticate(user=user)
 
-        response = client.post("/learning/student/%s" % sane_jane_id,{
+        response = client.post("/learning/v0/student/%s" % sane_jane_id,{
             "age": 6,
             "words": ["it","there"]
         }, format='json')
@@ -473,7 +473,7 @@ class test_Django(SimpleTestCase):
             "words": ["it","there"]
         })
 
-        self.assertEqual(client.get("/learning/student/%s" % sane_jane_id).data,{
+        self.assertEqual(client.get("/learning/v0/student/%s" % sane_jane_id).data,{
             "id": sane_jane_id,
             "first_name": "sane",
             "last_name": "jane",
@@ -485,14 +485,14 @@ class test_Django(SimpleTestCase):
 
         client.force_authenticate(user=loser)
 
-        response = client.post("/learning/student/%s/append" % sane_jane_id,{})
+        response = client.post("/learning/v0/student/%s/append" % sane_jane_id,{})
 
         self.assertEqual(response.status_code,status.HTTP_404_NOT_FOUND);
         self.assertEqual(response.data,{"detail": "Student not found"})
 
         client.force_authenticate(user=user)
 
-        response = client.post("/learning/student/%s/append" % sane_jane_id,{
+        response = client.post("/learning/v0/student/%s/append" % sane_jane_id,{
             "words": ["here","everywhere"]
         }, format='json')
 
@@ -504,7 +504,7 @@ class test_Django(SimpleTestCase):
             "words": ["everywhere","here","it","there"]
         })
 
-        self.assertEqual(client.get("/learning/student/%s" % sane_jane_id).data,{
+        self.assertEqual(client.get("/learning/v0/student/%s" % sane_jane_id).data,{
             "id": sane_jane_id,
             "first_name": "sane",
             "last_name": "jane",
@@ -516,14 +516,14 @@ class test_Django(SimpleTestCase):
 
         client.force_authenticate(user=loser)
 
-        response = client.post("/learning/student/%s/remove" % sane_jane_id,{})
+        response = client.post("/learning/v0/student/%s/remove" % sane_jane_id,{})
 
         self.assertEqual(response.status_code,status.HTTP_404_NOT_FOUND);
         self.assertEqual(response.data,{"detail": "Student not found"})
 
         client.force_authenticate(user=user)
 
-        response = client.post("/learning/student/%s/remove" % sane_jane_id,{
+        response = client.post("/learning/v0/student/%s/remove" % sane_jane_id,{
             "words": ["here","there"]
         }, format='json')
 
@@ -535,7 +535,7 @@ class test_Django(SimpleTestCase):
             "words": ["everywhere","it"]
         })
 
-        self.assertEqual(client.get("/learning/student/%s" % sane_jane_id).data,{
+        self.assertEqual(client.get("/learning/v0/student/%s" % sane_jane_id).data,{
             "id": sane_jane_id,
             "first_name": "sane",
             "last_name": "jane",
@@ -551,11 +551,11 @@ class test_Django(SimpleTestCase):
 
         client.force_authenticate(user=loser)
 
-        self.assertEqual([dict(student) for student in client.get("/learning/student/").data],[])
+        self.assertEqual([dict(student) for student in client.get("/learning/v0/student/").data],[])
 
         client.force_authenticate(user=user)
 
-        self.assertEqual([dict(student) for student in client.get("/learning/student/").data],[
+        self.assertEqual([dict(student) for student in client.get("/learning/v0/student/").data],[
             {
                 "id": silly_billy_id,
                 "first_name": "silly",
@@ -576,16 +576,16 @@ class test_Django(SimpleTestCase):
 
         client.force_authenticate(user=loser)
 
-        response = client.delete("/learning/student/%s" % sane_jane_id)
+        response = client.delete("/learning/v0/student/%s" % sane_jane_id)
 
         self.assertEqual(response.status_code,status.HTTP_404_NOT_FOUND);
         self.assertEqual(response.data,{"detail": "Student not found"})
 
         client.force_authenticate(user=user)
 
-        self.assertEqual(client.delete("/learning/student/%s" % sane_jane_id).data,{})
+        self.assertEqual(client.delete("/learning/v0/student/%s" % sane_jane_id).data,{})
 
-        self.assertEqual([dict(student) for student in client.get("/learning/student/").data],[
+        self.assertEqual([dict(student) for student in client.get("/learning/v0/student/").data],[
             {
                 "id": silly_billy_id,
                 "first_name": "silly",
@@ -599,26 +599,26 @@ class test_Django(SimpleTestCase):
 
         client.force_authenticate(user=loser)
 
-        response = client.post("/learning/student/%s/attain" % silly_billy_id,{}, format='json')
+        response = client.post("/learning/v0/student/%s/attain" % silly_billy_id,{}, format='json')
 
         self.assertEqual(response.status_code,status.HTTP_404_NOT_FOUND);
         self.assertEqual(response.data,{"detail": "Student not found"})
 
         client.force_authenticate(user=user)
 
-        response = client.post("/learning/student/%s/attain" % silly_billy_id,{}, format='json')
+        response = client.post("/learning/v0/student/%s/attain" % silly_billy_id,{}, format='json')
 
         self.assertEqual(response.status_code,status.HTTP_400_BAD_REQUEST);
         self.assertEqual(response.data,{"word": ["This field is required."]})
 
-        response = client.post("/learning/student/%s/attain" % silly_billy_id,{
+        response = client.post("/learning/v0/student/%s/attain" % silly_billy_id,{
             "word": "here"
         }, format='json')
 
         self.assertEqual(response.status_code,status.HTTP_400_BAD_REQUEST);
         self.assertEqual(response.data,{"achievement": ["This field is required."]})
 
-        response = client.post("/learning/student/%s/attain" % silly_billy_id,{
+        response = client.post("/learning/v0/student/%s/attain" % silly_billy_id,{
             "word": "here",
             "achievement": 0
         }, format='json')
@@ -626,12 +626,12 @@ class test_Django(SimpleTestCase):
         self.assertEqual(response.status_code,status.HTTP_404_NOT_FOUND);
         self.assertEqual(response.data,{"detail": "Word not found"})
 
-        response = client.post("/learning/student/%s/append" % silly_billy_id,{
+        response = client.post("/learning/v0/student/%s/append" % silly_billy_id,{
             "words": ["here"]
         }, format='json')
         self.assertEqual(response.status_code,status.HTTP_202_ACCEPTED);
 
-        response = client.post("/learning/student/%s/attain" % silly_billy_id,{
+        response = client.post("/learning/v0/student/%s/attain" % silly_billy_id,{
             "word": "here",
             "achievement": 0
         }, format='json')
@@ -643,7 +643,7 @@ class test_Django(SimpleTestCase):
         achievement.save()
         sight_id = achievement.id
 
-        response = client.post("/learning/student/%s/attain" % silly_billy_id,{
+        response = client.post("/learning/v0/student/%s/attain" % silly_billy_id,{
             "word": "here",
             "achievement": sight_id,
             "at": "2015-09-20T00:00:00Z"
@@ -655,7 +655,7 @@ class test_Django(SimpleTestCase):
         self.assertEqual(response.data["hold"],True)
         self.assertEqual(response.data["at"],"2015-09-20T00:00:00Z")
 
-        response = client.post("/learning/student/%s/attain" % silly_billy_id,{
+        response = client.post("/learning/v0/student/%s/attain" % silly_billy_id,{
             "word": "here",
             "achievement": sight_id,
             "at": "2015-09-21T00:00:00Z"
@@ -668,32 +668,32 @@ class test_Django(SimpleTestCase):
 
         # Yield 
 
-        client.post("/learning/student/%s/append" % silly_billy_id,{
+        client.post("/learning/v0/student/%s/append" % silly_billy_id,{
             "words": ["there"]
         })
 
         client.force_authenticate(user=loser)
 
-        response = client.post("/learning/student/%s/yield" % silly_billy_id,{}, format='json')
+        response = client.post("/learning/v0/student/%s/yield" % silly_billy_id,{}, format='json')
 
         self.assertEqual(response.status_code,status.HTTP_404_NOT_FOUND);
         self.assertEqual(response.data,{"detail": "Student not found"})
 
         client.force_authenticate(user=user)
 
-        response = client.post("/learning/student/%s/yield" % silly_billy_id,{}, format='json')
+        response = client.post("/learning/v0/student/%s/yield" % silly_billy_id,{}, format='json')
 
         self.assertEqual(response.status_code,status.HTTP_400_BAD_REQUEST);
         self.assertEqual(response.data,{"word": ["This field is required."]})
 
-        response = client.post("/learning/student/%s/yield" % silly_billy_id,{
+        response = client.post("/learning/v0/student/%s/yield" % silly_billy_id,{
             "word": "there"
         }, format='json')
 
         self.assertEqual(response.status_code,status.HTTP_400_BAD_REQUEST);
         self.assertEqual(response.data,{"achievement": ["This field is required."]})
 
-        response = client.post("/learning/student/%s/yield" % silly_billy_id,{
+        response = client.post("/learning/v0/student/%s/yield" % silly_billy_id,{
             "word": "there",
             "achievement": 0
         }, format='json')
@@ -701,12 +701,12 @@ class test_Django(SimpleTestCase):
         self.assertEqual(response.status_code,status.HTTP_404_NOT_FOUND);
         self.assertEqual(response.data,{"detail": "Word not found"})
 
-        response = client.post("/learning/student/%s/append" % silly_billy_id,{
+        response = client.post("/learning/v0/student/%s/append" % silly_billy_id,{
             "words": ["there"]
         }, format='json')
         self.assertEqual(response.status_code,status.HTTP_202_ACCEPTED);
 
-        response = client.post("/learning/student/%s/yield" % silly_billy_id,{
+        response = client.post("/learning/v0/student/%s/yield" % silly_billy_id,{
             "word": "there",
             "achievement": 0
         }, format='json')
@@ -718,13 +718,13 @@ class test_Django(SimpleTestCase):
         achievement.save()
         spell_id = achievement.id
 
-        response = client.post("/learning/student/%s/attain" % silly_billy_id,{
+        response = client.post("/learning/v0/student/%s/attain" % silly_billy_id,{
             "word": "there",
             "achievement": spell_id,
             "at": "2015-09-22T00:00:00Z"
         }, format='json')
 
-        response = client.post("/learning/student/%s/yield" % silly_billy_id,{
+        response = client.post("/learning/v0/student/%s/yield" % silly_billy_id,{
             "word": "there",
             "achievement": spell_id,
             "at": "2015-09-23T00:00:00Z"
@@ -735,7 +735,7 @@ class test_Django(SimpleTestCase):
         self.assertEqual(response.data["achievement"],spell_id)
         self.assertEqual(response.data["hold"],False)
 
-        response = client.post("/learning/student/%s/yield" % silly_billy_id,{
+        response = client.post("/learning/v0/student/%s/yield" % silly_billy_id,{
             "word": "there",
             "achievement": spell_id,
             "at": "2015-09-24T00:00:00Z"
@@ -750,14 +750,14 @@ class test_Django(SimpleTestCase):
 
         client.force_authenticate(user=loser)
 
-        response = client.get("/learning/student/%s/position" % silly_billy_id)
+        response = client.get("/learning/v0/student/%s/position" % silly_billy_id)
 
         self.assertEqual(response.status_code,status.HTTP_404_NOT_FOUND);
         self.assertEqual(response.data,{"detail": "Student not found"})
 
         client.force_authenticate(user=user)
 
-        self.assertEqual(client.get("/learning/student/%s/position" % silly_billy_id).data,[
+        self.assertEqual(client.get("/learning/v0/student/%s/position" % silly_billy_id).data,[
             {
                 "word": "here",
                 "achievements": [sight_id]
@@ -768,7 +768,7 @@ class test_Django(SimpleTestCase):
             }
         ])
 
-        self.assertEqual(client.get("/learning/student/%s/position?words=here,there" % silly_billy_id).data,[
+        self.assertEqual(client.get("/learning/v0/student/%s/position?words=here,there" % silly_billy_id).data,[
             {
                 "word": "here",
                 "achievements": [sight_id]
@@ -779,7 +779,7 @@ class test_Django(SimpleTestCase):
             }
         ])
 
-        self.assertEqual(client.get("/learning/student/%s/position?words=here" % silly_billy_id).data,[
+        self.assertEqual(client.get("/learning/v0/student/%s/position?words=here" % silly_billy_id).data,[
             {
                 "word": "here",
                 "achievements": [sight_id]
@@ -790,14 +790,14 @@ class test_Django(SimpleTestCase):
 
         client.force_authenticate(user=loser)
 
-        response = client.get("/learning/student/%s/history" % silly_billy_id)
+        response = client.get("/learning/v0/student/%s/history" % silly_billy_id)
 
         self.assertEqual(response.status_code,status.HTTP_404_NOT_FOUND);
         self.assertEqual(response.data,{"detail": "Student not found"})
 
         client.force_authenticate(user=user)
 
-        history = [dict(progress) for progress in client.get("/learning/student/%s/history" % silly_billy_id).data]
+        history = [dict(progress) for progress in client.get("/learning/v0/student/%s/history" % silly_billy_id).data]
 
         self.assertItemsEqual(history,[
             {
@@ -832,7 +832,7 @@ class test_Django(SimpleTestCase):
             }
         ])
 
-        history = [dict(progress) for progress in client.get("/learning/student/%s/history/?words=here,there" % silly_billy_id).data]
+        history = [dict(progress) for progress in client.get("/learning/v0/student/%s/history/?words=here,there" % silly_billy_id).data]
 
         self.assertItemsEqual(history,[
             {
@@ -867,7 +867,7 @@ class test_Django(SimpleTestCase):
             }
         ])
 
-        history = [dict(progress) for progress in client.get("/learning/student/%s/history/?words=here" % silly_billy_id).data]
+        history = [dict(progress) for progress in client.get("/learning/v0/student/%s/history/?words=here" % silly_billy_id).data]
 
         self.assertItemsEqual(history,[
             {
@@ -884,13 +884,13 @@ class test_Django(SimpleTestCase):
             }
         ])
 
-        response = client.post("/learning/student/%s/attain" % silly_billy_id,{
+        response = client.post("/learning/v0/student/%s/attain" % silly_billy_id,{
             "word": "here",
             "achievement": spell_id,
             "at": "2015-09-25T00:00:00Z"
         }, format='json')
 
-        history = [dict(progress) for progress in client.get("/learning/student/%s/history/?achievements=%s,%s" % (silly_billy_id,sight_id,spell_id)).data]
+        history = [dict(progress) for progress in client.get("/learning/v0/student/%s/history/?achievements=%s,%s" % (silly_billy_id,sight_id,spell_id)).data]
 
         self.assertItemsEqual(history,[
             {
@@ -931,7 +931,7 @@ class test_Django(SimpleTestCase):
             }
         ])
 
-        history = [dict(progress) for progress in client.get("/learning/student/%s/history/?achievements=%s" % (silly_billy_id,spell_id)).data]
+        history = [dict(progress) for progress in client.get("/learning/v0/student/%s/history/?achievements=%s" % (silly_billy_id,spell_id)).data]
 
         self.assertItemsEqual(history,[
             {
@@ -960,7 +960,7 @@ class test_Django(SimpleTestCase):
             }
         ])
 
-        history = [dict(progress) for progress in client.get("/learning/student/%s/history/?achievements=%s" % (silly_billy_id,spell_id)).data]
+        history = [dict(progress) for progress in client.get("/learning/v0/student/%s/history/?achievements=%s" % (silly_billy_id,spell_id)).data]
 
         self.assertItemsEqual(history,[
             {
@@ -989,7 +989,7 @@ class test_Django(SimpleTestCase):
             }
         ])
 
-        history = [dict(progress) for progress in client.get("/learning/student/%s/history/?words=here&achievements=%s" % (silly_billy_id,spell_id)).data]
+        history = [dict(progress) for progress in client.get("/learning/v0/student/%s/history/?words=here&achievements=%s" % (silly_billy_id,spell_id)).data]
 
         for progress in history:
             del progress['at']
@@ -1002,7 +1002,7 @@ class test_Django(SimpleTestCase):
             }
         ])
 
-        history = [dict(progress) for progress in client.get("/learning/student/%s/history/?from=2015-09-21&to=2015-09-24" % (silly_billy_id)).data]
+        history = [dict(progress) for progress in client.get("/learning/v0/student/%s/history/?from=2015-09-21&to=2015-09-24" % (silly_billy_id)).data]
 
         self.assertItemsEqual(history,[
             {
