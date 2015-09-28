@@ -53,7 +53,11 @@ Learning.controller("Student","Changeable",{
         if (this.application.current.query.words) {
             words = this.words_array(this.application.current.query.words);
         }
-        this.it.positions = hwAPI.student.position(this.application.current.path.student_id,words);
+        var focus = null;
+        if (this.application.current.query.focus) {
+            focus = this.application.current.query.focus.toLowerCase() == 'true';
+        }
+        this.it.positions = hwAPI.student.position(this.application.current.path.student_id,words,focus);
         this.application.render(this.it);
     },
     position_search: function() {
@@ -61,6 +65,9 @@ Learning.controller("Student","Changeable",{
         var words = $("#words").val();
         if (words.length) {
             parameters["words"] = this.words_array(words).join(",");
+        }
+        if ($("#focus").prop("checked")) {
+            parameters["focus"] = "true";
         }
         if ($.isEmptyObject(parameters)) {
             this.application.go('student/position',this.application.current.path.student_id);
@@ -73,6 +80,13 @@ Learning.controller("Student","Changeable",{
             hwAPI.student.attain(this.application.current.path.student_id,word,achievement);
         } else {
             hwAPI.student.yield(this.application.current.path.student_id,word,achievement);
+        }
+    },
+    focus: function(event,word) {
+        if ($(event.target).prop("checked")) {
+            hwAPI.student.focus(this.application.current.path.student_id,[word]);
+        } else {
+            hwAPI.student.blur(this.application.current.path.student_id,[word]);
         }
     },
     history: function() {
