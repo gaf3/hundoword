@@ -84,9 +84,10 @@ There's already an existing user/pass: vagrant/vagrant or you can create a new o
 * `#/student/` - Students: List existing students or create a new one
 * `#/student/<id>/` - Student: Selecting existing student using id, edit or delete.
   * id - Student to select
-* `#/student/<id>/position/words=<word>,<word>` - Position: Where a student stands on each of their words' achievements.
+* `#/student/<id>/position/words=<word>,<word>,focus=true/false` - Position: Where a student stands on each of their words' achievements.
   * id - Student to select
   * words - Only show position for these words
+  * words - Only show position for words the Student is focusing on or not focusing on
 * `#/student/<id>/history/words=<word>,<word>&achievements=<achievement_id>,<achievement_id>&from=<from>&to=<to>` - Position: Where a student stands on each of their words' achievements.
   * id - Student to select
   * words - Only show history for these words
@@ -313,6 +314,24 @@ In all JavaScript API functions, the arguments success, error, and complete are 
       * words - Array of words (string)
     * JavaScript - `api.student.remove(id,words,success,error,complete)`
       * words - array of words to remove
+  * Focus - Have Student focus on particular words
+    * Request - `POST http://192.168.72.87/api/v0/student/<id>/focus/`
+      * words - Array of words (string) - Will have their focus set to true
+    * Response - `202 Accepted`
+      * word 
+      * focus - Whether this word is being focused on
+      * achievments - Array of achievement ids
+    * JavaScript - `api.student.focus(id,words,success,error,complete)`
+      * words - array of words to focus on
+  * Blur - Have a Student stop focusing on particular words
+    * Request - `POST http://192.168.72.87/api/v0/student/<id>/blur/`
+      * words - Array of words (string) - Will have their focus set to true
+    * Response - `202 Accepted`
+      * word 
+      * focus - Whether this word is being focused on
+      * achievments - Array of achievement ids
+    * JavaScript - `api.student.blur(id,words,success,error,complete)`
+      * words - array of words to stop focusing on
   * Attain - Attains an achievement for a word for a Student and updates Position as well
     * Request - `POST http://192.168.72.87/api/v0/student/<id>/attain/`
       * word
@@ -335,12 +354,14 @@ In all JavaScript API functions, the arguments success, error, and complete are 
     * JavaScript - `api.student.yield(id,word,achievement,at,success,error,complete)`
   * Position - Retrieves Student Position with words and Achievements using id
     * Request - `GET http://192.168.72.87/api/v0/student/<id>/position/?words=<word>,<word>`
-      * words = Only return position for these words
+      * words = Only return positions for these words
+      * focus = Only return position for this focus (true/false)
     * Response - `200 Ok`
       * Array - ordered by word
         * word 
-        * achievments - Array of strings
-    * JavaScript - `api.student.position(id,words,success,error,complete)`
+        * focus - Whether this word is being focused on
+        * achievments - Array of achievement ids
+    * JavaScript - `api.student.position(id,words,focus,success,error,complete)`
       * words - Array of words to return data for
   * History - Retrieves Student History with words and Achievements using id
     * Request - `GET http://192.168.72.87/api/v0/student/<id>/history/?words=<word>,<word>&achievements=<achievement>,<achievement>`
@@ -351,7 +372,7 @@ In all JavaScript API functions, the arguments success, error, and complete are 
     * Response - `200 Ok`
       * Array - ordered by at descending
         * word 
-        * achievement
+        * achievement (id)
         * hold - Whether the Achieveent was attained or yielded
         * at - Date and time 
     * JavaScript - `api.student.history(id,words[],achievements[],hold,from,to,success,error,complete)`
