@@ -38,7 +38,7 @@ class test_Django(SimpleTestCase):
 
     def test_Achievement(self):
 
-        self.assertEqual(str(Achievement(name="plain")),"plain")
+        self.assertEqual(str(Achievement(name="plain",progression=1)),"plain")
 
 
     def test_Program(self):
@@ -73,7 +73,7 @@ class test_Django(SimpleTestCase):
 
         user = User(username="tester")
         user.save()
-        achievement = Achievement(name="Sight")
+        achievement = Achievement(name="Sight",progression=1)
         achievement.save()
         student = Student(teacher=user,first_name="plain",last_name="jane")
         student.save()
@@ -156,13 +156,23 @@ class test_Django(SimpleTestCase):
             "description": "Plain ol' example"
         }, format='json')
 
+        self.assertEqual(response.status_code,status.HTTP_400_BAD_REQUEST);
+        self.assertEqual(response.data,{"progression": ["This field is required."]})
+
+        response = client.post("/learning/v0/achievement/",{
+            "name": "plain",
+            "description": "Plain ol' example",
+            "progression": 100
+        }, format='json')
+
         achievement = Achievement.objects.get(name="plain")
         plain_id = achievement.pk
 
         self.assertEqual(response.data,{
             "id": plain_id,
             "name": "plain",
-            "description": "Plain ol' example"
+            "description": "Plain ol' example",
+            "progression": 100
         })
 
         # Select
@@ -175,7 +185,8 @@ class test_Django(SimpleTestCase):
         self.assertEqual(client.get("/learning/v0/achievement/%s" % plain_id).data,{
             "id": plain_id,
             "name": "plain",
-            "description": "Plain ol' example"
+            "description": "Plain ol' example",
+            "progression": 100
         })
 
         # Update 
@@ -187,18 +198,20 @@ class test_Django(SimpleTestCase):
         self.assertEqual(response.data,{
             "id": plain_id,
             "name": "plain",
-            "description": "Plain old example"
+            "description": "Plain old example",
+            "progression": 100
         })
 
         self.assertEqual(client.get("/learning/v0/achievement/%s" % plain_id).data,{
             "id": plain_id,
             "name": "plain",
-            "description": "Plain old example"
+            "description": "Plain old example",
+            "progression": 100
         })
 
         # List
 
-        achievement = Achievement(name="jane")
+        achievement = Achievement(name="jane",progression=99)
         achievement.save()
         jane_id = achievement.pk
 
@@ -206,12 +219,14 @@ class test_Django(SimpleTestCase):
             {
                 "id": jane_id,
                 "name": "jane",
-                "description": ""
+                "description": "",
+                "progression": 99
             },
             {
                 "id": plain_id,
                 "name": "plain",
-                "description": "Plain old example"
+                "description": "Plain old example",
+                "progression": 100
             }
         ])
 
@@ -223,7 +238,8 @@ class test_Django(SimpleTestCase):
             {
                 "id": jane_id,
                 "name": "jane",
-                "description": ""
+                "description": "",
+                "progression": 99
             }
         ])
 
@@ -756,7 +772,7 @@ class test_Django(SimpleTestCase):
         self.assertEqual(response.status_code,status.HTTP_404_NOT_FOUND);
         self.assertEqual(response.data,{"detail": "Achievement not found"})
 
-        achievement = Achievement(name="Sight")
+        achievement = Achievement(name="Sight",progression=100)
         achievement.save()
         sight_id = achievement.id
 
@@ -831,7 +847,7 @@ class test_Django(SimpleTestCase):
         self.assertEqual(response.status_code,status.HTTP_404_NOT_FOUND);
         self.assertEqual(response.data,{"detail": "Achievement not found"})
 
-        achievement = Achievement(name="Spell")
+        achievement = Achievement(name="Spell",progression=101)
         achievement.save()
         spell_id = achievement.id
 

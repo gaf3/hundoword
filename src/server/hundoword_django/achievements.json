@@ -1,0 +1,56 @@
+[
+    {
+        "pk": 1,
+        "model": "learning.achievement",
+        "fields": {
+            "name": "Introduction",
+            "description": "Just shows the word and an icon to click the speaker.",
+            "progression": 1
+        }
+    },
+    {
+        "pk": 2,
+        "model": "learning.achievement",
+        "fields": {
+            "name": "Sight Match",
+            "description": "Show the word above and they have to click the word in a group below. First click either pass or fail.",
+            "progression": 2
+        }
+    },
+    {
+        "pk": 3,
+        "model": "learning.achievement",
+        "fields": {
+            "name": "Cross Match",
+            "description": "Two lists of words, click one, then click the other. If wrong, both get crossed out red.",
+            "progression": 3
+        }
+    },
+    {
+        "pk": 4,
+        "model": "learning.achievement",
+        "fields": {
+            "name": "Spell Match",
+            "description": "Word displayed above, need to spell, have a done button.",
+            "progression": 4
+        }
+    },
+    {
+        "pk": 5,
+        "model": "learning.achievement",
+        "fields": {
+            "name": "Sight Search",
+            "description": "Basic word search. Student clicks letters, circling in row. When circle matches, word is crossed out. Done button.",
+            "progression": 5
+        }
+    },
+    {
+        "pk": 6,
+        "model": "learning.achievement",
+        "fields": {
+            "name": "Sound Match",
+            "description": "Button to play sound, pick from a list.",
+            "progression": 6
+        }
+    }
+]

@@ -1,23 +1,21 @@
 {{#def.Header}}
 <div class="uk-overflow-container">
     {{#def.StudentTabs}}
+    <br/>
     <form class="uk-form">
         <div>
             <fieldset data-uk-margin>
                 <strong>Words</strong>
                 <input id="words" value="{{=Learning.current.query.words ? Learning.current.query.words.replace(/,/g,' ') : ''}}" type="text">
-                <td>
-                    <input 
-                        id="focus" 
-                        type="checkbox" OnClick="Learning.current.controller.position_search()" 
-                        {{? Learning.current.query.focus && Learning.current.query.focus.toLowerCase() == 'true' }}checked{{?}}
-                    > <strong>Focus</strong>
-                </td>
+                <input 
+                    id="focus" 
+                    type="checkbox" OnClick="Learning.current.controller.position_search()" 
+                    {{? Learning.current.query.focus && Learning.current.query.focus.toLowerCase() == 'true' }}checked{{?}}
+                > <strong>Focus</strong>
                 <button OnClick="Learning.current.controller.position_search();" class="uk-button uk-button-primary">
                     <i class="uk-icon-search"></i>
                 </button>
             </fieldset>
-        </form>
         </div>
         <table class="uk-table uk-table-hover">
             <thead>

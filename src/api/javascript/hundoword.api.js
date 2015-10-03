@@ -97,10 +97,10 @@ HundoWord.Student = function(api) {
 
 HundoWord.Student.prototype = new HundoWord.Words();
 
-HundoWord.Base.prototype.focus = function(id,words,success,error,complete) {
+HundoWord.Student.prototype.focus = function(id,words,success,error,complete) {
     return this.rest("POST",this.build_url(id,"focus"),{words: words},success,error,complete);
 }
-HundoWord.Base.prototype.blur = function(id,words,success,error,complete) {
+HundoWord.Student.prototype.blur = function(id,words,success,error,complete) {
     return this.rest("POST",this.build_url(id,"blur"),{words: words},success,error,complete);
 }
 HundoWord.Student.prototype.attain = function(id,word,achievement,at,success,error,complete) {

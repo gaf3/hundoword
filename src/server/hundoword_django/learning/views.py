@@ -77,12 +77,18 @@ def achievement(request,pk='',action=''):
             if 'name' not in request.DATA:
                 return Response({"name": ["This field is required."]}, status=status.HTTP_400_BAD_REQUEST)
 
+            if 'progression' not in request.DATA:
+                return Response({"progression": ["This field is required."]}, status=status.HTTP_400_BAD_REQUEST)
+
             with transaction.atomic():
 
                 achievement = Achievement(name=request.DATA['name'])
 
                 if 'description' in request.DATA:
                     achievement.description = request.DATA['description']
+
+                if 'progression' in request.DATA:
+                    achievement.progression = request.DATA['progression']
 
                 achievement.save()
 
@@ -119,8 +125,6 @@ def achievement(request,pk='',action=''):
                 return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
 
             else: # pragma: no cover
-
-                print "What?"
 
                 return errors_response(serializer)
 

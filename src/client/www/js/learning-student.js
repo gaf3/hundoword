@@ -143,7 +143,7 @@ Learning.controller("Student","Changeable",{
         } else {
             this.application.go('student/history',this.application.current.path.student_id,parameters);
         }
-    },
+    }
 });
 
 Learning.partial("StudentTabs",Learning.load("student-tabs"));
@@ -159,4 +159,3 @@ Learning.route("student/new","/student/new/","Student","Student","new");
 Learning.route("student/position","/student/{student_id:^\\d+$}/position/","Position","Student","position");
 Learning.route("student/history","/student/{student_id:^\\d+$}/history/","History","Student","history");
 Learning.route("student/chart","/student/{student_id:^\\d+$}/chart/","Student","Student","select");
-Learning.route("student/games","/student/{student_id:^\\d+$}/games/","Student","Student","select");
