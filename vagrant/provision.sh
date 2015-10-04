@@ -22,7 +22,7 @@ sudo pip install mysqlclient
 # API
 
 sudo pip install pytz
-sudo pip install requests
+sudo pip install requests==2.5.3
 sudo pip install Django==1.8.4
 sudo pip install djangorestframework==3.1
 

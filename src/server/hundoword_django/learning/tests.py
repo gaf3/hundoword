@@ -1,3 +1,4 @@
+import os
 import json
 import datetime
 
@@ -10,6 +11,7 @@ from rest_framework.authtoken.models import Token
 
 from learning.models import *
 from learning.views import *
+import learning.views
 
 from rest_framework import status
 from rest_framework.test import APIClient, force_authenticate
@@ -34,11 +36,17 @@ class test_Django(SimpleTestCase):
         connection.creation.create_test_db(verbosity=0)
         user = User(username="vagrant",password="vagrant")
         user.save()
+        self.original_forvo_key_file = learning.views.forvo_key_file
+
+
+    def tearDown(self):
+
+        learning.views.forvo_key_file = self.original_forvo_key_file 
 
 
     def test_Achievement(self):
 
-        self.assertEqual(str(Achievement(name="plain")),"plain")
+        self.assertEqual(str(Achievement(name="plain",progression=1)),"plain")
 
 
     def test_Program(self):
@@ -73,7 +81,7 @@ class test_Django(SimpleTestCase):
 
         user = User(username="tester")
         user.save()
-        achievement = Achievement(name="Sight")
+        achievement = Achievement(name="Sight",progression=1)
         achievement.save()
         student = Student(teacher=user,first_name="plain",last_name="jane")
         student.save()
@@ -156,13 +164,23 @@ class test_Django(SimpleTestCase):
             "description": "Plain ol' example"
         }, format='json')
 
+        self.assertEqual(response.status_code,status.HTTP_400_BAD_REQUEST);
+        self.assertEqual(response.data,{"progression": ["This field is required."]})
+
+        response = client.post("/learning/v0/achievement/",{
+            "name": "plain",
+            "description": "Plain ol' example",
+            "progression": 100
+        }, format='json')
+
         achievement = Achievement.objects.get(name="plain")
         plain_id = achievement.pk
 
         self.assertEqual(response.data,{
             "id": plain_id,
             "name": "plain",
-            "description": "Plain ol' example"
+            "description": "Plain ol' example",
+            "progression": 100
         })
 
         # Select
@@ -175,7 +193,8 @@ class test_Django(SimpleTestCase):
         self.assertEqual(client.get("/learning/v0/achievement/%s" % plain_id).data,{
             "id": plain_id,
             "name": "plain",
-            "description": "Plain ol' example"
+            "description": "Plain ol' example",
+            "progression": 100
         })
 
         # Update 
@@ -187,18 +206,20 @@ class test_Django(SimpleTestCase):
         self.assertEqual(response.data,{
             "id": plain_id,
             "name": "plain",
-            "description": "Plain old example"
+            "description": "Plain old example",
+            "progression": 100
         })
 
         self.assertEqual(client.get("/learning/v0/achievement/%s" % plain_id).data,{
             "id": plain_id,
             "name": "plain",
-            "description": "Plain old example"
+            "description": "Plain old example",
+            "progression": 100
         })
 
         # List
 
-        achievement = Achievement(name="jane")
+        achievement = Achievement(name="jane",progression=99)
         achievement.save()
         jane_id = achievement.pk
 
@@ -206,12 +227,14 @@ class test_Django(SimpleTestCase):
             {
                 "id": jane_id,
                 "name": "jane",
-                "description": ""
+                "description": "",
+                "progression": 99
             },
             {
                 "id": plain_id,
                 "name": "plain",
-                "description": "Plain old example"
+                "description": "Plain old example",
+                "progression": 100
             }
         ])
 
@@ -223,7 +246,8 @@ class test_Django(SimpleTestCase):
             {
                 "id": jane_id,
                 "name": "jane",
-                "description": ""
+                "description": "",
+                "progression": 99
             }
         ])
 
@@ -595,6 +619,123 @@ class test_Django(SimpleTestCase):
             }
         ])
 
+        # Focus 
+
+        client.force_authenticate(user=loser)
+
+        response = client.post("/learning/v0/student/%s/focus" % silly_billy_id,{}, format='json')
+
+        self.assertEqual(response.status_code,status.HTTP_404_NOT_FOUND);
+        self.assertEqual(response.data,{"detail": "Student not found"})
+
+        client.force_authenticate(user=user)
+
+        response = client.post("/learning/v0/student/%s/focus" % silly_billy_id,{}, format='json')
+
+        self.assertEqual(response.status_code,status.HTTP_400_BAD_REQUEST);
+        self.assertEqual(response.data,{"words": ["This field is required."]})
+
+        response = client.post("/learning/v0/student/%s/append" % silly_billy_id,{
+            "words": ["here"]
+        }, format='json')
+        self.assertEqual(response.status_code,status.HTTP_202_ACCEPTED);
+
+        response = client.post("/learning/v0/student/%s/focus" % silly_billy_id,{
+            "words": ["here","there"]
+        }, format='json')
+
+        self.assertEqual(response.status_code,status.HTTP_404_NOT_FOUND);
+        self.assertEqual(response.data,{"detail": "Words not found","words": ["there"]})
+
+        response = client.post("/learning/v0/student/%s/append" % silly_billy_id,{
+            "words": ["there","everywhere"]
+        }, format='json')
+        self.assertEqual(response.status_code,status.HTTP_202_ACCEPTED);
+
+        response = client.post("/learning/v0/student/%s/focus" % silly_billy_id,{
+            "words": ["here","there"]
+        }, format='json')
+
+        self.assertEqual(response.status_code,status.HTTP_202_ACCEPTED);
+        self.assertEqual(response.data,[
+            {
+                "word": "here",
+                "focus": True,
+                "achievements": []
+            },
+            {
+                "word": "there",
+                "focus": True,
+                "achievements": []
+            }
+        ])
+
+        response = client.post("/learning/v0/student/%s/remove" % silly_billy_id,{
+            "words": ["here","there","everywhere"]
+        }, format='json')
+        self.assertEqual(response.status_code,status.HTTP_202_ACCEPTED);
+
+        # Blur 
+
+        client.force_authenticate(user=loser)
+
+        response = client.post("/learning/v0/student/%s/blur" % silly_billy_id,{}, format='json')
+
+        self.assertEqual(response.status_code,status.HTTP_404_NOT_FOUND);
+        self.assertEqual(response.data,{"detail": "Student not found"})
+
+        client.force_authenticate(user=user)
+
+        response = client.post("/learning/v0/student/%s/blur" % silly_billy_id,{}, format='json')
+
+        self.assertEqual(response.status_code,status.HTTP_400_BAD_REQUEST);
+        self.assertEqual(response.data,{"words": ["This field is required."]})
+
+        response = client.post("/learning/v0/student/%s/append" % silly_billy_id,{
+            "words": ["here"]
+        }, format='json')
+        self.assertEqual(response.status_code,status.HTTP_202_ACCEPTED);
+
+        response = client.post("/learning/v0/student/%s/blur" % silly_billy_id,{
+            "words": ["here","there"]
+        }, format='json')
+
+        self.assertEqual(response.status_code,status.HTTP_404_NOT_FOUND);
+        self.assertEqual(response.data,{"detail": "Words not found","words": ["there"]})
+
+        response = client.post("/learning/v0/student/%s/append" % silly_billy_id,{
+            "words": ["there","everywhere"]
+        }, format='json')
+        self.assertEqual(response.status_code,status.HTTP_202_ACCEPTED);
+
+        response = client.post("/learning/v0/student/%s/focus" % silly_billy_id,{
+            "words": ["here","there"]
+        }, format='json')
+        self.assertEqual(response.status_code,status.HTTP_202_ACCEPTED);
+
+        response = client.post("/learning/v0/student/%s/blur" % silly_billy_id,{
+            "words": ["here","there"]
+        }, format='json')
+
+        self.assertEqual(response.status_code,status.HTTP_202_ACCEPTED);
+        self.assertEqual(response.data,[
+            {
+                "word": "here",
+                "focus": False,
+                "achievements": []
+            },
+            {
+                "word": "there",
+                "focus": False,
+                "achievements": []
+            }
+        ])
+
+        response = client.post("/learning/v0/student/%s/remove" % silly_billy_id,{
+            "words": ["here","there","everywhere"]
+        }, format='json')
+        self.assertEqual(response.status_code,status.HTTP_202_ACCEPTED);
+
         # Attain 
 
         client.force_authenticate(user=loser)
@@ -639,7 +780,7 @@ class test_Django(SimpleTestCase):
         self.assertEqual(response.status_code,status.HTTP_404_NOT_FOUND);
         self.assertEqual(response.data,{"detail": "Achievement not found"})
 
-        achievement = Achievement(name="Sight")
+        achievement = Achievement(name="Sight",progression=100)
         achievement.save()
         sight_id = achievement.id
 
@@ -714,7 +855,7 @@ class test_Django(SimpleTestCase):
         self.assertEqual(response.status_code,status.HTTP_404_NOT_FOUND);
         self.assertEqual(response.data,{"detail": "Achievement not found"})
 
-        achievement = Achievement(name="Spell")
+        achievement = Achievement(name="Spell",progression=101)
         achievement.save()
         spell_id = achievement.id
 
@@ -757,13 +898,20 @@ class test_Django(SimpleTestCase):
 
         client.force_authenticate(user=user)
 
+        response = client.post("/learning/v0/student/%s/focus" % silly_billy_id,{
+            "words": ["here"]
+        }, format='json')
+        self.assertEqual(response.status_code,status.HTTP_202_ACCEPTED);
+
         self.assertEqual(client.get("/learning/v0/student/%s/position" % silly_billy_id).data,[
             {
                 "word": "here",
+                "focus": True,
                 "achievements": [sight_id]
             },
             {
                 "word": "there",
+                "focus": False,
                 "achievements": []
             }
         ])
@@ -771,10 +919,12 @@ class test_Django(SimpleTestCase):
         self.assertEqual(client.get("/learning/v0/student/%s/position?words=here,there" % silly_billy_id).data,[
             {
                 "word": "here",
+                "focus": True,
                 "achievements": [sight_id]
             },
             {
                 "word": "there",
+                "focus": False,
                 "achievements": []
             }
         ])
@@ -782,7 +932,24 @@ class test_Django(SimpleTestCase):
         self.assertEqual(client.get("/learning/v0/student/%s/position?words=here" % silly_billy_id).data,[
             {
                 "word": "here",
+                "focus": True,
                 "achievements": [sight_id]
+            }
+        ])
+
+        self.assertEqual(client.get("/learning/v0/student/%s/position?focus=true" % silly_billy_id).data,[
+            {
+                "word": "here",
+                "focus": True,
+                "achievements": [sight_id]
+            }
+        ])
+
+        self.assertEqual(client.get("/learning/v0/student/%s/position?focus=false" % silly_billy_id).data,[
+            {
+                "word": "there",
+                "focus": False,
+                "achievements": []
             }
         ])
 
@@ -1024,5 +1191,30 @@ class test_Django(SimpleTestCase):
                 "at": "2015-09-21T00:00:00Z"
             }
         ])
+
+
+    def test_audio(self):
+
+        client = APIClient()
+        user = User.objects.get(username="vagrant")
+        client.force_authenticate(user=user)
+
+        # Unavailable
+
+        original_forvo_key_file = learning.views.forvo_key_file
+        learning.views.forvo_key_file = "/tmp/forvo.key"
+
+        response = client.get("/learning/v0/audio/cat/", format='json')
+        self.assertEqual(response.status_code,status.HTTP_503_SERVICE_UNAVAILABLE);
+        self.assertEqual(response.data,{"detail": "Audio unavailable"})
+
+        # Available
+
+        learning.views.forvo_key_file = original_forvo_key_file 
+
+        response = client.get("/learning/v0/audio/cat/", format='json')
+        self.assertEqual(response.status_code,status.HTTP_200_OK);
+        self.assertIn("mp3",response.data)
+        self.assertIn("ogg",response.data)
 
 

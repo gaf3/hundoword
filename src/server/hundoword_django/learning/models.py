@@ -8,9 +8,10 @@ class Achievement(models.Model):
 
     name = models.CharField(max_length=32,unique=True)
     description = models.CharField(max_length=255,blank=True,default="")
+    progression = models.IntegerField(unique=True)
 
     class Meta:
-        ordering = ['name']
+        ordering = ['progression']
 
     def __unicode__(self):
         return self.name
@@ -60,6 +61,7 @@ class StudentWord(models.Model):
 
     student = models.ForeignKey(Student,related_name='words')
     word = models.CharField(max_length=128)
+    focus = models.BooleanField(default=False)
     achievements = models.ManyToManyField(Achievement)
 
     class Meta:

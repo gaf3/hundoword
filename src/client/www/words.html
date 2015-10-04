@@ -1,0 +1,32 @@
+{{#def.Header}}
+<div class="uk-overflow-container">
+    {{#def.StudentTabs}}<h4>{{=it.achievement.name}}</h4>
+    <form class="uk-form">
+        <div>
+            <fieldset data-uk-margin>
+                <input id="select" type="text" OnKeyPress="Learning.current.controller.press(event);"/>
+                <button OnClick="Learning.current.controller.select();" class="uk-button uk-button-primary">
+                    Select
+                </button>
+                <button OnClick="Learning.current.controller.focus();" class="uk-button uk-button-primary">
+                    Focus
+                </button>
+                <button OnClick="Learning.current.controller.clear();" class="uk-button uk-button-primary">
+                    Clear
+                </button>
+                <button OnClick="Learning.current.controller.start();" class="uk-button uk-button-primary">
+                    Start
+                </button>
+            </fieldset>
+        </div>
+    </form>
+    <ul id="words" class="uk-subnav uk-subnav-pill">
+        {{~it.student.words :word}}
+        <li onClick="Learning.current.controller.toggle(this)" data='{{=word}}' {{? $.inArray(word,it.words) > -1 }}class="uk-active"{{?}}>
+            <a>{{=word}}</a>
+        </li>
+        {{~}}
+    </ul>
+    <br/>
+</div>
+{{#def.Footer}}

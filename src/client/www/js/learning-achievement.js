@@ -20,7 +20,7 @@ Learning.controller("Achievement","Changeable",{
         var achievement = {
             name: $("#name").val(), 
             description: $("#description").val(),
-            words: this.words_array($("#words").val())
+            progression: $("#progression").val()
         };
         if (achievement_id) {
             this.it = {achievement: hwAPI.achievement.update(achievement_id,achievement)};

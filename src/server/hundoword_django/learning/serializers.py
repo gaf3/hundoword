@@ -82,7 +82,7 @@ class PositionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = StudentWord
-        fields = ('word','achievements')
+        fields = ('word','focus','achievements')
 
 
 class ProgressSerializer(serializers.ModelSerializer):

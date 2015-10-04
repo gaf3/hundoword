@@ -1,3 +1,4 @@
+import os
 import sys
 import traceback
 import datetime
@@ -18,6 +19,9 @@ from learning.serializers import *
 from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
 
+import requests
+
+forvo_key_file = "/etc/hundoword/forvo.key"
 
 def exception_response(exception,detail=None,status=status.HTTP_500_INTERNAL_SERVER_ERROR):
 
@@ -77,12 +81,18 @@ def achievement(request,pk='',action=''):
             if 'name' not in request.DATA:
                 return Response({"name": ["This field is required."]}, status=status.HTTP_400_BAD_REQUEST)
 
+            if 'progression' not in request.DATA:
+                return Response({"progression": ["This field is required."]}, status=status.HTTP_400_BAD_REQUEST)
+
             with transaction.atomic():
 
                 achievement = Achievement(name=request.DATA['name'])
 
                 if 'description' in request.DATA:
                     achievement.description = request.DATA['description']
+
+                if 'progression' in request.DATA:
+                    achievement.progression = request.DATA['progression']
 
                 achievement.save()
 
@@ -119,8 +129,6 @@ def achievement(request,pk='',action=''):
                 return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
 
             else: # pragma: no cover
-
-                print "What?"
 
                 return errors_response(serializer)
 
@@ -327,11 +335,17 @@ def student(request,pk='',action=''):
 
             elif action == "position": 
 
-                if "words" in request.GET:
-                    serializer = PositionSerializer(student.words.filter(word__in=request.GET["words"].split(",")), many=True)
-                else:
-                    serializer = PositionSerializer(student.words.all(), many=True)
+                filter = {
+                    "student": Student.objects.get(teacher=request.user,pk=pk)
+                }
 
+                if "words" in request.GET:
+                    filter["word__in"] = request.GET["words"].split(",")
+
+                if "focus" in request.GET:
+                    filter["focus"] = request.GET["focus"].lower() == "true"
+
+                serializer = PositionSerializer(StudentWord.objects.filter(**filter), many=True)
                 return Response(serializer.data)
 
             # Progress
@@ -402,6 +416,22 @@ def student(request,pk='',action=''):
                 serializer = StudentSerializer(student)
                 return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
 
+            elif action in ["focus","blur"]: 
+
+                if 'words' not in request.DATA:
+                    return Response({"words": ["This field is required."]}, status=status.HTTP_400_BAD_REQUEST)
+
+                student_words = StudentWord.objects.filter(student=student,word__in=request.DATA["words"])
+
+                missing = set(request.DATA["words"]) - set([student_word.word for student_word in student_words])
+
+                if missing:
+                    return Response({"detail": "Words not found","words": list(missing)}, status=status.HTTP_404_NOT_FOUND)
+
+                student_words.update(focus=action == "focus")
+                serializer = PositionSerializer(student_words, many=True)
+                return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+
             elif action in ["attain","yield"]: 
 
                 if 'word' not in request.DATA:
@@ -460,5 +490,29 @@ def student(request,pk='',action=''):
     except Exception as exception: # pragma: no cover
 
         return exception_response(exception)
+
+
+@api_view(['GET'])
+def audio(request,word):
+    """ Handles audio """
+
+    try:
+
+        handle = open(forvo_key_file,'rb')
+        forvo_key = handle.readline().strip()
+        handle.close()
+
+        url = "https://apifree.forvo.com/key/%s/format/json/action/word-pronunciations/language/en/country/usa/word/%s/limit/1" % (forvo_key,word)
+        response = requests.get(url)
+        response.raise_for_status()
+        data = response.json()
+        
+        return Response({"mp3": data["items"][0]["pathmp3"],"ogg": data["items"][0]["pathogg"]})
+
+    except Exception as exception: # pragma: no cover
+
+        return exception_response(exception, "Audio unavailable", status=status.HTTP_503_SERVICE_UNAVAILABLE)
+
+
 
 

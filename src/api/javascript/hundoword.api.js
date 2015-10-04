@@ -97,22 +97,35 @@ HundoWord.Student = function(api) {
 
 HundoWord.Student.prototype = new HundoWord.Words();
 
+HundoWord.Student.prototype.focus = function(id,words,success,error,complete) {
+    return this.rest("POST",this.build_url(id,"focus"),{words: words},success,error,complete);
+}
+HundoWord.Student.prototype.blur = function(id,words,success,error,complete) {
+    return this.rest("POST",this.build_url(id,"blur"),{words: words},success,error,complete);
+}
 HundoWord.Student.prototype.attain = function(id,word,achievement,at,success,error,complete) {
-    var parameters = {word: word,achievement: achievement};
+    var data = {word: word,achievement: achievement};
     if (at) {
-        parameters["at"] = at;
+        data["at"] = at;
     }
-    return this.rest("POST",this.build_url(id,"attain"),parameters,success,error,complete);
+    return this.rest("POST",this.build_url(id,"attain"),data,success,error,complete);
 }
 HundoWord.Student.prototype.yield = function(id,word,achievement,at,success,error,complete) {
-    var parameters = {word: word,achievement: achievement};
+    var data = {word: word,achievement: achievement};
     if (at) {
-        parameters["at"] = at;
+        data["at"] = at;
     }
-    return this.rest("POST",this.build_url(id,"yield"),parameters,success,error,complete);
+    return this.rest("POST",this.build_url(id,"yield"),data,success,error,complete);
 }
-HundoWord.Student.prototype.position = function(id,words,success,error,complete) {
-    return this.rest("GET",this.build_url(id,"position",words ? {words: words.join(',')} : undefined),null,success,error,complete);
+HundoWord.Student.prototype.position = function(id,words,focus,success,error,complete) {
+    var parameters = {};
+    if (words) {
+        parameters["words"] = words.join(',');
+    }
+    if (focus !== undefined && focus !== null) {
+        parameters["focus"] = focus ? "true" : "false";
+    }
+    return this.rest("GET",this.build_url(id,"position",parameters),null,success,error,complete);
 }
 HundoWord.Student.prototype.history = function(id,words,achievements,from,to,success,error,complete) {
     var parameters = {};
@@ -135,6 +148,7 @@ HundoWord.Student.prototype.history = function(id,words,achievements,from,to,suc
 // API
 
 HundoWord.API = function(url) {
+
     this.url = url;
 
     this.achievement = new HundoWord.Achievement(this);
@@ -260,6 +274,9 @@ HundoWord.API.prototype.login = function(username,password,success,error,complet
 
 }
 
+HundoWord.API.prototype.audio = function(word,success,error,complete) {
+    return this.rest("GET",this.build_url("audio",word),null,this.headers(),success,error,complete);
+}
 
 // Determines if there's an exception in the response
 

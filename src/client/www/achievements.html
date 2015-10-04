@@ -6,6 +6,7 @@
             <tr>
                 <th>Name</th>
                 <th>Description</th>
+                <th>Progression</th>
             </tr>
         </thead>
         <tbody>
@@ -13,6 +14,7 @@
             <tr OnClick="Learning.go('achievement/select',{{=achievement.id}})">
                 <td>{{=achievement.name}}</td>
                 <td>{{=achievement.description}}</td>
+                <td>{{=achievement.progression}}</td>
             </tr>
             {{~}}
         </tbody>
