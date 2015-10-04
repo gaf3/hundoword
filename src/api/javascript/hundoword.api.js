@@ -148,6 +148,7 @@ HundoWord.Student.prototype.history = function(id,words,achievements,from,to,suc
 // API
 
 HundoWord.API = function(url) {
+
     this.url = url;
 
     this.achievement = new HundoWord.Achievement(this);
@@ -273,6 +274,9 @@ HundoWord.API.prototype.login = function(username,password,success,error,complet
 
 }
 
+HundoWord.API.prototype.audio = function(word,success,error,complete) {
+    return this.rest("GET",this.build_url("audio",word),null,this.headers(),success,error,complete);
+}
 
 // Determines if there's an exception in the response
 

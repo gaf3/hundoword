@@ -380,6 +380,20 @@ QUnit.test("login", function(assert) {
 
 });
 
+QUnit.test("audio", function(assert) {
+
+    var api = new HundoWord.API(hundoword_django_host + "/api/v0/");
+    check_user(api,"tester0","tester0","tester0@hundoword.com");
+
+    var audio = api.audio("cat");
+
+    assert.ok("mp3" in audio);
+    assert.ok("ogg" in audio);
+
+
+});
+
+
 QUnit.module("HundoWord.Base", {
 
     setup: function() {
@@ -1830,4 +1844,3 @@ QUnit.test("delete", function(assert) {
     );
 
 });
-

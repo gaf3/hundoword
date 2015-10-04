@@ -1,3 +1,4 @@
+import os
 import sys
 import traceback
 import datetime
@@ -18,6 +19,9 @@ from learning.serializers import *
 from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
 
+import requests
+
+forvo_key_file = "/etc/hundoword/forvo.key"
 
 def exception_response(exception,detail=None,status=status.HTTP_500_INTERNAL_SERVER_ERROR):
 
@@ -486,5 +490,29 @@ def student(request,pk='',action=''):
     except Exception as exception: # pragma: no cover
 
         return exception_response(exception)
+
+
+@api_view(['GET'])
+def audio(request,word):
+    """ Handles audio """
+
+    try:
+
+        handle = open(forvo_key_file,'rb')
+        forvo_key = handle.readline().strip()
+        handle.close()
+
+        url = "https://apifree.forvo.com/key/%s/format/json/action/word-pronunciations/language/en/country/usa/word/%s/limit/1" % (forvo_key,word)
+        response = requests.get(url)
+        response.raise_for_status()
+        data = response.json()
+        
+        return Response({"mp3": data["items"][0]["pathmp3"],"ogg": data["items"][0]["pathogg"]})
+
+    except Exception as exception: # pragma: no cover
+
+        return exception_response(exception, "Audio unavailable", status=status.HTTP_503_SERVICE_UNAVAILABLE)
+
+
 
 

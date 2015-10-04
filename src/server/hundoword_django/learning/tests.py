@@ -1,3 +1,4 @@
+import os
 import json
 import datetime
 
@@ -10,6 +11,7 @@ from rest_framework.authtoken.models import Token
 
 from learning.models import *
 from learning.views import *
+import learning.views
 
 from rest_framework import status
 from rest_framework.test import APIClient, force_authenticate
@@ -34,6 +36,12 @@ class test_Django(SimpleTestCase):
         connection.creation.create_test_db(verbosity=0)
         user = User(username="vagrant",password="vagrant")
         user.save()
+        self.original_forvo_key_file = learning.views.forvo_key_file
+
+
+    def tearDown(self):
+
+        learning.views.forvo_key_file = self.original_forvo_key_file 
 
 
     def test_Achievement(self):
@@ -1183,5 +1191,30 @@ class test_Django(SimpleTestCase):
                 "at": "2015-09-21T00:00:00Z"
             }
         ])
+
+
+    def test_audio(self):
+
+        client = APIClient()
+        user = User.objects.get(username="vagrant")
+        client.force_authenticate(user=user)
+
+        # Unavailable
+
+        original_forvo_key_file = learning.views.forvo_key_file
+        learning.views.forvo_key_file = "/tmp/forvo.key"
+
+        response = client.get("/learning/v0/audio/cat/", format='json')
+        self.assertEqual(response.status_code,status.HTTP_503_SERVICE_UNAVAILABLE);
+        self.assertEqual(response.data,{"detail": "Audio unavailable"})
+
+        # Available
+
+        learning.views.forvo_key_file = original_forvo_key_file 
+
+        response = client.get("/learning/v0/audio/cat/", format='json')
+        self.assertEqual(response.status_code,status.HTTP_200_OK);
+        self.assertIn("mp3",response.data)
+        self.assertIn("ogg",response.data)
 
 
