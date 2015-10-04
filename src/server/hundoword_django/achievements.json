@@ -21,7 +21,7 @@
         "pk": 3,
         "model": "learning.achievement",
         "fields": {
-            "name": "Cross Match",
+            "name": "Sight Cross",
             "description": "Two lists of words, click one, then click the other. If wrong, both get crossed out red.",
             "progression": 3
         }
@@ -30,8 +30,8 @@
         "pk": 4,
         "model": "learning.achievement",
         "fields": {
-            "name": "Spell Match",
-            "description": "Word displayed above, need to spell, have a done button.",
+            "name": "Sight Spell",
+            "description": "Show the word above and they have to type in characters to match the spelling.",
             "progression": 4
         }
     },
@@ -40,7 +40,7 @@
         "model": "learning.achievement",
         "fields": {
             "name": "Sight Search",
-            "description": "Basic word search. Student clicks letters, circling in row. When circle matches, word is crossed out. Done button.",
+            "description": "Basic word search. Student clicks letters, circling in row. When circle matches, word is crossed out. Indifferent button to give up.",
             "progression": 5
         }
     },
@@ -49,8 +49,35 @@
         "model": "learning.achievement",
         "fields": {
             "name": "Sound Match",
-            "description": "Button to play sound, pick from a list.",
+            "description": "Play the sound (and button to replay), pick from a list.",
             "progression": 6
+        }
+    },
+    {
+        "pk": 7,
+        "model": "learning.achievement",
+        "fields": {
+            "name": "Sound Cross",
+            "description": "Line of speakers and line of words.  Play the speaker, match the words.",
+            "progression": 7
+        }
+    },
+    {
+        "pk": 8,
+        "model": "learning.achievement",
+        "fields": {
+            "name": "Sound Spell",
+            "description": "Show the word above and they have to type in characters to match the spelling.",
+            "progression": 8
+        }
+    },
+    {
+        "pk": 9,
+        "model": "learning.achievement",
+        "fields": {
+            "name": "Sound Search",
+            "description": "Basic word search. List of speakers for words to search for. Student clicks letters, circling in row. When circle matches, word is green. Indifferent button to give up.",
+            "progression": 9
         }
     }
 ]

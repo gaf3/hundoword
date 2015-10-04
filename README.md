@@ -30,11 +30,23 @@ vagrant ssh
 
 This will create an Ubuntu server and map the vagrant user's src directory to the checked out src directory.  It'll also map 192.168.72.87 locally to the VM.
 
+## Pronounciation
+
+Right now, this requires an account at http://api.forvo.com/. I have the $1/month 500 req/day one right now.  If you see up an account, add your key to your vagrant instance like so:
+
+```bash
+sudo mkdir /etc/hundoword
+echo "your key here" | sudo tee /etc/hundoword/forvo.key
+```
+
+Without this, none of the pronounciation works.  I think we're eventually just going to record our own and allow users to the do the same, but this works for now.
+
 # Data
 
 * Achievements - What a student can do to identify or understand a word.
   * name 
   * description
+  * progression - Suggested order to attain
 * Program - Collections of words
   * name 
   * description
@@ -88,6 +100,8 @@ There's already an existing user/pass: vagrant/vagrant or you can create a new o
   * id - Student to select
   * words - Only show position for these words
   * words - Only show position for words the Student is focusing on or not focusing on
+* `#/student/<id>/game/` - Games: Where a student can play games and attain/yield achievements
+  * id - Student to select
 * `#/student/<id>/history/words=<word>,<word>&achievements=<achievement_id>,<achievement_id>&from=<from>&to=<to>` - Position: Where a student stands on each of their words' achievements.
   * id - Student to select
   * words - Only show history for these words
