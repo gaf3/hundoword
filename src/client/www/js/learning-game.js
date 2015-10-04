@@ -54,12 +54,14 @@ Learning.controller("Game","Changeable",{
         this.index = 0;
         this.it.words = this.words;
         this.it.word = this.it.words[this.index];
+        this.it.audio = hwAPI.audio(this.it.word);
         this.application.render(this.it,this.it.achievement.name);
     },
     introduce: function() {
         hwAPI.student.attain(this.it.student.id,this.it.word,this.it.achievement.id);
         if (++this.index < this.words.length) {
             this.it.word = this.it.words[this.index];
+            this.it.audio = hwAPI.audio(this.it.word);
             this.application.render(this.it,this.it.achievement.name);
         } else {
             this.application.go("student/history",this.it.student.id);
