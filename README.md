@@ -76,6 +76,18 @@ Without this, none of the pronounciation works.  I think we're eventually just g
   * hold - Whether attained or yielded
   * at - The date and time of the progress
 
+## Achievements
+
+* Introduction - Just shows the word, plays its sound, and has a speaker icon to replay.
+* Sight Match - Show the word above and they have to click the word in a group below. First click either pass or fail.
+* Sight Cross - Two lists of words, click one, then click the other. If wrong, both get crossed out red.
+* Sight Spell - Show the word above and they have to type in characters to match the spelling.
+* Sight Search - Basic word search. Student clicks letters, circling in row. When circle matches, word is crossed out. Indifferent button to give up.
+* Sound Match - Play the sound (and button to replay), pick from a list.
+* Sound Cross - Line of speakers and line of words.  Play the speaker, match the words.
+* Sound Spell - Show the word above and they have to type in characters to match the spelling.
+* Sound Search - Basic word search. List of speakers for words to search for. Student clicks letters, circling in row. When circle matches, word is green. Indifferent button to give up.
+
 # Web
 
 ## Client 
@@ -160,6 +172,7 @@ In all JavaScript API functions, the arguments success, error, and complete are 
         * id
         * name
         * description
+        * progression
     * JavaScript - `api.achievement.list(success,error,complete)`
   * Select - Retrieves an Achievement using id
     * Request - `GET http://192.168.72.87/api/v0/achievement/<id>/`
@@ -167,25 +180,30 @@ In all JavaScript API functions, the arguments success, error, and complete are 
       * id
       * name
       * description
+      * progression
     * JavaScript - `api.achievement.select(id,success,error,complete)`
   * Create - Creates an Achievement
     * Request - `POST http://192.168.72.87/api/v0/achievement/`
       * name
       * description
+      * progression
     * Response - `201 Created`
       * id
       * name
       * description
+      * progression
     * JavaScript - `api.achievement.create(data,success,error,complete)`
       * data - object to be posted
   * Update - Updates an Achievement
     * Request - `POST http://192.168.72.87/api/v0/achievement/<id>/`
       * name (optional)
       * description (optional)
+      * progression (optional)
     * Response - `202 Accepted`
       * id
       * name
       * description
+      * progression
     * JavaScript - `api.achievement.update(id,data,success,error,complete)`
       * data - object to be posted
   * Delete - Deletes an Achievement
@@ -350,6 +368,7 @@ In all JavaScript API functions, the arguments success, error, and complete are 
     * Request - `POST http://192.168.72.87/api/v0/student/<id>/attain/`
       * word
       * achievement - Name of achievement
+      * at (optional, defaults to now) - Date and time (YYYY-MM-DDTHH:MM:SSZ)
     * Response - `202 Accepted`
       * word 
       * achievement (id)
@@ -360,6 +379,7 @@ In all JavaScript API functions, the arguments success, error, and complete are 
     * Request - `POST http://192.168.72.87/api/v0/student/<id>/yield/`
       * word
       * achievement - Name of achievement
+      * at (optional, defaults to now) - Date and time (YYYY-MM-DDTHH:MM:SSZ)
     * Response - `202 Accepted`
       * word 
       * achievement (id)
@@ -394,6 +414,15 @@ In all JavaScript API functions, the arguments success, error, and complete are 
     * Request - `DELETE http://192.168.72.87/api/v0/student/<id>/`
     * Response - `200 Ok`
     * JavaScript - `api.student.delete(id,success,error,complete)`
+* audio - Get the audio for a word
+  * Request - `POST http://192.168.72.87/api/v0/audio/<word>/`
+    * word - Word to get sound for
+  * Response - `200 OK`
+    * mp3 - A link for the mp3 file 
+    * ogg - A link for the ogg file
+  * Response - `503 SERVICE UNAVAILABLE` - If anything goes, no account, etc.
+    * detail - Audio unavailable
+  * JavaScript - `api.audio(word,success,error,complete)`
 
 # Development
 
@@ -418,6 +447,10 @@ sudo service apache2 start
 # Testing
 
 Make sure you're using Django in Development mode above.  Trust me, it'll save you a lot of headaches. 
+
+## Pronounciation
+
+Without the a Forvo account, the audio RESTful and JavaScript tests fail in parts.  I may add something to say "not covered" or something instead. 
 
 ## RESTful API
 
