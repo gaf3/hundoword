@@ -69,10 +69,10 @@ Learning.controller("Game","Changeable",{
     },
     introduced: function() {
         hwAPI.student.attain(this.it.student.id,this.it.word,this.it.achievement.id);
-        $('#next').removeClass('uk-icon-spin');
-        $('#next').prop('disabled',false);
+        $('.hw-attain').show();
+        $('.hw-progress').hide();
     },
-    single_match: function(start) {
+    match: function(start) {
         if (start) {
             this.index = -1;
         }
@@ -92,31 +92,63 @@ Learning.controller("Game","Changeable",{
             this.application.go("student/history",this.it.student.id);
         }
     },
-    single_matched: function(choice) {
-        $(choice).addClass("uk-active");
-        if ($(choice).attr('data') == this.it.word) {
+    matched: function() {
+        $('#choices li').attr('OnClick','');
+        if ($('#choices li.uk-active').attr('data') == this.it.word) {
             hwAPI.student.attain(this.it.student.id,this.it.word,this.it.achievement.id);
-            $('#next').addClass('uk-button-success');
+            $('.hw-attain').show();
         } else {
             hwAPI.student.yield(this.it.student.id,this.it.word,this.it.achievement.id);
-            $('#next i').removeClass('uk-icon-thumbs-o-up');
-            $('#next i').addClass('uk-icon-thumbs-o-down');
-            $('#next').addClass('uk-button-danger');
+            $('.hw-yield').show();
         }
-        $('#next').removeClass('uk-icon-spin');
-        $('#next').prop('disabled',false);
+        $('.hw-progress').hide();
     },
     sight_match: function(start) {
-        this.single_match(start);
+        this.match(start);
     },
-    sight_matched: function(choice) {
-        this.single_matched(choice);
+    sight_matched: function() {
+        this.matched();
     },
     sound_match: function(start) {
-        this.single_match(start);
+        this.match(start);
     },
-    sound_matched: function(choice) {
-        this.single_matched(choice);
+    sound_matched: function() {
+        this.matched();
+    },
+    spell: function(start) {
+        if (start) {
+            this.index = -1;
+        }
+        if (++this.index < this.words.length) {
+            this.it.word = this.it.words[this.index];
+            this.it.audio = hwAPI.audio(this.it.word);
+            this.application.render(this.it,this.it.achievement.name);
+            $("#spell").focus();
+        } else {
+            this.application.go("student/history",this.it.student.id);
+        }
+    },
+    spelled: function() {
+        if ($('#spell').val().toLowerCase() == this.it.word.toLowerCase()) {
+            hwAPI.student.attain(this.it.student.id,this.it.word,this.it.achievement.id);
+            $('.hw-attain').show();
+        } else {
+            hwAPI.student.yield(this.it.student.id,this.it.word,this.it.achievement.id);
+            $('.hw-yield').show();
+        }
+        $('.hw-progress').hide();
+    },
+    sight_spell: function(start) {
+        this.spell(start);
+    },
+    sight_spelled: function() {
+        this.spelled();
+    },
+    sound_spell: function(start) {
+        this.spell(start);
+    },
+    sound_spelled: function() {
+        this.spelled();
     }
 });
 
@@ -125,6 +157,8 @@ Learning.template("Words",Learning.load("words"),null,Learning.partials);
 Learning.template("Introduction",Learning.load("introduction"),null,Learning.partials);
 Learning.template("Sight Match",Learning.load("sight-match"),null,Learning.partials);
 Learning.template("Sound Match",Learning.load("sound-match"),null,Learning.partials);
+Learning.template("Sight Spell",Learning.load("sight-spell"),null,Learning.partials);
+Learning.template("Sound Spell",Learning.load("sound-spell"),null,Learning.partials);
 
 Learning.route("student/games","/student/{student_id:^\\d+$}/game/","Games","Game","list");
 Learning.route("student/game","/student/{student_id:^\\d+$}/game/{achievement_id:^\\d+$}/","Words","Game","words");
