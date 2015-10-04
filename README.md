@@ -85,7 +85,6 @@ Completed:
 * Sound Match - Play the sound (and button to replay), pick from a list.
 * Sound Spell - Show the word above and they have to type in characters to match the spelling.
 
-
 In Progress:
 * Sight Cross - Two lists of words, click one, then click the other. If wrong, both get crossed out red.
 * Sight Search - Basic word search. Student clicks letters, circling in row. When circle matches, word is crossed out. Indifferent button to give up.
