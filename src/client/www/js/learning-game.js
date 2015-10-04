@@ -39,7 +39,7 @@ Learning.controller("Game","Changeable",{
             $("#words li[data=" + positions[position].word + "]").addClass("uk-active");
         }
     },
-    clear: function(word) {
+    clear: function() {
         $("#words li.uk-active").removeClass("uk-active");
     },
     toggle: function(word) {
@@ -48,11 +48,28 @@ Learning.controller("Game","Changeable",{
         } else {
             $(word).addClass("uk-active");
         }
+    },
+    start: function() {
+        this.words = $("#words li.uk-active").map(function(){return $(this).attr("data");}).get();
+        this.index = 0;
+        this.it.words = this.words;
+        this.it.word = this.it.words[this.index];
+        this.application.render(this.it,this.it.achievement.name);
+    },
+    introduce: function() {
+        hwAPI.student.attain(this.it.student.id,this.it.word,this.it.achievement.id);
+        if (++this.index < this.words.length) {
+            this.it.word = this.it.words[this.index];
+            this.application.render(this.it,this.it.achievement.name);
+        } else {
+            this.application.go("student/history",this.it.student.id);
+        }
     }
 });
 
 Learning.template("Games",Learning.load("games"),null,Learning.partials);
 Learning.template("Words",Learning.load("words"),null,Learning.partials);
+Learning.template("Introduction",Learning.load("introduction"),null,Learning.partials);
 
 Learning.route("student/games","/student/{student_id:^\\d+$}/game/","Games","Game","list");
 Learning.route("student/game","/student/{student_id:^\\d+$}/game/{achievement_id:^\\d+$}/","Words","Game","words");
