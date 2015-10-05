@@ -111,13 +111,15 @@ There's already an existing user/pass: vagrant/vagrant or you can create a new o
 * `#/student/` - Students: List existing students or create a new one
 * `#/student/<id>/` - Student: Selecting existing student using id, edit or delete.
   * id - Student to select
+* `#/student/<id>/focus/` - Focus: What words a student should be focusing on
+  * id - Student to select
+* `#/student/<id>/game/` - Games: Where a student can play games and attain/yield achievements
+  * id - Student to select
 * `#/student/<id>/position/words=<word>,<word>,focus=true/false` - Position: Where a student stands on each of their words' achievements.
   * id - Student to select
   * words - Only show position for these words
   * words - Only show position for words the Student is focusing on or not focusing on
-* `#/student/<id>/game/` - Games: Where a student can play games and attain/yield achievements
-  * id - Student to select
-* `#/student/<id>/history/words=<word>,<word>&achievements=<achievement_id>,<achievement_id>&from=<from>&to=<to>` - Position: Where a student stands on each of their words' achievements.
+* `#/student/<id>/history/words=<word>,<word>&achievements=<achievement_id>,<achievement_id>&from=<from>&to=<to>` - History: All the attains and yields a studnt has made
   * id - Student to select
   * words - Only show history for these words
   * achievements - Only show history for these achievements (by id)
