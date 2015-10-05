@@ -69,8 +69,13 @@ Learning.controller("Game","Changeable",{
         }
     },
     introduced: function() {
-        hwAPI.student.attain(this.it.student.id,this.it.word,this.it.achievement.id);
-        $('.hw-attain').show();
+        if ($('#sound').attr('data') == 1) {
+            hwAPI.student.attain(this.it.student.id,this.it.word,this.it.achievement.id);
+            $('.hw-attain').show();
+        } else {
+            hwAPI.student.yield(this.it.student.id,this.it.word,this.it.achievement.id);
+            $('.hw-yield').show();
+        }
         $('.hw-progress').hide();
     },
     match: function(start) {

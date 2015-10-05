@@ -3,7 +3,7 @@
         <h1 class="uk-heading-large">
             {{=it.word}}
             {{? it.audio }}
-            <audio id="sound" OnLoadedData="$('#play').prop('disabled',false); this.play();">
+            <audio id="sound" OnLoadedData="$('#play').prop('disabled',false);">
                 <source src="{{=it.audio.mp3}}"/>
                 <source src="{{=it.audio.ogg}}"/>
             </audio>

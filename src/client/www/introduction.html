@@ -3,7 +3,7 @@
         <h1 class="uk-heading-large">
             {{=it.word}}
             {{? it.audio }}
-            <audio id="sound" OnLoadedData="$('#play').prop('disabled',false); this.play();">
+            <audio id="sound" OnLoadedData="$('#play').prop('disabled',false);" OnPlay="$(this).attr('data',1);" data='0'>
                 <source src="{{=it.audio.mp3}}"/>
                 <source src="{{=it.audio.ogg}}"/>
             </audio>
@@ -17,6 +17,9 @@
         </button>
         <button id="next" OnClick="Learning.current.controller.introduction();" class="uk-button uk-button-success hw-attain" style="display: none">
             <i class="uk-icon-thumbs-o-up"/>
+        </button>
+        <button id="next" OnClick="Learning.current.controller.introduction();" class="uk-button uk-button-danger hw-yield" style="display: none">
+            <i class="uk-icon-thumbs-o-down"/>
         </button>
     </div>
 </div>
