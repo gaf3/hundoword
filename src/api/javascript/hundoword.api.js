@@ -98,7 +98,11 @@ HundoWord.Student = function(api) {
 HundoWord.Student.prototype = new HundoWord.Words();
 
 HundoWord.Student.prototype.focus = function(id,words,success,error,complete) {
-    return this.rest("POST",this.build_url(id,"focus"),{words: words},success,error,complete);
+    if (words !== undefined && words !== null) {
+        return this.rest("POST",this.build_url(id,"focus"),{words: words},success,error,complete);
+    } else {
+        return this.rest("GET",this.build_url(id,"focus"),null,success,error,complete);
+    }
 }
 HundoWord.Student.prototype.blur = function(id,words,success,error,complete) {
     return this.rest("POST",this.build_url(id,"blur"),{words: words},success,error,complete);

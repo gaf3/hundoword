@@ -349,7 +349,7 @@ In all JavaScript API functions, the arguments success, error, and complete are 
       * words - Array of words (string)
     * JavaScript - `api.student.remove(id,words,success,error,complete)`
       * words - array of words to remove
-  * Focus - Have Student focus on particular words
+  * Focus - Have Student focus on particular words or get what they're focusing on
     * Request - `POST http://192.168.72.87/api/v0/student/<id>/focus/`
       * words - Array of words (string) - Will have their focus set to true
     * Response - `202 Accepted`
@@ -358,6 +358,10 @@ In all JavaScript API functions, the arguments success, error, and complete are 
       * achievments - Array of achievement ids
     * JavaScript - `api.student.focus(id,words,success,error,complete)`
       * words - array of words to focus on
+    * Request - `GET http://192.168.72.87/api/v0/student/<id>/focus/`
+    * Response - `200 OK`
+      * Array of words (string) that are being focused on
+    * JavaScript - `api.student.focus(id,null,success,error,complete)`
   * Blur - Have a Student stop focusing on particular words
     * Request - `POST http://192.168.72.87/api/v0/student/<id>/blur/`
       * words - Array of words (string) - Will have their focus set to true
