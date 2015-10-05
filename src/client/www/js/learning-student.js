@@ -117,16 +117,21 @@ Learning.controller("Student","Changeable",{
         this.it.history = hwAPI.student.history(this.application.current.path.student_id,words,achievements,from,to);
         this.application.render(this.it);
     },
+    history_toggle: function(achievement) {
+        if ($(achievement).hasClass("uk-active")) {
+            $(achievement).removeClass("uk-active");
+        } else {
+            $(achievement).addClass("uk-active");
+        }
+        this.history_search();
+    },
     history_search: function() {
         var parameters = {};
         var words = $("#words").val();
         if (words.length) {
             parameters["words"] = this.words_array(words).join(",");
         }
-        var achievements = [];
-        $("input[name='achievements']:checked").each(function () {
-            achievements.push($(this).val());
-        });
+        var achievements = $("#achievements li.uk-active").map(function(){return $(this).attr("data");}).get();;
         if (achievements.length) {
             parameters["achievements"] = achievements.join(",");
         }

@@ -6,21 +6,26 @@
         <div>
             <fieldset data-uk-margin>
                 <strong>Words</strong>
-                <input id="words" value="{{=Learning.current.query.words ? Learning.current.query.words.replace(/,/g,' ') : ''}}" type="text">
-                &nbsp; &nbsp; &nbsp;
-                <strong>Achievements</strong>
-                {{~it.achievements :achievement}}
-                <input type="checkbox"
-                    name="achievements" value="{{=achievement.id}}" 
-                    {{? Learning.current.query.achievements && Learning.current.query.achievements.indexOf(achievement.id) > -1}}checked{{?}}
-                > {{=achievement.name}}
-                {{~}}
-                &nbsp; &nbsp; &nbsp;
+                <input 
+                    id="words" value="{{=Learning.current.query.words ? Learning.current.query.words.replace(/,/g,' ') : ''}}" type="text"
+                    OnKeyPress="if (event.keyCode == 13) { Learning.current.controller.history_search(); }"
+                >
                 <strong>From</strong> <input type="" id="from" value="{{!Learning.current.query.from}}" data-uk-datepicker="{format:'YYYY-MM-DD'}">
                 <strong>To</strong> <input type="" id="to" value="{{!Learning.current.query.to}}" data-uk-datepicker="{format:'YYYY-MM-DD'}">
                 <button OnClick="Learning.current.controller.history_search();" class="uk-button uk-button-primary">
                     <i class="uk-icon-search"></i>
                 </button>
+                <br/>
+                <ul id="achievements" class="uk-subnav uk-subnav-pill">
+                    {{~it.achievements :achievement}}
+                    <li 
+                        onClick="Learning.current.controller.history_toggle(this)" data='{{=achievement.id}}' 
+                        {{? Learning.current.query.achievements && Learning.current.query.achievements.indexOf(achievement.id) > -1}}class="uk-active"{{?}}
+                    >
+                        <a>{{=achievement.name}}</a>
+                    </li>
+                    {{~}}
+                </ul>
             </fieldset>
         </div>
         <table class="uk-table uk-table-hover">
