@@ -1,5 +1,5 @@
 Learning.controller("Position","Changeable",{
-    select: function() {
+    list: function() {
         this.it = {
             student: hwAPI.student.select(this.application.current.path.student_id),
             achievements: hwAPI.achievement.list()
@@ -48,5 +48,5 @@ Learning.controller("Position","Changeable",{
 
 Learning.template("Position",Learning.load("position"),null,Learning.partials);
 
-Learning.route("student/position","/student/{student_id:^\\d+$}/position/","Position","Position","select");
+Learning.route("student/position","/student/{student_id:^\\d+$}/position/","Position","Position","list");
 
