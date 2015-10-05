@@ -14,7 +14,7 @@
         <ul id="choices" class="uk-subnav uk-subnav-pill">
         {{~ it.choices :choice}}
         <li OnClick="$('#choices li').removeClass('uk-active'); $(this).addClass('uk-active');" data='{{!choice}}'>
-            <a>{{=choice}}</a>
+            <a class="uk-text-large">{{=choice}}</a>
         </li>
         {{~}}
         </ul>
