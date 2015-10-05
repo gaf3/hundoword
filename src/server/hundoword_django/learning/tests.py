@@ -619,7 +619,7 @@ class test_Django(SimpleTestCase):
             }
         ])
 
-        # Focus 
+        # Focus
 
         client.force_authenticate(user=loser)
 
@@ -669,6 +669,11 @@ class test_Django(SimpleTestCase):
                 "achievements": []
             }
         ])
+
+        response = client.get("/learning/v0/student/%s/focus" % silly_billy_id,format='json')
+
+        self.assertEqual(response.status_code,status.HTTP_200_OK);
+        self.assertEqual(response.data,["here","there"]);
 
         response = client.post("/learning/v0/student/%s/remove" % silly_billy_id,{
             "words": ["here","there","everywhere"]

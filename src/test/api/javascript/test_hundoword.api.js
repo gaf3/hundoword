@@ -1491,6 +1491,8 @@ QUnit.test("focus", function(assert) {
         ]
     );
 
+    assert.deepEqual(api.student.focus(sane_jane.id),["fun","time"]);
+
     var pass = assert.async();
     api.student.focus(sane_jane.id,["party"],
         function (data) {

@@ -8,11 +8,7 @@ Learning.controller("Game","Changeable",{
     },
     words: function() {
         if (!("words" in this.words)) {
-            this.words = [];
-            var positions = hwAPI.student.position(this.application.current.path.student_id,null,true);
-            for (var position = 0; position < positions.length; position++) {
-                this.words.push(positions[position].word);
-            }
+            this.words = hwAPI.student.focus(this.application.current.path.student_id);
         }
         this.it = {
             student: hwAPI.student.select(this.application.current.path.student_id),

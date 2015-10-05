@@ -9,10 +9,10 @@
                 <input id="words" value="{{=Learning.current.query.words ? Learning.current.query.words.replace(/,/g,' ') : ''}}" type="text">
                 <input 
                     id="focus" 
-                    type="checkbox" OnClick="Learning.current.controller.position_search()" 
+                    type="checkbox" OnClick="Learning.current.controller.search()" 
                     {{? Learning.current.query.focus && Learning.current.query.focus.toLowerCase() == 'true' }}checked{{?}}
                 > <strong>Focus</strong>
-                <button OnClick="Learning.current.controller.position_search();" class="uk-button uk-button-primary">
+                <button OnClick="Learning.current.controller.search();" class="uk-button uk-button-primary">
                     <i class="uk-icon-search"></i>
                 </button>
             </fieldset>

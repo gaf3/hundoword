@@ -331,12 +331,19 @@ def student(request,pk='',action=''):
                 serializer = StudentSerializer(student)
                 return Response(serializer.data)
 
+            # Focus
+
+            elif action == "focus": 
+
+                serializer = StudentWordSerializer(StudentWord.objects.filter(student=student,focus=True), many=True)
+                return Response(serializer.data)
+
             # Position
 
             elif action == "position": 
 
                 filter = {
-                    "student": Student.objects.get(teacher=request.user,pk=pk)
+                    "student": student
                 }
 
                 if "words" in request.GET:
@@ -353,7 +360,7 @@ def student(request,pk='',action=''):
             elif action == "history": 
 
                 filter = {
-                    "student": Student.objects.get(teacher=request.user,pk=pk)
+                    "student": student
                 }
 
                 if "words" in request.GET:
