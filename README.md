@@ -118,7 +118,7 @@ There's already an existing user/pass: vagrant/vagrant or you can create a new o
 * `#/student/<id>/position/words=<word>,<word>,focus=true/false` - Position: Where a student stands on each of their words' achievements.
   * id - Student to select
   * words - Only show position for these words
-  * words - Only show position for words the Student is focusing on or not focusing on
+  * focus - Only show position for words the Student is focusing on or not focusing on
 * `#/student/<id>/history/words=<word>,<word>&achievements=<achievement_id>,<achievement_id>&from=<from>&to=<to>` - History: All the attains and yields a studnt has made
   * id - Student to select
   * words - Only show history for these words
