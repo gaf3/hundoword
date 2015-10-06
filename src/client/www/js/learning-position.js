@@ -6,7 +6,7 @@ Learning.controller("Position","Changeable",{
         };
         var words = null;
         if (this.application.current.query.words) {
-            words = this.words_array(this.application.current.query.words);
+            words = this.application.words_array(this.application.current.query.words);
         }
         var focus = null;
         if (this.application.current.query.focus) {
@@ -19,7 +19,7 @@ Learning.controller("Position","Changeable",{
         var parameters = {};
         var words = $("#words").val();
         if (words.length) {
-            parameters["words"] = this.words_array(words).join(",");
+            parameters["words"] = this.application.words_array(words).join(",");
         }
         if ($("#focus").prop("checked")) {
             parameters["focus"] = "true";

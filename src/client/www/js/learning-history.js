@@ -10,11 +10,11 @@ Learning.controller("History","Changeable",{
         }
         var words = null;
         if (this.application.current.query.words) {
-            words = this.words_array(this.application.current.query.words);
+            words = this.application.words_array(this.application.current.query.words);
         }
         var achievements = null;
         if (this.application.current.query.achievements) {
-            achievements = this.words_array(this.application.current.query.achievements);
+            achievements = this.application.words_array(this.application.current.query.achievements);
         }
         var from = null;
         if (this.application.current.query.from) {
@@ -39,7 +39,7 @@ Learning.controller("History","Changeable",{
         var parameters = {};
         var words = $("#words").val();
         if (words.length) {
-            parameters["words"] = this.words_array(words).join(",");
+            parameters["words"] = this.application.words_array(words).join(",");
         }
         var achievements = $("#achievements li.uk-active").map(function(){return $(this).attr("data");}).get();;
         if (achievements.length) {

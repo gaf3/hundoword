@@ -6,6 +6,14 @@ Learning.load = function (name) {
     return $.ajax({url: name + ".html", async: false}).responseText;
 }
 
+Learning.words_string = function(list) {
+    return list ? list.join(" ") : "";
+}
+
+Learning.words_array = function(text) {
+    return text ? text.replace(/,+/g," ").replace(/\s+/g," ").replace(/^ | $/,"").split(" ") : [];
+}
+
 Learning.partial("Header",Learning.load("header"));
 Learning.partial("Footer",Learning.load("footer"));
 
@@ -21,11 +29,5 @@ Learning.controller("Changeable",null,{
     changing: function(programs) {
         $(".selecting").hide();
         $(".changing").show();
-    },
-    words_string: function(list) {
-        return list ? list.join(" ") : "";
-    },
-    words_array: function(text) {
-        return text ? text.replace(/,+/g," ").replace(/\s+/g," ").replace(/^ | $/,"").split(" ") : [];
     }
 });

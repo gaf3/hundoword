@@ -16,7 +16,7 @@ Learning.controller("Focus","Changeable",{
         }
     },
     select: function() {
-        var words = this.words_array($("#select").val());
+        var words = this.application.words_array($("#select").val());
         for (var word = 0; word < words.length; word++) {
             $("#words li[data=" + words[word] + "]").addClass("uk-active");
         }
