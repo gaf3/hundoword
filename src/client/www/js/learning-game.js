@@ -23,7 +23,7 @@ Learning.controller("Game","Changeable",{
         }
     },
     select: function() {
-        var words = this.words_array($("#select").val());
+        var words = this.application.words_array($("#select").val());
         for (var word = 0; word < words.length; word++) {
             $("#words li[data=" + words[word] + "]").addClass("uk-active");
         }
@@ -47,7 +47,7 @@ Learning.controller("Game","Changeable",{
     },
     start: function() {
         this.words = $("#words li.uk-active").map(function(){return $(this).attr("data");}).get();
-        this.words.sort(function() { return .5 - Math.random(); });
+        this.application.words_shuffle(this.words);
         this.it.words = this.words;
         this.game = this.it.achievement.name.replace(/ /,"_").toLowerCase();
         this[this.game](true);

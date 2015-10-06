@@ -21,7 +21,7 @@ Learning.controller("Student","Changeable",{
             first_name: $("#first_name").val(), 
             last_name: $("#last_name").val(), 
             age: $("#age").val(),
-            words: this.words_array($("#words").val())
+            words: this.application.words_array($("#words").val())
         };
         if (student_id) {
             this.it = {student: hwAPI.student.update(student_id,student)};

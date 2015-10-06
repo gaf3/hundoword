@@ -14,7 +14,7 @@
             <tr OnClick="Learning.go('program/select',{{=program.id}})">
                 <td>{{=program.name}}</td>
                 <td>{{=program.description}}</td>
-                <td>{{=Learning.current.controller.words_string(program.words)}}</td>
+                <td>{{=Learning.words_string(program.words)}}</td>
             </tr>
             {{~}}
         </tbody>

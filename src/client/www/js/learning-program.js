@@ -20,7 +20,7 @@ Learning.controller("Program","Changeable",{
         var program = {
             name: $("#name").val(), 
             description: $("#description").val(),
-            words: this.words_array($("#words").val())
+            words: this.application.words_array($("#words").val())
         };
         if (program_id) {
             this.it = {program: hwAPI.program.update(program_id,program)};

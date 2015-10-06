@@ -41,10 +41,10 @@
             <label class="uk-form-label" for="student-description">Words</label>
             <div class="uk-form-controls">
                 <div class="selecting">
-                    <span>{{=Learning.current.controller.words_string(it.student.words)}}</span>
+                    <span>{{=Learning.words_string(it.student.words)}}</span>
                 </div>
                 <div class="changing" style="display: none">
-                    <textarea id='words' placeholder="Enter words separated by spaces or commas or both. #yolo" class="uk-form-width-large">{{=Learning.current.controller.words_string(it.student.words)}}</textarea>
+                    <textarea id='words' placeholder="Enter words separated by spaces or commas or both. #yolo" class="uk-form-width-large">{{=Learning.words_string(it.student.words)}}</textarea>
                 </div>
             </div>
         </div>
