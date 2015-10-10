@@ -19,7 +19,7 @@ Learning.controller("Game","Changeable",{
     },
     audio: function(word) {
         try {
-            return hwAPI.audio(this.it.word);
+            return hwAPI.audio(word);
         } catch (exception) {
             return {};
         }
@@ -68,7 +68,7 @@ Learning.controller("Game","Changeable",{
             this.it.audio = this.audio(this.it.word);
             this.application.render(this.it,this.it.achievement.name);
         } else {
-            this.application.go("student/history",this.it.student.id);
+            this.application.go("student/position",this.it.student.id);
         }
     },
     introduced: function() {
@@ -98,7 +98,7 @@ Learning.controller("Game","Changeable",{
             this.it.choices[Math.floor(Math.random() * this.it.student.words.length)] = this.it.word
             this.application.render(this.it,this.it.achievement.name);
         } else {
-            this.application.go("student/history",this.it.student.id);
+            this.application.go("student/position",this.it.student.id);
         }
     },
     matched: function() {
@@ -134,7 +134,7 @@ Learning.controller("Game","Changeable",{
             this.application.render(this.it,this.it.achievement.name);
             $("#spell").focus();
         } else {
-            this.application.go("student/history",this.it.student.id);
+            this.application.go("student/position",this.it.student.id);
         }
     },
     spelled: function() {
@@ -158,6 +158,47 @@ Learning.controller("Game","Changeable",{
     },
     sound_spelled: function() {
         this.spelled();
+    },
+    cross: function(start) {
+        if (start) {
+            this.index = -1;
+            this.groups = [];
+            for (var word = 0; word < this.words.length; word++) {
+                var group = Math.floor(word/8.0);
+                if (!this.groups[group]) {
+                    this.groups[group] = [];
+                }
+                this.groups[group].push(this.words[word]);
+            }
+        }
+        if (++this.index < this.groups.length) {
+            this.it.crosses = [];
+            this.it.matches = [];
+            for (var match = 0; match < this.groups[this.index].length; match++) {
+                var row = {
+                    word: this.groups[this.index][match],
+                    audio: this.audio(this.groups[this.index][match])
+                }
+                this.it.crosses.push(row);
+                this.it.matches.push(row);             
+            }
+            this.application.words_shuffle(this.it.matches);
+            this.application.render(this.it,this.it.achievement.name);
+        } else {
+            this.application.go("student/position",this.it.student.id);
+        }
+    },
+    sight_cross: function(start) {
+        this.cross(start);
+    },
+    sight_crossed: function() {
+        this.crossed();
+    },
+    sound_cross: function(start) {
+        this.cross(start);
+    },
+    sound_crossed: function() {
+        this.crossed();
     }
 });
 
@@ -168,6 +209,7 @@ Learning.template("Sight Match",Learning.load("sight-match"),null,Learning.parti
 Learning.template("Sound Match",Learning.load("sound-match"),null,Learning.partials);
 Learning.template("Sight Spell",Learning.load("sight-spell"),null,Learning.partials);
 Learning.template("Sound Spell",Learning.load("sound-spell"),null,Learning.partials);
+Learning.template("Sight Cross",Learning.load("sight-cross"),null,Learning.partials);
 
 Learning.route("student/games","/student/{student_id:^\\d+$}/game/","Games","Game","list");
 Learning.route("student/game","/student/{student_id:^\\d+$}/game/{achievement_id:^\\d+$}/","Words","Game","words");
