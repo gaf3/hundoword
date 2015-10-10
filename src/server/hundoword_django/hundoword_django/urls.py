@@ -21,5 +21,5 @@ import learning
 
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
-    url(r'^learning/', include('learning.urls'))
+    url(r'^api/', include('learning.urls'))
 ]

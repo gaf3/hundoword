@@ -17,6 +17,13 @@ Learning.controller("Game","Changeable",{
         };
         this.application.render(this.it);
     },
+    audio: function(word) {
+        try {
+            return hwAPI.audio(this.it.word);
+        } catch (exception) {
+            return {};
+        }
+    },
     press: function(event) {
         if (event.keyCode == 13) {
             this.select();
@@ -58,7 +65,7 @@ Learning.controller("Game","Changeable",{
         }
         if (++this.index < this.words.length) {
             this.it.word = this.it.words[this.index];
-            this.it.audio = hwAPI.audio(this.it.word);
+            this.it.audio = this.audio(this.it.word);
             this.application.render(this.it,this.it.achievement.name);
         } else {
             this.application.go("student/history",this.it.student.id);
@@ -80,7 +87,7 @@ Learning.controller("Game","Changeable",{
         }
         if (++this.index < this.words.length) {
             this.it.word = this.it.words[this.index];
-            this.it.audio = hwAPI.audio(this.it.word);
+            this.it.audio = this.audio(this.it.word);
             this.it.choices = [];
             while (this.it.choices.length < 8) {
                 var choice = this.it.student.words[Math.floor(Math.random() * this.it.student.words.length)];
@@ -123,7 +130,7 @@ Learning.controller("Game","Changeable",{
         }
         if (++this.index < this.words.length) {
             this.it.word = this.it.words[this.index];
-            this.it.audio = hwAPI.audio(this.it.word);
+            this.it.audio = this.audio(this.it.word);
             this.application.render(this.it,this.it.achievement.name);
             $("#spell").focus();
         } else {
