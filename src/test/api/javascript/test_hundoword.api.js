@@ -648,15 +648,26 @@ QUnit.test("create", function(assert) {
     var api = new HundoWord.API(hundoword_django_host + "/api/v0/");
     check_user(api,"tester0","tester0","tester0@hundoword.com");
 
-    var sight = api.achievement.create({name: make_achievement("Sight"), description: "See it", "progression": 100});
+    var sight = api.achievement.create({
+        name: make_achievement("Sight"), 
+        slug: make_achievement("sight"), 
+        description: "See it", 
+        progression: 100
+    });
     assert.equal(sight.name,make_achievement("Sight"));
     assert.equal(sight.description,"See it");
     assert.equal(sight.progression,100);
 
     var pass = assert.async();
-    api.achievement.create({name: make_achievement("Sound"), description: "Hear it", "progression": 101},
+    api.achievement.create({
+            name: make_achievement("Sound"), 
+            slug: make_achievement("sound"), 
+            description: "Hear it", 
+            progression: 101
+        },
         function (data) {
             assert.equal(data.name,make_achievement("Sound"));
+            assert.equal(data.slug,make_achievement("sound"));
             assert.equal(data.description,"Hear it");
             assert.equal(data.progression,101);
             pass();
@@ -674,13 +685,19 @@ QUnit.test("select", function(assert) {
     var api = new HundoWord.API(hundoword_django_host + "/api/v0/");
     check_user(api,"tester0","tester0","tester0@hundoword.com");
 
-    var sight = api.achievement.create({name: make_achievement("Sight"), description: "See it", "progression": 100});
+    var sight = api.achievement.create({
+        name: make_achievement("Sight"), 
+        slug: make_achievement("sight"), 
+        description: "See it", 
+        progression: 100
+    });
 
     assert.deepEqual(
         api.achievement.select(sight.id),
         {
             id: sight.id,
             name: make_achievement("Sight"),
+            slug: make_achievement("sight"),
             description: "See it",
             progression: 100
         }
@@ -694,6 +711,53 @@ QUnit.test("select", function(assert) {
                 {
                     id: sight.id,
                     name: make_achievement("Sight"),
+                    slug: make_achievement("sight"),
+                    description: "See it",
+                    progression: 100
+                }
+            );
+            pass();
+        },
+        function () {
+            assert.ok(false);
+            pass();
+        }
+    );
+
+});
+
+QUnit.test("slug", function(assert) {
+
+    var api = new HundoWord.API(hundoword_django_host + "/api/v0/");
+    check_user(api,"tester0","tester0","tester0@hundoword.com");
+
+    var sight = api.achievement.create({
+        name: make_achievement("Sight"), 
+        slug: make_achievement("sight"), 
+        description: "See it", 
+        progression: 100
+    });
+
+    assert.deepEqual(
+        api.achievement.slug(make_achievement("sight")),
+        {
+            id: sight.id,
+            name: make_achievement("Sight"),
+            slug: make_achievement("sight"),
+            description: "See it",
+            progression: 100
+        }
+    );
+
+    var pass = assert.async();
+    api.achievement.slug(make_achievement("sight"),
+        function (data) {
+            assert.deepEqual(
+                data,
+                {
+                    id: sight.id,
+                    name: make_achievement("Sight"),
+                    slug: make_achievement("sight"),
                     description: "See it",
                     progression: 100
                 }
@@ -713,8 +777,18 @@ QUnit.test("list", function(assert) {
     var api = new HundoWord.API(hundoword_django_host + "/api/v0/");
     check_user(api,"tester0","tester0","tester0@hundoword.com");
 
-    var sight = api.achievement.create({name: make_achievement("Sight"), description: "See it", "progression": 100});
-    var sound = api.achievement.create({name: make_achievement("Sound"), description: "Hear it", "progression": 101});
+    var sight = api.achievement.create({
+        name: make_achievement("Sight"), 
+        slug: make_achievement("sight"), 
+        description: "See it", 
+        progression: 100
+    });
+    var sound = api.achievement.create({
+        name: make_achievement("Sound"), 
+        slug: make_achievement("sound"), 
+        description: "Hear it", 
+        progression: 101
+    });
 
     assert.deepEqual(
         filter_achievements(api.achievement.list()),
@@ -722,12 +796,14 @@ QUnit.test("list", function(assert) {
             {
                 id: sight.id,
                 name: make_achievement("Sight"),
+                slug: make_achievement("sight"),
                 description: "See it",
                 progression: 100
             },
             {
                 id: sound.id,
                 name: make_achievement("Sound"),
+                slug: make_achievement("sound"),
                 description: "Hear it",
                 progression: 101
             }
@@ -743,12 +819,14 @@ QUnit.test("list", function(assert) {
                     {
                         id: sight.id,
                         name: make_achievement("Sight"),
+                        slug: make_achievement("sight"),
                         description: "See it",
                         progression: 100
                     },
                     {
                         id: sound.id,
                         name: make_achievement("Sound"),
+                        slug: make_achievement("sound"),
                         description: "Hear it",
                         progression: 101
                     }
@@ -769,13 +847,19 @@ QUnit.test("update", function(assert) {
     var api = new HundoWord.API(hundoword_django_host + "/api/v0/");
     check_user(api,"tester0","tester0","tester0@hundoword.com");
 
-    var sight = api.achievement.create({name: make_achievement("Sight"), description: "See it", "progression": 100});
+    var sight = api.achievement.create({
+        name: make_achievement("Sight"), 
+        slug: make_achievement("sight"), 
+        description: "See it", 
+        progression: 100
+    });
 
     assert.deepEqual(
         api.achievement.update(sight.id,{description: "View it"}),
         {
             id: sight.id,
             name: make_achievement("Sight"),
+            slug: make_achievement("sight"),
             description: "View it",
             progression: 100
         }
@@ -786,6 +870,7 @@ QUnit.test("update", function(assert) {
         {
             id: sight.id,
             name: make_achievement("Sight"),
+            slug: make_achievement("sight"),
             description: "View it",
           progression: 100
         }
@@ -799,6 +884,7 @@ QUnit.test("update", function(assert) {
                 {
                     id: sight.id,
                     name: make_achievement("Sight"),
+                    slug: make_achievement("sight"),
                     description: "See it",
                     progression: 100
                 }
@@ -818,8 +904,18 @@ QUnit.test("delete", function(assert) {
     var api = new HundoWord.API(hundoword_django_host + "/api/v0/");
     check_user(api,"tester0","tester0","tester0@hundoword.com");
 
-    var sight = api.achievement.create({name: make_achievement("Sight"), description: "See it", "progression": 100});
-    var sound = api.achievement.create({name: make_achievement("Sound"), description: "Hear it", "progression": 101});
+    var sight = api.achievement.create({
+        name: make_achievement("Sight"), 
+        slug: make_achievement("sight"), 
+        description: "See it", 
+        progression: 100
+    });
+    var sound = api.achievement.create({
+        name: make_achievement("Sound"), 
+        slug: make_achievement("sound"), 
+        description: "Hear it", 
+        progression: 101
+    });
 
     assert.deepEqual(api.achievement.delete(sight.id),{});
 
@@ -829,6 +925,7 @@ QUnit.test("delete", function(assert) {
             {
                 id: sound.id,
                 name: make_achievement("Sound"),
+                slug: make_achievement("sound"),
                 description: "Hear it",
                 progression: 101
             }
@@ -1570,8 +1667,18 @@ QUnit.test("attain", function(assert) {
     check_user(api,"tester0","tester0","tester0@hundoword.com");
 
     var sane_jane = api.student.create({first_name: "Sane", last_name: "Jane", age: 5,words:["fun","time"]});
-    var sight = api.achievement.create({name: make_achievement("Sight"), description: "See it", "progression": 100});
-    var sound = api.achievement.create({name: make_achievement("Sound"), description: "Hear it", "progression": 101});
+    var sight = api.achievement.create({
+        name: make_achievement("Sight"), 
+        slug: make_achievement("sight"), 
+        description: "See it", 
+        progression: 100
+    });
+    var sound = api.achievement.create({
+        name: make_achievement("Sound"), 
+        slug: make_achievement("sound"), 
+        description: "Hear it", 
+        progression: 101
+    });
 
     var progress = api.student.attain(sane_jane.id,"fun",sight.id,"2015-09-22T00:00:00Z");
 
@@ -1603,8 +1710,18 @@ QUnit.test("yield", function(assert) {
     check_user(api,"tester0","tester0","tester0@hundoword.com");
 
     var sane_jane = api.student.create({first_name: "Sane", last_name: "Jane", age: 5,words:["fun","time"]});
-    var sight = api.achievement.create({name: make_achievement("Sight"), description: "See it", "progression": 100});
-    var sound = api.achievement.create({name: make_achievement("Sound"), description: "Hear it", "progression": 101});
+    var sight = api.achievement.create({
+        name: make_achievement("Sight"), 
+        slug: make_achievement("sight"), 
+        description: "See it", 
+        progression: 100
+    });
+    var sound = api.achievement.create({
+        name: make_achievement("Sound"), 
+        slug: make_achievement("sound"), 
+        description: "Hear it", 
+        progression: 101
+    });
 
     var progress = api.student.yield(sane_jane.id,"fun",sight.id,"2015-09-22T00:00:00Z");
 
@@ -1636,8 +1753,18 @@ QUnit.test("position", function(assert) {
     check_user(api,"tester0","tester0","tester0@hundoword.com");
 
     var sane_jane = api.student.create({first_name: "Sane", last_name: "Jane", age: 5,words:["fun","time"]});
-    var sight = api.achievement.create({name: make_achievement("Sight"), description: "See it", "progression": 100});
-    var sound = api.achievement.create({name: make_achievement("Sound"), description: "Hear it", "progression": 101});
+    var sight = api.achievement.create({
+        name: make_achievement("Sight"), 
+        slug: make_achievement("sight"), 
+        description: "See it", 
+        progression: 100
+    });
+    var sound = api.achievement.create({
+        name: make_achievement("Sound"), 
+        slug: make_achievement("sound"), 
+        description: "Hear it", 
+        progression: 101
+    });
 
     api.student.attain(sane_jane.id,"fun",sight.id);
     api.student.attain(sane_jane.id,"time",sound.id);
@@ -1742,8 +1869,18 @@ QUnit.test("history", function(assert) {
     check_user(api,"tester0","tester0","tester0@hundoword.com");
 
     var sane_jane = api.student.create({first_name: "Sane", last_name: "Jane", age: 5,words:["fun","time"]});
-    var sight = api.achievement.create({name: make_achievement("Sight"), description: "See it", "progression": 100});
-    var sound = api.achievement.create({name: make_achievement("Sound"), description: "Hear it", "progression": 101});
+    var sight = api.achievement.create({
+        name: make_achievement("Sight"), 
+        slug: make_achievement("sight"), 
+        description: "See it", 
+        progression: 100
+    });
+    var sound = api.achievement.create({
+        name: make_achievement("Sound"), 
+        slug: make_achievement("sound"), 
+        description: "Hear it", 
+        progression: 101
+    });
 
     api.student.attain(sane_jane.id,"fun",sight.id,"2015-09-22T00:00:00Z");
     api.student.yield(sane_jane.id,"time",sound.id,"2015-09-23T00:00:00Z");
