@@ -1,14 +1,17 @@
-<div class="uk-vertical-align uk-text-center" style="height: 200px;">
-    <div class="uk-vertical-align-middle uk-width-1-2">
-        {{~ it.crosses :cross:index}}
+<canvas id="connections" style="position:absolute; width:100%; weight:100%; border:1px solid red;"/>
+<div class="uk-text-center">
+    <br/><br/><br/><br/>
+    <div id="crosses" class="uk-vertical-align-middle uk-width-1-2" style="height: 600px;">
+        {{~ it.lefts :left:index}}
+        {{ var right = it.rights[index]; }}
         <div class="uk-grid">
             <div class="uk-width-1-6 uk-text-right">
-                {{? cross.audio }}
-                <audio id="sound-cross-{{=index}}" OnLoadedData="$('#play-cross-{{=index}}').prop('disabled',false);">
-                    <source src="{{=cross.audio.mp3}}"/>
-                    <source src="{{=cross.audio.ogg}}"/>
+                {{? left.audio }}
+                <audio id="sound-left-{{=index}}" OnLoadedData="$('#play-left-{{=index}}').prop('disabled',false);">
+                    <source src="{{=left.audio.mp3}}"/>
+                    <source src="{{=left.audio.ogg}}"/>
                 </audio>
-                <button id="play-cross-{{=index}}" OnClick="$('#sound-cross-{{=index}}')[0].play();" class="uk-button uk-button-primary" disabled>
+                <button id="play-left-{{=index}}" OnClick="$('#sound-left-{{=index}}')[0].play();" class="uk-button uk-button-primary" disabled>
                     <i class="uk-icon-volume-up"/>
                 </button>
                 {{??}}
@@ -17,26 +20,26 @@
             </div>
             <div class="uk-width-1-6 uk-text-left">
                 <ul class="uk-subnav uk-subnav-pill">
-                    <li onClick="Learning.current.controller.click(this)" data='{{=cross.word}}'>
-                    <a>{{=cross.word}}</a>
+                    <li onClick="Learning.current.controller.match(this)" data-word='{{=left.word}}' data-column='left'>
+                        <a>{{=left.word}}</a>
                     </li>
                 </ul>
             </div>
             <div class="uk-width-1-3">&nbsp;</div>
             <div class="uk-width-1-6 uk-text-right">
                 <ul class="uk-subnav uk-subnav-pill">
-                    <li onClick="Learning.current.controller.click(this)" data='{{=it.matches[index].word}}'>
-                        <a>{{=it.matches[index].word}}</a>
+                    <li onClick="Learning.current.controller.match(this)" data-word='{{=right.word}}' data-column='right'>
+                        <a>{{=right.word}}</a>
                     </li>
                 </ul>
             </div>
             <div class="uk-width-1-6 uk-text-left">
-                {{? it.matches[index].audio }}
-                <audio id="sound-match-{{=index}}" OnLoadedData="$('#play-match-{{=index}}').prop('disabled',false);">
-                    <source src="{{=it.matches[index].audio.mp3}}"/>
-                    <source src="{{=it.matches[index].audio.ogg}}"/>
+                {{? right.audio }}
+                <audio id="sound-right-{{=index}}" OnLoadedData="$('#play-right-{{=index}}').prop('disabled',false);">
+                    <source src="{{=right.audio.mp3}}"/>
+                    <source src="{{=right.audio.ogg}}"/>
                 </audio>
-                <button id="play-match-{{=index}}" OnClick="$('#sound-match-{{=index}}')[0].play();" class="uk-button uk-button-primary" disabled>
+                <button id="play-right-{{=index}}" OnClick="$('#sound-right-{{=index}}')[0].play();" class="uk-button uk-button-primary" disabled>
                     <i class="uk-icon-volume-up"/>
                 </button>
                 {{??}}

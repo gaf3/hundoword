@@ -61,7 +61,7 @@ Learning.controller("History","Changeable",{
     }
 });
 
-Learning.template("History",Learning.load("history"),null,Learning.partials);
+Learning.template("History",Learning.load("student/history"),null,Learning.partials);
 
 Learning.route("student/history","/student/{student_id:^\\d+$}/history/","History","History","list");
 

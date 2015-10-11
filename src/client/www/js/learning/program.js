@@ -45,8 +45,8 @@ Learning.controller("Program","Changeable",{
     }
 });
 
-Learning.template("Programs",Learning.load("programs"),null,Learning.partials);
-Learning.template("Program",Learning.load("program"),null,Learning.partials);
+Learning.template("Programs",Learning.load("program/list"),null,Learning.partials);
+Learning.template("Program",Learning.load("program/item"),null,Learning.partials);
 
 Learning.route("program","/program/","Programs","Program","list");
 Learning.route("program/select","/program/{program_id:^\\d+$}","Program","Program","select");

@@ -35,7 +35,7 @@ Learning.controller("Focus","Changeable",{
     }
 });
 
-Learning.template("Focus",Learning.load("focus"),null,Learning.partials);
+Learning.template("Focus",Learning.load("student/focus"),null,Learning.partials);
 
 Learning.route("student/focus","/student/{student_id:^\\d+$}/focus/","Focus","Focus","list");
 

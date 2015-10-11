@@ -24,11 +24,6 @@ Learning.controller("Game","Changeable",{
             return {};
         }
     },
-    press: function(event) {
-        if (event.keyCode == 13) {
-            this.select();
-        }
-    },
     select: function() {
         var words = this.application.words_array($("#select").val());
         for (var word = 0; word < words.length; word++) {
@@ -56,6 +51,14 @@ Learning.controller("Game","Changeable",{
         this.words = $("#words li.uk-active").map(function(){return $(this).attr("data");}).get();
         this.application.words_shuffle(this.words);
         this.it.words = this.words;
+        this.groups = [];
+        for (var word = 0; word < this.words.length; word++) {
+            var group = Math.floor(word/6.0);
+            if (!this.groups[group]) {
+                this.groups[group] = [];
+            }
+            this.groups[group].push(this.words[word]);
+        }
         this.game = this.it.achievement.name.replace(/ /,"_").toLowerCase();
         this[this.game](true);
     },
@@ -162,27 +165,20 @@ Learning.controller("Game","Changeable",{
     cross: function(start) {
         if (start) {
             this.index = -1;
-            this.groups = [];
-            for (var word = 0; word < this.words.length; word++) {
-                var group = Math.floor(word/8.0);
-                if (!this.groups[group]) {
-                    this.groups[group] = [];
-                }
-                this.groups[group].push(this.words[word]);
-            }
         }
         if (++this.index < this.groups.length) {
-            this.it.crosses = [];
-            this.it.matches = [];
-            for (var match = 0; match < this.groups[this.index].length; match++) {
+            this.it.lefts = [];
+            this.it.rights = [];
+            this.it.crosses = this.groups[this.index].length;
+            for (var match = 0; match < this.it.crosses; match++) {
                 var row = {
                     word: this.groups[this.index][match],
                     audio: this.audio(this.groups[this.index][match])
                 }
-                this.it.crosses.push(row);
-                this.it.matches.push(row);             
+                this.it.lefts.push(row);
+                this.it.rights.push(row);             
             }
-            this.application.words_shuffle(this.it.matches);
+            this.application.words_shuffle(this.it.rights);
             this.application.render(this.it,this.it.achievement.name);
         } else {
             this.application.go("student/position",this.it.student.id);
@@ -202,14 +198,14 @@ Learning.controller("Game","Changeable",{
     }
 });
 
-Learning.template("Games",Learning.load("games"),null,Learning.partials);
-Learning.template("Words",Learning.load("words"),null,Learning.partials);
-Learning.template("Introduction",Learning.load("introduction"),null,Learning.partials);
-Learning.template("Sight Match",Learning.load("sight-match"),null,Learning.partials);
-Learning.template("Sound Match",Learning.load("sound-match"),null,Learning.partials);
-Learning.template("Sight Spell",Learning.load("sight-spell"),null,Learning.partials);
-Learning.template("Sound Spell",Learning.load("sound-spell"),null,Learning.partials);
-Learning.template("Sight Cross",Learning.load("sight-cross"),null,Learning.partials);
+Learning.template("Games",Learning.load("game/list"),null,Learning.partials);
+Learning.template("Words",Learning.load("game/words"),null,Learning.partials);
+Learning.template("Introduction",Learning.load("game/introduction"),null,Learning.partials);
+Learning.template("Sight Match",Learning.load("game/sight-match"),null,Learning.partials);
+Learning.template("Sound Match",Learning.load("game/sound-match"),null,Learning.partials);
+Learning.template("Sight Spell",Learning.load("game/sight-spell"),null,Learning.partials);
+Learning.template("Sound Spell",Learning.load("game/sound-spell"),null,Learning.partials);
+Learning.template("Sight Cross",Learning.load("game/sight-cross"),null,Learning.partials);
 
 Learning.route("student/games","/student/{student_id:^\\d+$}/game/","Games","Game","list");
 Learning.route("student/game","/student/{student_id:^\\d+$}/game/{achievement_id:^\\d+$}/","Words","Game","words");

@@ -45,8 +45,8 @@ Learning.controller("Achievement","Changeable",{
     }
 });
 
-Learning.template("Achievements",Learning.load("achievements"),null,Learning.partials);
-Learning.template("Achievement",Learning.load("achievement"),null,Learning.partials);
+Learning.template("Achievements",Learning.load("achievement/list"),null,Learning.partials);
+Learning.template("Achievement",Learning.load("achievement/item"),null,Learning.partials);
 
 Learning.route("achievement","/achievement/","Achievements","Achievement","list");
 Learning.route("achievement/select","/achievement/{achievement_id:^\\d+$}","Achievement","Achievement","select");

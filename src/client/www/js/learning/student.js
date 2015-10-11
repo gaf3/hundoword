@@ -46,10 +46,10 @@ Learning.controller("Student","Changeable",{
     }
 });
 
-Learning.partial("StudentTabs",Learning.load("student-tabs"));
+Learning.partial("StudentTabs",Learning.load("student/tabs"));
 
-Learning.template("Students",Learning.load("students"),null,Learning.partials);
-Learning.template("Student",Learning.load("student"),null,Learning.partials);
+Learning.template("Students",Learning.load("student/list"),null,Learning.partials);
+Learning.template("Student",Learning.load("student/item"),null,Learning.partials);
 
 Learning.route("student","/student/","Students","Student","list");
 Learning.route("student/select","/student/{student_id:^\\d+$}/","Student","Student","select");
