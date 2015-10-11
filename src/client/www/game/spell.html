@@ -1,6 +1,9 @@
 <div class="uk-vertical-align uk-text-center" style="height: 500px;">
     <div class="uk-vertical-align-middle uk-width-1-2 uk-text-center">
         <h1 class="uk-heading-large">
+            {{? Learning.current.paths[3] == 'sight-spell' }}
+            {{=it.word}}
+            {{?}}
             {{? it.audio }}
             <audio id="sound" OnLoadedData="$('#play').prop('disabled',false);">
                 <source src="{{=it.audio.mp3}}"/>
@@ -10,16 +13,18 @@
                 <i class="uk-icon-volume-up"/>
             </button>
             {{?}}
+            {{? Learning.current.paths[3] == 'sound-spell' }}
             <br/>
-            <input id="spell" type="text" style="text-align:center;" OnKeyPress="if (event.keyCode == 13) { Learning.current.controller.sound_spelled(); }"/>
+            {{?}}
+            <input id="spell" type="text" style="text-align:center;" OnKeyPress="if (event.keyCode == 13) { Learning.current.controller.sight_spelled(); }"/>
         </h1>
-        <button OnClick="Learning.current.controller.sound_spelled();" class="uk-button uk-icon-spin hw-progress">
+        <button OnClick="Learning.current.controller.check();" class="uk-button uk-icon-spin hw-progress">
             <i class="uk-icon-thumbs-o-up"/>
         </button>
-        <button id="next" OnClick="Learning.current.controller.sound_spell();" class="uk-button uk-button-success hw-attain" style="display: none">
+        <button id="next" OnClick="Learning.current.controller.play();" class="uk-button uk-button-success hw-attain" style="display: none">
             <i class="uk-icon-thumbs-o-up"/>
         </button>
-        <button id="next" OnClick="Learning.current.controller.sound_spell();" class="uk-button uk-button-danger hw-yield" style="display: none">
+        <button id="next" OnClick="Learning.current.controller.play();" class="uk-button uk-button-danger hw-yield" style="display: none">
             <i class="uk-icon-thumbs-o-down"/>
         </button>
     </div>

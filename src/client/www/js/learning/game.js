@@ -12,17 +12,10 @@ Learning.controller("Game","Changeable",{
         }
         this.it = {
             student: hwAPI.student.select(this.application.current.path.student_id),
-            achievement: hwAPI.achievement.select(this.application.current.path.achievement_id),
+            achievement: hwAPI.achievement.slug(Learning.current.paths[3]),
             words: this.words
         };
-        this.application.render(this.it);
-    },
-    audio: function(word) {
-        try {
-            return hwAPI.audio(word);
-        } catch (exception) {
-            return {};
-        }
+        this.application.render(this.it,"Words");
     },
     select: function() {
         var words = this.application.words_array($("#select").val());
@@ -59,153 +52,18 @@ Learning.controller("Game","Changeable",{
             }
             this.groups[group].push(this.words[word]);
         }
-        this.game = this.it.achievement.name.replace(/ /,"_").toLowerCase();
-        this[this.game](true);
+        this.play(true);
     },
-    introduction: function(start) {
-        if (start) {
-            this.index = -1;
+    audio: function(word) {
+        try {
+            return hwAPI.audio(word);
+        } catch (exception) {
+            return {};
         }
-        if (++this.index < this.words.length) {
-            this.it.word = this.it.words[this.index];
-            this.it.audio = this.audio(this.it.word);
-            this.application.render(this.it,this.it.achievement.name);
-        } else {
-            this.application.go("student/position",this.it.student.id);
-        }
-    },
-    introduced: function() {
-        if ($('#sound').attr('data') == 1) {
-            hwAPI.student.attain(this.it.student.id,this.it.word,this.it.achievement.id);
-            $('.hw-attain').show();
-        } else {
-            hwAPI.student.yield(this.it.student.id,this.it.word,this.it.achievement.id);
-            $('.hw-yield').show();
-        }
-        $('.hw-progress').hide();
-    },
-    match: function(start) {
-        if (start) {
-            this.index = -1;
-        }
-        if (++this.index < this.words.length) {
-            this.it.word = this.it.words[this.index];
-            this.it.audio = this.audio(this.it.word);
-            this.it.choices = [];
-            while (this.it.choices.length < 8) {
-                var choice = this.it.student.words[Math.floor(Math.random() * this.it.student.words.length)];
-                if (choice != this.it.word) {
-                    this.it.choices.push(choice);
-                }
-            }
-            this.it.choices[Math.floor(Math.random() * this.it.student.words.length)] = this.it.word
-            this.application.render(this.it,this.it.achievement.name);
-        } else {
-            this.application.go("student/position",this.it.student.id);
-        }
-    },
-    matched: function() {
-        $('#choices li').attr('OnClick','');
-        if ($('#choices li.uk-active').attr('data') == this.it.word) {
-            hwAPI.student.attain(this.it.student.id,this.it.word,this.it.achievement.id);
-            $('.hw-attain').show();
-        } else {
-            hwAPI.student.yield(this.it.student.id,this.it.word,this.it.achievement.id);
-            $('.hw-yield').show();
-        }
-        $('.hw-progress').hide();
-    },
-    sight_match: function(start) {
-        this.match(start);
-    },
-    sight_matched: function() {
-        this.matched();
-    },
-    sound_match: function(start) {
-        this.match(start);
-    },
-    sound_matched: function() {
-        this.matched();
-    },
-    spell: function(start) {
-        if (start) {
-            this.index = -1;
-        }
-        if (++this.index < this.words.length) {
-            this.it.word = this.it.words[this.index];
-            this.it.audio = this.audio(this.it.word);
-            this.application.render(this.it,this.it.achievement.name);
-            $("#spell").focus();
-        } else {
-            this.application.go("student/position",this.it.student.id);
-        }
-    },
-    spelled: function() {
-        if ($('#spell').val().toLowerCase() == this.it.word.toLowerCase()) {
-            hwAPI.student.attain(this.it.student.id,this.it.word,this.it.achievement.id);
-            $('.hw-attain').show();
-        } else {
-            hwAPI.student.yield(this.it.student.id,this.it.word,this.it.achievement.id);
-            $('.hw-yield').show();
-        }
-        $('.hw-progress').hide();
-    },
-    sight_spell: function(start) {
-        this.spell(start);
-    },
-    sight_spelled: function() {
-        this.spelled();
-    },
-    sound_spell: function(start) {
-        this.spell(start);
-    },
-    sound_spelled: function() {
-        this.spelled();
-    },
-    cross: function(start) {
-        if (start) {
-            this.index = -1;
-        }
-        if (++this.index < this.groups.length) {
-            this.it.lefts = [];
-            this.it.rights = [];
-            this.it.crosses = this.groups[this.index].length;
-            for (var match = 0; match < this.it.crosses; match++) {
-                var row = {
-                    word: this.groups[this.index][match],
-                    audio: this.audio(this.groups[this.index][match])
-                }
-                this.it.lefts.push(row);
-                this.it.rights.push(row);             
-            }
-            this.application.words_shuffle(this.it.rights);
-            this.application.render(this.it,this.it.achievement.name);
-        } else {
-            this.application.go("student/position",this.it.student.id);
-        }
-    },
-    sight_cross: function(start) {
-        this.cross(start);
-    },
-    sight_crossed: function() {
-        this.crossed();
-    },
-    sound_cross: function(start) {
-        this.cross(start);
-    },
-    sound_crossed: function() {
-        this.crossed();
     }
 });
 
 Learning.template("Games",Learning.load("game/list"),null,Learning.partials);
 Learning.template("Words",Learning.load("game/words"),null,Learning.partials);
-Learning.template("Introduction",Learning.load("game/introduction"),null,Learning.partials);
-Learning.template("Sight Match",Learning.load("game/sight-match"),null,Learning.partials);
-Learning.template("Sound Match",Learning.load("game/sound-match"),null,Learning.partials);
-Learning.template("Sight Spell",Learning.load("game/sight-spell"),null,Learning.partials);
-Learning.template("Sound Spell",Learning.load("game/sound-spell"),null,Learning.partials);
-Learning.template("Sight Cross",Learning.load("game/sight-cross"),null,Learning.partials);
 
 Learning.route("student/games","/student/{student_id:^\\d+$}/game/","Games","Game","list");
-Learning.route("student/game","/student/{student_id:^\\d+$}/game/{achievement_id:^\\d+$}/","Words","Game","words");
