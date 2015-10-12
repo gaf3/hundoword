@@ -19,7 +19,7 @@
                 <ul id="achievements" class="uk-subnav uk-subnav-pill">
                     {{~it.achievements :achievement}}
                     <li 
-                        onClick="Learning.current.controller.toggle(this)" data='{{=achievement.id}}' 
+                        onClick="Learning.current.controller.toggle(this)" achievement-id='{{=achievement.id}}' 
                         {{? Learning.current.query.achievements && Learning.current.query.achievements.indexOf(achievement.id) > -1}}class="uk-active"{{?}}
                     >
                         <a>{{=achievement.name}}</a>

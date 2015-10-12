@@ -81,12 +81,18 @@ def achievement(request,pk='',action=''):
             if 'name' not in request.DATA:
                 return Response({"name": ["This field is required."]}, status=status.HTTP_400_BAD_REQUEST)
 
+            if 'slug' not in request.DATA:
+                return Response({"slug": ["This field is required."]}, status=status.HTTP_400_BAD_REQUEST)
+
             if 'progression' not in request.DATA:
                 return Response({"progression": ["This field is required."]}, status=status.HTTP_400_BAD_REQUEST)
 
             with transaction.atomic():
 
                 achievement = Achievement(name=request.DATA['name'])
+
+                if 'slug' in request.DATA:
+                    achievement.slug = request.DATA['slug']
 
                 if 'description' in request.DATA:
                     achievement.description = request.DATA['description']
@@ -109,9 +115,17 @@ def achievement(request,pk='',action=''):
 
         # Select
 
-        elif request.method == 'GET' and pk:
+        elif request.method == 'GET' and pk and not action:
 
             achievement = Achievement.objects.get(pk=pk)
+            serializer = AchievementSerializer(achievement)
+            return Response(serializer.data)
+
+        # Slug
+
+        elif request.method == 'GET' and pk and action == "slug":
+
+            achievement = Achievement.objects.get(slug=pk)
             serializer = AchievementSerializer(achievement)
             return Response(serializer.data)
 

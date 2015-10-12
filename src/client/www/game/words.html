@@ -22,7 +22,7 @@
     </form>
     <ul id="words" class="uk-subnav uk-subnav-pill">
         {{~it.student.words :word}}
-        <li onClick="Learning.current.controller.toggle(this)" data='{{=word}}' {{? $.inArray(word,it.words) > -1 }}class="uk-active"{{?}}>
+        <li onClick="Learning.current.controller.toggle(this)" word='{{=word}}' {{? $.inArray(word,it.words) > -1 }}class="uk-active"{{?}}>
             <a>{{=word}}</a>
         </li>
         {{~}}

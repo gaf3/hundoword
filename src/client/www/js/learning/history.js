@@ -41,7 +41,7 @@ Learning.controller("History","Changeable",{
         if (words.length) {
             parameters["words"] = this.application.words_array(words).join(",");
         }
-        var achievements = $("#achievements li.uk-active").map(function(){return $(this).attr("data");}).get();;
+        var achievements = $("#achievements li.uk-active").map(function(){return $(this).attr("achievement-id");}).get();;
         if (achievements.length) {
             parameters["achievements"] = achievements.join(",");
         }
@@ -61,7 +61,7 @@ Learning.controller("History","Changeable",{
     }
 });
 
-Learning.template("History",Learning.load("history"),null,Learning.partials);
+Learning.template("History",Learning.load("student/history"),null,Learning.partials);
 
 Learning.route("student/history","/student/{student_id:^\\d+$}/history/","History","History","list");
 

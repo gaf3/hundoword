@@ -82,13 +82,13 @@ Completed:
 * Introduction - Just shows the word, plays its sound, and has a speaker icon to replay.
 * Sight Match - Show the word above and they have to click the word in a group below. First click either pass or fail.
 * Sight Spell - Show the word above and they have to type in characters to match the spelling.
+* Sight Cross - Two lists of words, click one, then click the other. If wrong, both get crossed out red.
 * Sound Match - Play the sound (and button to replay), pick from a list.
 * Sound Spell - Show the word above and they have to type in characters to match the spelling.
+* Sound Cross - Line of speakers and line of words.  Play the speaker, match the words.
 
 In Progress:
-* Sight Cross - Two lists of words, click one, then click the other. If wrong, both get crossed out red.
 * Sight Search - Basic word search. Student clicks letters, circling in row. When circle matches, word is crossed out. Indifferent button to give up.
-* Sound Cross - Line of speakers and line of words.  Play the speaker, match the words.
 * Sound Search - Basic word search. List of speakers for words to search for. Student clicks letters, circling in row. When circle matches, word is green. Indifferent button to give up.
 
 # Web

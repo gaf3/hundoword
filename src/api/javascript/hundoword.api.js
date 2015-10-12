@@ -81,6 +81,10 @@ HundoWord.Achievement = function(api) {
 
 HundoWord.Achievement.prototype = new HundoWord.Base();
 
+HundoWord.Achievement.prototype.slug = function(slug,success,error,complete) {
+    return this.rest("GET",this.build_url(slug,"slug"),null,success,error,complete);
+}
+
 // Program has words base
 
 HundoWord.Program = function(api) {

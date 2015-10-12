@@ -46,7 +46,7 @@ Learning.controller("Position","Changeable",{
     }
 });
 
-Learning.template("Position",Learning.load("position"),null,Learning.partials);
+Learning.template("Position",Learning.load("student/position"),null,Learning.partials);
 
 Learning.route("student/position","/student/{student_id:^\\d+$}/position/","Position","Position","list");
 

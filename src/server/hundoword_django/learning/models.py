@@ -6,7 +6,8 @@ from django.utils import timezone
 
 class Achievement(models.Model):
 
-    name = models.CharField(max_length=32,unique=True)
+    name = models.CharField(max_length=64,unique=True)
+    slug = models.CharField(max_length=32,unique=True)
     description = models.CharField(max_length=255,blank=True,default="")
     progression = models.IntegerField(unique=True)
 
