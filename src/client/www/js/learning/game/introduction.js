@@ -12,7 +12,7 @@ Learning.controller("Introduction","Game",{
         }
     },
     check: function() {
-        if ($('#sound').attr('data') == 1) {
+        if ($('#sound').attr('played')) {
             hwAPI.student.attain(this.it.student.id,this.it.word,this.it.achievement.id);
             $('.hw-attain').show();
         } else {

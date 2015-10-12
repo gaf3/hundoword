@@ -20,14 +20,14 @@ Learning.controller("Game","Changeable",{
     select: function() {
         var words = this.application.words_array($("#select").val());
         for (var word = 0; word < words.length; word++) {
-            $("#words li[data=" + words[word] + "]").addClass("uk-active");
+            $("#words li[word=" + words[word] + "]").addClass("uk-active");
         }
         $("#select").val('');
     },
     focus: function() {
-        var positions = hwAPI.student.position(this.application.current.path.student_id,null,true);
-        for (var position = 0; position < positions.length; position++) {
-            $("#words li[data=" + positions[position].word + "]").addClass("uk-active");
+        var words = hwAPI.student.focus(this.application.current.path.student_id);
+        for (var word = 0; word < words.length; word++) {
+            $("#words li[word=" + words[word] + "]").addClass("uk-active");
         }
     },
     clear: function() {
@@ -41,7 +41,7 @@ Learning.controller("Game","Changeable",{
         }
     },
     start: function() {
-        this.words = $("#words li.uk-active").map(function(){return $(this).attr("data");}).get();
+        this.words = $("#words li.uk-active").map(function(){return $(this).attr("word");}).get();
         this.application.words_shuffle(this.words);
         this.it.words = this.words;
         this.groups = [];

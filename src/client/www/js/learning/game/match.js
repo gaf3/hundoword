@@ -25,7 +25,7 @@ Learning.controller("Match","Game",{
     },
     check: function() {
         $('#choices li').attr('OnClick','');
-        if ($('#choices li.uk-active').attr('data') == this.it.word) {
+        if ($('#choices li.uk-active').attr('word') == this.it.word) {
             hwAPI.student.attain(this.it.student.id,this.it.word,this.it.achievement.id);
             $('.hw-attain').show();
         } else {

@@ -16,7 +16,7 @@
         </h1>
         <ul id="choices" class="uk-subnav uk-subnav-pill">
         {{~ it.choices :choice}}
-        <li OnClick="Learning.current.controller.match(this);" data='{{!choice}}'>
+        <li OnClick="Learning.current.controller.match(this);" word='{{!choice}}'>
             <a class="uk-text-large">{{=choice}}</a>
         </li>
         {{~}}
