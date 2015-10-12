@@ -16,7 +16,7 @@
         </h1>
         <ul id="choices" class="uk-subnav uk-subnav-pill">
         {{~ it.choices :choice}}
-        <li OnClick="$('#choices li').removeClass('uk-active'); $(this).addClass('uk-active');" data='{{!choice}}'>
+        <li OnClick="Learning.current.controller.match(this);" data='{{!choice}}'>
             <a class="uk-text-large">{{=choice}}</a>
         </li>
         {{~}}

@@ -19,6 +19,10 @@ Learning.controller("Match","Game",{
             this.application.go("student/position",this.it.student.id);
         }
     },
+    match: function(item) {
+        $('#choices li').removeClass('uk-active'); 
+        $(item).addClass('uk-active');
+    },
     check: function() {
         $('#choices li').attr('OnClick','');
         if ($('#choices li.uk-active').attr('data') == this.it.word) {

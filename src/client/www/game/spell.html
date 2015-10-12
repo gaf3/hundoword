@@ -16,7 +16,7 @@
             {{? Learning.current.paths[3] == 'sound-spell' }}
             <br/>
             {{?}}
-            <input id="spell" type="text" style="text-align:center;" OnKeyPress="if (event.keyCode == 13) { Learning.current.controller.sight_spelled(); }"/>
+            <input id="spell" type="text" style="text-align:center;" OnKeyPress="if (event.keyCode == 13) { Learning.current.controller.check(); }"/>
         </h1>
         <button OnClick="Learning.current.controller.check();" class="uk-button uk-icon-spin hw-progress">
             <i class="uk-icon-thumbs-o-up"/>
