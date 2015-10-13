@@ -1,4 +1,4 @@
-Learning.controller("Cross","Game",{
+Learning.controller("Search","Game",{
     play: function(start) {
         if (start) {
             this.index = -1;
@@ -6,18 +6,22 @@ Learning.controller("Cross","Game",{
         if (++this.index < this.groups.length) {
             this.it.lefts = [];
             this.it.rights = [];
-            this.it.crosses = this.groups[this.index].length;
-            for (var match = 0; match < this.it.crosses; match++) {
-                var row = {
-                    word: this.groups[this.index][match],
-                    audio: this.audio(this.groups[this.index][match])
-                }
-                this.it.lefts.push(row);
-                this.it.rights.push(row);             
+            this.it.searches = [];
+            for (var search = 0; search < this.groups[this.index].length; search++) {
+                this.it.searches.push({
+                    word: this.groups[this.index][search],
+                    audio: this.audio(this.groups[this.index][search])
+                });
             }
-            this.application.words_shuffle(this.it.rights);
+            this.it.grid = [];
+            for (var row = 0; row < 10; row++) {
+                this.it.grid.push([]);
+                for (var col = 0; col < 10; col++) {
+                    this.it.grid[row][col] = 'abcdefghijklmnopqrstuvwxyz'[Math.floor(26*Math.random())]
+                }
+            }
             this.application.render(this.it);
-            var canvas = $("#matches")[0];
+            var canvas = $("#finds")[0];
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
         } else {
@@ -125,7 +129,7 @@ Learning.controller("Cross","Game",{
     }
 });
 
-Learning.template("Cross",Learning.load("game/cross"),null,Learning.partials);
+Learning.template("Search",Learning.load("game/search"),null,Learning.partials);
 
-Learning.route("game/sight-cross","/student/{student_id:^\\d+$}/game/sight-cross/","Cross","Cross","words");
-Learning.route("game/sound-cross","/student/{student_id:^\\d+$}/game/sound-cross/","Cross","Cross","words");
+Learning.route("game/sight-search","/student/{student_id:^\\d+$}/game/sight-search/","Search","Search","words");
+Learning.route("game/sound-search","/student/{student_id:^\\d+$}/game/sound-search/","Search","Search","words");

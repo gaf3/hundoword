@@ -7,7 +7,7 @@ Learning.controller("Match","Game",{
             this.it.word = this.it.words[this.index];
             this.it.audio = this.audio(this.it.word);
             this.it.choices = [];
-            while (this.it.choices.length < 8) {
+            while (this.it.choices.length < 6) {
                 var choice = this.it.student.words[Math.floor(Math.random() * this.it.student.words.length)];
                 if (choice != this.it.word) {
                     this.it.choices.push(choice);
