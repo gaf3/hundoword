@@ -24,7 +24,10 @@ Learning.controller("Cross","Game",{
             this.application.go("student/position",this.it.student.id);
         }
     },
-    cross: function(item) {
+    cross: function(button,sound) {
+        if (sound) {
+            this.audio(button,sound);
+        }
         var column = $(item).attr("column");
         var word = $(item).attr('word');
         var match = $(item).attr("match");

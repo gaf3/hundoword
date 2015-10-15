@@ -4,13 +4,16 @@ Learning.controller("Spell","Game",{
             this.index = -1;
         }
         if (++this.index < this.words.length) {
+            this.sight = (this.application.current.paths[3] == 'sight-spell');
             this.it.word = this.it.words[this.index];
-            this.it.audio = this.audio(this.it.word);
             this.application.render(this.it);
-            $("#spell").focus();
         } else {
             this.application.go("student/position",this.it.student.id);
         }
+    },
+    spell: function(item,sound) {
+        this.audio(item,sound);
+        $("#spell").focus();
     },
     check: function() {
         if ($('#spell').val().toLowerCase() == this.it.word.toLowerCase()) {

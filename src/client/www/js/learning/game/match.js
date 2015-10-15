@@ -4,8 +4,8 @@ Learning.controller("Match","Game",{
             this.index = -1;
         }
         if (++this.index < this.words.length) {
+            this.sight = (this.application.current.paths[3] == 'sight-match');
             this.it.word = this.it.words[this.index];
-            this.it.audio = this.audio(this.it.word);
             this.it.choices = [];
             while (this.it.choices.length < 6) {
                 var choice = this.it.student.words[Math.floor(Math.random() * this.it.student.words.length)];
