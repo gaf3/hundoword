@@ -24,7 +24,7 @@
                             <li word='{{!search.word}}'>
                                 <a>
                                 {{? Learning.current.paths[3] == 'sight-search' }}
-                                {{=search.word}}
+                                {{=search.word.toUpperCase()}}
                                 {{??}}
                                 ???
                                 {{?}}
