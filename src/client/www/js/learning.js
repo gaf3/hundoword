@@ -14,7 +14,7 @@ Learning.words_array = function(text) {
     return text ? text.replace(/,+/g," ").replace(/\s+/g," ").replace(/^ | $/,"").split(" ") : [];
 }
 
-Learning.words_shuffle = function(list) {
+Learning.shuffle = function(list) {
     // Durstenfeld (stolen)
     for (var index = list.length - 1; index > 0; index--) {
         var swap = Math.floor(Math.random() * (index + 1));

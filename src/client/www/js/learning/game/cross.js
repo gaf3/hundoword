@@ -15,7 +15,7 @@ Learning.controller("Cross","Game",{
                 this.it.lefts.push(row);
                 this.it.rights.push(row);             
             }
-            this.application.words_shuffle(this.it.rights);
+            this.application.shuffle(this.it.rights);
             this.application.render(this.it);
             var canvas = $("#matches")[0];
             canvas.width = window.innerWidth;

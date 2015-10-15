@@ -42,7 +42,7 @@ Learning.controller("Game","Changeable",{
     },
     start: function() {
         this.words = $("#words li.uk-active").map(function(){return $(this).attr("word");}).get();
-        this.application.words_shuffle(this.words);
+        this.application.shuffle(this.words);
         this.it.words = this.words;
         this.groups = [];
         for (var word = 0; word < this.words.length; word++) {
