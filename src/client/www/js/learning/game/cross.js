@@ -96,7 +96,7 @@ Learning.controller("Cross","Game",{
             var color = '#d32c46';
             if ($(this).attr('word') == $(other).attr('word')) {
                 matches.push($(this).attr('word'));
-                color = '#82bb42'
+                color = '#82bb42';
             }
             context.strokeStyle = color;
             $(this).find('a').css('color',color);

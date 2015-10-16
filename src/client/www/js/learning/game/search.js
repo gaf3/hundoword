@@ -1,54 +1,63 @@
 Learning.controller("Search","Game",{
     size: 10,
-    grid: function(words,places) { // Creates a grid and fills words from places
-        var grid = [];
-        for (var x = 0; x < this.size; x++) {
-            grid.push([]);
-            for (var y = 0; y < this.size; y++) {
-                grid[x][y] = ' ';
+    table: function(words,places) { // Creates a table and fills words from places
+        var table = [];
+        for (var row = 0; row < this.size; row++) {
+            table.push([]);
+            for (var col = 0; col < this.size; col++) {
+                table[row][col] = ' ';
             }
         }
         if (places) {
             for (var index = 0; index < places.length; index++) {
                 var word = words[index];
                 for (var letter = 0; letter < word.length; letter++) {
-                    var x = places[index].position.x + letter * places[index].direction.x;
-                    var y = places[index].position.y + letter * places[index].direction.y;
-                    grid[x][y] = word[letter];
+                    var row = places[index].position.row + letter * places[index].direction.row;
+                    var col = places[index].position.col + letter * places[index].direction.col;
+                    table[row][col] = word[letter];
                 }
             }
         }
-        return grid;
+        return table;
     },
-    hide: function(words,places) { // Hides the next word in the grid
+    hide: function(words,places) { // Hides the next word in the table
         // If the number of places equals the number of words, then we're done
         if (words.length == places.length) {
             return places;
         }
         // The current word how many places we have
         var word = words[places.length];
-        var grid = this.grid(words,places);
+        var table = this.table(words,places);
         var place;
         // A direction specifies which way for the word to go from its position 
-        var directions = [{x:-1,y:-1},{x:-1,y:0},{x:-1,y:1},{x:0,y:-1},{x:0,y:-1},{x:1,y:-1},{x:1,y:0},{x:1,y:1}];
+        var directions = [
+            {row:1,col:1},
+            //{row:1,col:0},
+            //{row:1,col:-1},
+            //{row:0,col:-1},
+            //{row:-1,col:-1},
+            //{row:-1,col:0},
+            {row:-1,col:1},
+            {row:0,col:1}
+        ];
         this.application.shuffle(directions);
         // Go through all the possible directions which we do first as that determines the possible positions
         turns: for (var turn = 0; turn < directions.length; turn++) {
             var direction = directions[turn];
             // Calculate the range of possible positions based on the word length and direction
             var start = {
-                x: Math.max(0,-direction.x*word.length-1),
-                y: Math.max(0,-direction.y*word.length-1)
+                row: Math.max(0,-direction.row*word.length-1),
+                col: Math.max(0,-direction.col*word.length-1)
             };
             var end = {
-                x: Math.min(this.size,this.size-direction.x*word.length), 
-                y: Math.min(this.size,this.size-direction.y*word.length)
+                row: Math.min(this.size,this.size-direction.row*word.length), 
+                col: Math.min(this.size,this.size-direction.col*word.length)
             };
             // The position is where the word starts at
             positions = [];
-            for (var x = start.x; x < end.x; x++) {
-                for (var y = start.y; y < end.y; y++) {
-                    positions.push({x: x, y: y});
+            for (var row = start.row; row < end.row; row++) {
+                for (var col = start.col; col < end.col; col++) {
+                    positions.push({row: row, col: col});
                 } 
             } 
             // Shuffle where they can start
@@ -58,10 +67,10 @@ Learning.controller("Search","Game",{
                 var position = positions[location];
                 // Determine letter position based on word length and direction
                 for (var letter = 0; letter < word.length; letter++) {
-                    var x = position.x + letter * direction.x;
-                    var y = position.y + letter * direction.y;
+                    var row = position.row + letter * direction.row;
+                    var col = position.col + letter * direction.col;
                     // If we're not a space and not the same letter, we won't fit
-                    if (grid[x][y] != ' ' && grid[x][y] != word[letter]) {
+                    if (table[row][col] != ' ' && table[row][col] != word[letter]) {
                         continue locations;
                     }
                 }
@@ -86,32 +95,141 @@ Learning.controller("Search","Game",{
             this.index = -1;
         }
         if (++this.index < this.groups.length) {
+            this.sight = (this.application.current.paths[3] == 'sight-search');
             this.it.searches = [];
             for (var search = 0; search < this.groups[this.index].length; search++) {
                 this.it.searches.push({
-                    word: this.groups[this.index][search],
-                    audio: this.audio(this.groups[this.index][search])
+                    word: this.groups[this.index][search]
                 });
             }
-            var places = this.hide(this.groups[this.index],[]);
-            if (!places) {
+            this.it.places = this.hide(this.groups[this.index],[]);
+            if (!this.it.places) {
                 alert("Couldn't fit!");
                 return;
             }
-            this.it.grid = this.grid(this.groups[this.index],places);
-            for (var x = 0; x < this.size; x++) {
-                for (var y = 0; y < this.size; y++) {
-                    if (this.it.grid[x][y] == ' ') {
-                        this.it.grid[x][y] = 'abcdefghijklmnopqrstuvwxyz'[Math.floor(26*Math.random())];
+            this.it.table = this.table(this.groups[this.index],this.it.places);
+            for (var row = 0; row < this.size; row++) {
+                for (var col = 0; col < this.size; col++) {
+                    if (this.it.table[row][col] == ' ') {
+                        this.it.table[row][col] = 'abcdefghijklmnopqrstuvwxyz'[Math.floor(26*Math.random())];
                     }
                 }
             }
+            this.it.selection = null;
+            this.it.finds = [];
             this.application.render(this.it);
             var canvas = $("#finds")[0];
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
+            this.draw();
         } else {
             this.application.go("student/position",this.it.student.id);
+        }
+    },
+    find: function(cell) {
+        var row = Number($(cell).attr("row"));
+        var col = Number($(cell).attr("col"));
+        var selection = this.it.selection;
+        // If we have a selection and position, then we have to figure 
+        // whether this is related to the current
+        if (this.it.selection && this.it.selection.position) {
+            // Calculate the distance from the current position
+            var distance = {
+                row: row-this.it.selection.position.row,
+                col: col-this.it.selection.position.col
+            };
+            // If we have direction, than there's more than one already and 
+            // we have to determin if it's next along the same line
+            if (this.it.selection.direction) {
+                // If the current postion plus it's length plus one along the direction
+                // is the same as where we're at, then add to this length
+                var position = {
+                    row: this.it.selection.position.row + (this.it.selection.length)*this.it.selection.direction.row,
+                    col: this.it.selection.position.col + (this.it.selection.length)*this.it.selection.direction.col
+                }
+                if (position.row == row && position.col == col) {
+                    this.it.selection.length++;
+                // Else we're somewhere new
+                } else {
+                    this.it.selection = null;
+                }
+            } else {
+                // If we're within one from the current, then the difference is the direction
+                if (Math.abs(distance.row) <= 1 && Math.abs(distance.col) <= 1) {
+                    this.it.selection.direction = {
+                        row: distance.row,
+                        col: distance.col
+                    };
+                    this.it.selection.length++;
+                } else {
+                    this.it.selection = null;
+                }
+            }
+        }
+        // If there's no selection at this point, then what's clicked is it.
+        if (!this.it.selection) {
+            this.it.selection = {
+                position: {
+                    row: row,
+                    col: col
+                },
+                length: 1
+            };
+        }
+        // Now generate the word
+        this.draw();
+    },
+    select: function(context,from,to) {
+        var start = from.getBoundingClientRect();
+        var end = to.getBoundingClientRect();
+        var degree = Math.atan2(end.top-start.top,end.left-start.left);
+        context.beginPath();
+        context.arc(
+            0.5*(start.left+start.right),
+            0.5*(start.top+start.bottom),
+            0.25*(start.width+start.height),
+            degree+0.5*Math.PI,
+            degree-0.5*Math.PI
+        );
+        context.arc(
+            0.5*(end.left+end.right),
+            0.5*(end.top+end.bottom),
+            0.25*(end.width+end.height),
+            degree-0.5*Math.PI,
+            degree+0.5*Math.PI
+        );
+        context.closePath();
+        context.stroke();
+    },
+    draw: function() {
+        var context = $("#finds")[0].getContext("2d");
+        context.clearRect(0, 0, window.innerWidth, window.innerHeight);
+        context.lineWidth = 1;
+        context.strokeStyle = '#82bb42';
+        for (var find = 0; find < this.it.finds.length; find++) {
+            var found = this.it.finds[find];
+            var word = this.groups[this.index][found];
+            var position = this.it.places[found].position;
+            var direction = this.it.places[found].direction;
+            var start_query = "#table td[row=" + position.row + "]" + 
+                                       "[col=" + position.col + "]";
+            var end_query = "#table td[row=" + (position.row+(word.length-1)*direction.row) + "]" + 
+                                     "[col=" + (position.col+(word.length-1)*direction.col) + "]";
+            this.select(context,$(start_query)[0],$(end_query)[0]);
+        }
+        if (this.it.selection && this.it.selection.position) {
+            context.strokeStyle = '#0077dd';
+            var position = this.it.selection.position;
+            var start_query = "#table td[row=" + position.row + "]" + 
+                                       "[col=" + position.col + "]";
+            if (this.it.selection.direction) {
+                var direction = this.it.selection.direction;
+                var end_query = "#table td[row=" + (position.row+(this.it.selection.length-1)*direction.row) + "]" + 
+                                         "[col=" + (position.col+(this.it.selection.length-1)*direction.col) + "]";
+                this.select(context,$(start_query)[0],$(end_query)[0]);
+            } else {
+                this.select(context,$(start_query)[0],$(start_query)[0]);
+            }
         }
     }
 });
