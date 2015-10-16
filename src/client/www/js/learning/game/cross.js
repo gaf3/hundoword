@@ -4,13 +4,13 @@ Learning.controller("Cross","Game",{
             this.index = -1;
         }
         if (++this.index < this.groups.length) {
+            this.sight = (this.application.current.paths[3] == 'sight-cross');
             this.it.lefts = [];
             this.it.rights = [];
             this.it.crosses = this.groups[this.index].length;
             for (var match = 0; match < this.it.crosses; match++) {
                 var row = {
-                    word: this.groups[this.index][match],
-                    audio: this.audio(this.groups[this.index][match])
+                    word: this.groups[this.index][match]
                 }
                 this.it.lefts.push(row);
                 this.it.rights.push(row);             
@@ -24,9 +24,9 @@ Learning.controller("Cross","Game",{
             this.application.go("student/position",this.it.student.id);
         }
     },
-    cross: function(button,sound) {
+    cross: function(item,sound) {
         if (sound) {
-            this.audio(button,sound);
+            this.audio(item,sound);
         }
         var column = $(item).attr("column");
         var word = $(item).attr('word');

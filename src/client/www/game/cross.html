@@ -6,25 +6,18 @@
         {{ var right = it.rights[index]; }}
         <div class="uk-grid">
             <div class="uk-width-1-3 uk-text-right">
-                <audio id="sound-left-{{=index}}"><source class="hw-mp3"/><source class="hw-ogg"/></audio>
-                <button 
-                    id="play-left-{{=index}}" word="{{!left.word}}"  class="uk-button uk-button-primary"
-                    OnClick="Learning.current.controller.cross(this,$('#sound-left-{{=index}}')[0]);"
-                >
-                    ???
-                </button>
                 <ul class="uk-subnav uk-subnav-pill">
-                    <li onClick="Learning.current.controller.cross(this)" column='right' word='{{=right.word}}'>
-                        <a>{{=right.word}}</a>
+                    <li onClick="Learning.current.controller.cross(this,$('#sound-left-{{=index}}')[0])" column='left' word='{{=left.word}}'>
+                        <a class="uk-text-large">???</a>
                     </li>
                 </ul>
-                
+                <audio id="sound-left-{{=index}}"><source class="hw-mp3"/><source class="hw-ogg"/></audio>
             </div>
             <div class="uk-width-1-3">&nbsp;</div>
             <div class="uk-width-1-3 uk-text-left">
                 <ul class="uk-subnav uk-subnav-pill">
                     <li onClick="Learning.current.controller.cross(this)" column='right' word='{{=right.word}}'>
-                        <a>{{=right.word}}</a>
+                        <a class="uk-text-large">{{=right.word}}</a>
                     </li>
                 </ul>
             </div>
