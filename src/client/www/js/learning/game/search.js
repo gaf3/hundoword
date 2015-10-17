@@ -1,5 +1,15 @@
 Learning.controller("Search","Game",{
     size: 10,
+    directions: [
+        {row:1,col:1},
+        //{row:1,col:0},
+        //{row:1,col:-1},
+        //{row:0,col:-1},
+        //{row:-1,col:-1},
+        //{row:-1,col:0},
+        {row:-1,col:1},
+        {row:0,col:1}
+    ],
     table: function(words,places) { // Creates a table and fills words from places
         var table = [];
         for (var row = 0; row < this.size; row++) {
@@ -30,16 +40,7 @@ Learning.controller("Search","Game",{
         var table = this.table(words,places);
         var place;
         // A direction specifies which way for the word to go from its position 
-        var directions = [
-            {row:1,col:1},
-            //{row:1,col:0},
-            //{row:1,col:-1},
-            //{row:0,col:-1},
-            //{row:-1,col:-1},
-            //{row:-1,col:0},
-            {row:-1,col:1},
-            {row:0,col:1}
-        ];
+        var directions = this.directions.slice();
         this.application.shuffle(directions);
         // Go through all the possible directions which we do first as that determines the possible positions
         turns: for (var turn = 0; turn < directions.length; turn++) {
@@ -102,12 +103,12 @@ Learning.controller("Search","Game",{
                     word: this.groups[this.index][search]
                 });
             }
-            this.it.places = this.hide(this.groups[this.index],[]);
-            if (!this.it.places) {
+            this.places = this.hide(this.groups[this.index],[]);
+            if (!this.places) {
                 alert("Couldn't fit!");
                 return;
             }
-            this.it.table = this.table(this.groups[this.index],this.it.places);
+            this.it.table = this.table(this.groups[this.index],this.places);
             for (var row = 0; row < this.size; row++) {
                 for (var col = 0; col < this.size; col++) {
                     if (this.it.table[row][col] == ' ') {
@@ -115,8 +116,8 @@ Learning.controller("Search","Game",{
                     }
                 }
             }
-            this.it.selection = null;
-            this.it.finds = [];
+            this.selection = null;
+            this.finds = [];
             this.application.render(this.it);
             var canvas = $("#finds")[0];
             canvas.width = window.innerWidth;
@@ -129,54 +130,68 @@ Learning.controller("Search","Game",{
     find: function(cell) {
         var row = Number($(cell).attr("row"));
         var col = Number($(cell).attr("col"));
-        var selection = this.it.selection;
+        var letter = $(cell).html();
         // If we have a selection and position, then we have to figure 
         // whether this is related to the current
-        if (this.it.selection && this.it.selection.position) {
+        if (this.selection && this.selection.position) {
             // Calculate the distance from the current position
             var distance = {
-                row: row-this.it.selection.position.row,
-                col: col-this.it.selection.position.col
+                row: row-this.selection.position.row,
+                col: col-this.selection.position.col
             };
             // If we have direction, than there's more than one already and 
             // we have to determin if it's next along the same line
-            if (this.it.selection.direction) {
+            if (this.selection.direction) {
                 // If the current postion plus it's length plus one along the direction
                 // is the same as where we're at, then add to this length
                 var position = {
-                    row: this.it.selection.position.row + (this.it.selection.length)*this.it.selection.direction.row,
-                    col: this.it.selection.position.col + (this.it.selection.length)*this.it.selection.direction.col
+                    row: this.selection.position.row + (this.selection.word.length)*this.selection.direction.row,
+                    col: this.selection.position.col + (this.selection.word.length)*this.selection.direction.col
                 }
                 if (position.row == row && position.col == col) {
-                    this.it.selection.length++;
+                    this.selection.word += letter;
                 // Else we're somewhere new
                 } else {
-                    this.it.selection = null;
+                    this.selection = null;
                 }
             } else {
-                // If we're within one from the current, then the difference is the direction
-                if (Math.abs(distance.row) <= 1 && Math.abs(distance.col) <= 1) {
-                    this.it.selection.direction = {
-                        row: distance.row,
-                        col: distance.col
-                    };
-                    this.it.selection.length++;
-                } else {
-                    this.it.selection = null;
+                // Go through all the valid positions and determine if this is one of them
+                for (var turn = 0; turn < this.directions.length; turn++) {
+                    if ((distance.row == this.directions[turn].row) &&
+                        (distance.col == this.directions[turn].col)) {
+                        this.selection.direction = distance;
+                        this.selection.word += letter;
+                    }
+                }
+                // Not valid, then this is the next start
+                if (!this.selection.direction) {
+                    this.selection = null;
                 }
             }
         }
         // If there's no selection at this point, then what's clicked is it.
-        if (!this.it.selection) {
-            this.it.selection = {
+        if (!this.selection) {
+            this.selection = {
                 position: {
                     row: row,
                     col: col
                 },
-                length: 1
+                word: letter
             };
         }
-        // Now generate the word
+        // Now determine the word and see if there's a match
+        if (this.selection) {
+            // Go through the list of words
+            for (var find = 0; find < this.groups[this.index].length; find++) {
+                // If this word is the same, add to finds, null selection and make the word green
+                if (this.selection.word == this.groups[this.index][find].toUpperCase()) {
+                    $("#searches li[word='" + this.selection.word + "'] a").css('color','#82bb42');
+                    this.finds.push(this.selection);
+                    this.selection = null;
+                    break;
+                }
+            }
+        }
         this.draw();
     },
     select: function(context,from,to) {
@@ -206,31 +221,73 @@ Learning.controller("Search","Game",{
         context.clearRect(0, 0, window.innerWidth, window.innerHeight);
         context.lineWidth = 1;
         context.strokeStyle = '#82bb42';
-        for (var find = 0; find < this.it.finds.length; find++) {
-            var found = this.it.finds[find];
-            var word = this.groups[this.index][found];
-            var position = this.it.places[found].position;
-            var direction = this.it.places[found].direction;
+        for (var find = 0; find < this.finds.length; find++) {
+            var word = this.finds[find].word;
+            var position = this.finds[find].position;
+            var direction = this.finds[find].direction;
             var start_query = "#table td[row=" + position.row + "]" + 
                                        "[col=" + position.col + "]";
             var end_query = "#table td[row=" + (position.row+(word.length-1)*direction.row) + "]" + 
                                      "[col=" + (position.col+(word.length-1)*direction.col) + "]";
             this.select(context,$(start_query)[0],$(end_query)[0]);
         }
-        if (this.it.selection && this.it.selection.position) {
+        if (this.selection && this.selection.position) {
             context.strokeStyle = '#0077dd';
-            var position = this.it.selection.position;
+            var position = this.selection.position;
             var start_query = "#table td[row=" + position.row + "]" + 
                                        "[col=" + position.col + "]";
-            if (this.it.selection.direction) {
-                var direction = this.it.selection.direction;
-                var end_query = "#table td[row=" + (position.row+(this.it.selection.length-1)*direction.row) + "]" + 
-                                         "[col=" + (position.col+(this.it.selection.length-1)*direction.col) + "]";
+            if (this.selection.direction) {
+                var direction = this.selection.direction;
+                var end_query = "#table td[row=" + (position.row+(this.selection.word.length-1)*direction.row) + "]" + 
+                                         "[col=" + (position.col+(this.selection.word.length-1)*direction.col) + "]";
                 this.select(context,$(start_query)[0],$(end_query)[0]);
             } else {
                 this.select(context,$(start_query)[0],$(start_query)[0]);
             }
         }
+    },
+    check: function() {
+        this.draw();
+        var context = $("#finds")[0].getContext("2d");
+        context.lineWidth = 1;
+        context.strokeStyle = '#d32c46';
+        var finds = [];
+        // Go through the list of words and finds, adding to fidns if found
+        for (var sought = 0; sought < this.groups[this.index].length; sought++) {
+            var word = this.groups[this.index][sought];
+            for (var found = 0; found < this.finds.length; found++) {
+                if (word.toUpperCase() == this.finds[found].word) {
+                    finds.push(this.groups[this.index][sought]);
+                    break;
+                }
+            }
+            // If we're in, then we have attainment
+            if ($.inArray(word,finds) > -1) {
+                hwAPI.student.attain(this.it.student.id,word,this.it.achievement.id);
+            // If we don't, we have yield and we need to color what's missing
+            } else {
+                hwAPI.student.yield(this.it.student.id,word,this.it.achievement.id);
+                var place = this.places[sought];
+                $("#searches li[word='" + word.toUpperCase() + "'] a").css('color','#d32c46');
+                var position = place.position;
+                var direction = place.direction;
+                var start_query = "#table td[row=" + position.row + "]" + 
+                                           "[col=" + position.col + "]";
+                var end_query = "#table td[row=" + (position.row+(word.length-1)*direction.row) + "]" + 
+                                         "[col=" + (position.col+(word.length-1)*direction.col) + "]";
+                this.select(context,$(start_query)[0],$(end_query)[0]);
+            }
+        }
+        var transform = "rotate(" + -180 * (1 - finds.length / this.groups[this.index].length)  + "deg)";
+        $('.hw-complete').css({
+            "webkitTransform":transform,
+            "MozTransform":transform,
+            "msTransform":transform,
+            "OTransform":transform,
+            "transform":transform
+        });
+        $('.hw-complete').show();
+        $('.hw-progress').hide();
     }
 });
 

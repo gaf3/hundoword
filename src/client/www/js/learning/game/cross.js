@@ -54,9 +54,9 @@ Learning.controller("Cross","Game",{
         } else {
             $(item).addClass('uk-active');
         }
-        this.match();
+        this.draw();
     },
-    match: function() {
+    draw: function() {
         var context = $("#matches")[0].getContext("2d");
         context.clearRect(0, 0, window.innerWidth, window.innerHeight);
         context.lineWidth = 1;
@@ -73,7 +73,7 @@ Learning.controller("Cross","Game",{
     move: function(event) {
         var current = $("#crosses li.uk-active")[0];
         if (current) {
-            this.match();
+            this.draw();
             var context = $("#matches")[0].getContext("2d");
             context.lineWidth = 1;
             var from = current.getBoundingClientRect();
