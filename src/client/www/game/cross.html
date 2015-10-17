@@ -5,52 +5,21 @@
         {{~ it.lefts :left:index}}
         {{ var right = it.rights[index]; }}
         <div class="uk-grid">
-            <div class="uk-width-1-6 uk-text-right">
-                {{? left.audio }}
-                <audio id="sound-left-{{=index}}" OnLoadedData="$('#play-left-{{=index}}').prop('disabled',false);">
-                    <source src="{{=left.audio.mp3}}"/>
-                    <source src="{{=left.audio.ogg}}"/>
-                </audio>
-                <button id="play-left-{{=index}}" OnClick="$('#sound-left-{{=index}}')[0].play();" class="uk-button uk-button-primary" disabled>
-                    <i class="uk-icon-volume-up"/>
-                </button>
-                {{??}}
-                &nbsp;
-                {{?}}
-            </div>
-            <div class="uk-width-1-6 uk-text-left">
+            <div class="uk-width-1-3 uk-text-right">
                 <ul class="uk-subnav uk-subnav-pill">
-                    <li onClick="Learning.current.controller.cross(this)" column='left' word='{{=left.word}}'>
-                        <a>
-                        {{? Learning.current.paths[3] == 'sight-cross' }}
-                        {{=left.word}}
-                        {{??}}
-                        <i class=uk-icon-bullseye/>
-                        {{?}}
-                        </a>
+                    <li onClick="Learning.current.controller.cross(this,$('#sound-left-{{=index}}')[0])" column='left' word='{{=left.word}}'>
+                        <a class="uk-text-large">???</a>
                     </li>
                 </ul>
+                <audio id="sound-left-{{=index}}"><source class="hw-mp3"/><source class="hw-ogg"/></audio>
             </div>
             <div class="uk-width-1-3">&nbsp;</div>
-            <div class="uk-width-1-6 uk-text-right">
+            <div class="uk-width-1-3 uk-text-left">
                 <ul class="uk-subnav uk-subnav-pill">
                     <li onClick="Learning.current.controller.cross(this)" column='right' word='{{=right.word}}'>
-                        <a>{{=right.word}}</a>
+                        <a class="uk-text-large">{{=right.word}}</a>
                     </li>
                 </ul>
-            </div>
-            <div class="uk-width-1-6 uk-text-left">
-                {{? right.audio && Learning.current.paths[3] == 'sight-cross' }}
-                <audio id="sound-right-{{=index}}" OnLoadedData="$('#play-right-{{=index}}').prop('disabled',false);">
-                    <source src="{{=right.audio.mp3}}"/>
-                    <source src="{{=right.audio.ogg}}"/>
-                </audio>
-                <button id="play-right-{{=index}}" OnClick="$('#sound-right-{{=index}}')[0].play();" class="uk-button uk-button-primary" disabled>
-                    <i class="uk-icon-volume-up"/>
-                </button>
-                {{??}}
-                &nbsp;
-                {{?}}
             </div>
         </div>
         {{~}}

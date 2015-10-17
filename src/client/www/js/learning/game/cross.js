@@ -4,27 +4,30 @@ Learning.controller("Cross","Game",{
             this.index = -1;
         }
         if (++this.index < this.groups.length) {
+            this.sight = (this.application.current.paths[3] == 'sight-cross');
             this.it.lefts = [];
             this.it.rights = [];
             this.it.crosses = this.groups[this.index].length;
             for (var match = 0; match < this.it.crosses; match++) {
                 var row = {
-                    word: this.groups[this.index][match],
-                    audio: this.audio(this.groups[this.index][match])
+                    word: this.groups[this.index][match]
                 }
                 this.it.lefts.push(row);
                 this.it.rights.push(row);             
             }
-            this.application.words_shuffle(this.it.rights);
+            this.application.shuffle(this.it.rights);
             this.application.render(this.it);
-            var canvas=$("#matches")[0];
+            var canvas = $("#matches")[0];
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
         } else {
             this.application.go("student/position",this.it.student.id);
         }
     },
-    cross: function(item) {
+    cross: function(item,sound) {
+        if (sound) {
+            this.audio(item,sound);
+        }
         var column = $(item).attr("column");
         var word = $(item).attr('word');
         var match = $(item).attr("match");
@@ -51,9 +54,9 @@ Learning.controller("Cross","Game",{
         } else {
             $(item).addClass('uk-active');
         }
-        this.match();
+        this.draw();
     },
-    match: function() {
+    draw: function() {
         var context = $("#matches")[0].getContext("2d");
         context.clearRect(0, 0, window.innerWidth, window.innerHeight);
         context.lineWidth = 1;
@@ -70,7 +73,7 @@ Learning.controller("Cross","Game",{
     move: function(event) {
         var current = $("#crosses li.uk-active")[0];
         if (current) {
-            this.match();
+            this.draw();
             var context = $("#matches")[0].getContext("2d");
             context.lineWidth = 1;
             var from = current.getBoundingClientRect();
@@ -93,7 +96,7 @@ Learning.controller("Cross","Game",{
             var color = '#d32c46';
             if ($(this).attr('word') == $(other).attr('word')) {
                 matches.push($(this).attr('word'));
-                color = '#82bb42'
+                color = '#82bb42';
             }
             context.strokeStyle = color;
             $(this).find('a').css('color',color);

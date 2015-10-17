@@ -42,7 +42,7 @@ Learning.controller("Game","Changeable",{
     },
     start: function() {
         this.words = $("#words li.uk-active").map(function(){return $(this).attr("word");}).get();
-        this.application.words_shuffle(this.words);
+        this.application.shuffle(this.words);
         this.it.words = this.words;
         this.groups = [];
         for (var word = 0; word < this.words.length; word++) {
@@ -54,12 +54,25 @@ Learning.controller("Game","Changeable",{
         }
         this.play(true);
     },
-    audio: function(word) {
-        try {
-            return hwAPI.audio(word);
-        } catch (exception) {
-            return {};
+    audio: function(item,sound) {
+        if (sound.readyState > 0) {
+            sound.play();
+            return;
         }
+        var word = $(item).attr("word");
+        try {
+            var audio = hwAPI.audio(word);
+            $(sound).find(".hw-mp3").attr('src',audio.mp3);
+            $(sound).find(".hw-ogg").attr('src',audio.ogg);
+            sound.autoplay = true;
+            sound.load();
+            if (this.sight == true) {
+                $(item).find('a').html(word);
+            }
+        } catch (exception) {
+            $(item).find('a').html(word);
+        }
+        $(sound).attr('played',true);
     }
 });
 

@@ -1,17 +1,11 @@
 <div class="uk-vertical-align uk-text-center" style="height: 500px;">
     <div class="uk-vertical-align-middle uk-width-1-2 uk-text-center">
-        <h1 class="uk-heading-large">
-            {{=it.word}}
-            {{? it.audio }}
-            <audio id="sound" OnLoadedData="$('#play').prop('disabled',false);" OnPlay="$(this).attr('played',true);">
-                <source src="{{=it.audio.mp3}}"/>
-                <source src="{{=it.audio.ogg}}"/>
-            </audio>
-            <button id="play" OnClick="$('#sound')[0].play();" class="uk-button uk-button-primary" disabled>
-                <i class="uk-icon-volume-up"/>
-            </button>
-            {{?}}
-        </h1>
+        <audio id="sound"><source class="hw-mp3"/><source class="hw-ogg"/></audio>
+        <ul class="uk-subnav uk-subnav-pill">
+            <li word="{{!it.word}}" OnClick="Learning.current.controller.introduce(this,$('#sound')[0]);" >
+                <a class="uk-text-large">???</a>
+            </li>
+        </ul>
         <button OnClick="Learning.current.controller.check();" class="uk-button uk-icon-spin hw-progress">
             <i class="uk-icon-thumbs-o-up"/>
         </button>

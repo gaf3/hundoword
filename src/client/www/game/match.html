@@ -1,19 +1,11 @@
 <div class="uk-vertical-align uk-text-center" style="height: 500px;">
     <div class="uk-vertical-align-middle uk-width-1-2 uk-text-center">
-        <h1 class="uk-heading-large">
-            {{? Learning.current.paths[3] == 'sight-match' }}
-            {{=it.word}}
-            {{?}}
-            {{? it.audio }}
-            <audio id="sound" OnLoadedData="$('#play').prop('disabled',false);">
-                <source src="{{=it.audio.mp3}}"/>
-                <source src="{{=it.audio.ogg}}"/>
-            </audio>
-            <button id="play" OnClick="$('#sound')[0].play();" class="uk-button uk-button-primary" disabled>
-                <i class="uk-icon-volume-up"/>
-            </button>
-            {{?}}
-        </h1>
+        <audio id="sound"><source class="hw-mp3"/><source class="hw-ogg"/></audio>
+        <ul class="uk-subnav uk-subnav-pill">
+            <li word="{{!it.word}}" OnClick="Learning.current.controller.audio(this,$('#sound')[0]);" >
+                <a class="uk-text-large">???</a>
+            </li>
+        </ul>
         <ul id="choices" class="uk-subnav uk-subnav-pill">
         {{~ it.choices :choice}}
         <li OnClick="Learning.current.controller.match(this);" word='{{!choice}}'>
