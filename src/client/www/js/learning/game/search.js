@@ -1,5 +1,5 @@
 Learning.controller("Search","Game",{
-    size: 10,
+    size: 8,
     directions: [
         {row:1,col:1},
         //{row:1,col:0},
@@ -202,14 +202,14 @@ Learning.controller("Search","Game",{
         context.arc(
             0.5*(start.left+start.right),
             0.5*(start.top+start.bottom),
-            0.25*(start.width+start.height),
+            0.25*(start.width+start.height)-5,
             degree+0.5*Math.PI,
             degree-0.5*Math.PI
         );
         context.arc(
             0.5*(end.left+end.right),
             0.5*(end.top+end.bottom),
-            0.25*(end.width+end.height),
+            0.25*(end.width+end.height)-5,
             degree-0.5*Math.PI,
             degree+0.5*Math.PI
         );
