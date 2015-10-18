@@ -1,6 +1,7 @@
 import os
 import json
 import datetime
+import pytz
 
 from django.test import SimpleTestCase, Client
 from django.core.urlresolvers import reverse
@@ -11,6 +12,7 @@ from rest_framework.authtoken.models import Token
 
 from learning.models import *
 from learning.views import *
+import learning.chart
 import learning.views
 
 from rest_framework import status
@@ -20,13 +22,18 @@ from hundoword_django import settings
 
 settings.DEBUG = False
 
+
 def build_url(view,pk=None):
     """ Method for creating view urls as reverse doesn't seem to work """
 
     return "%s/%s/%s/" % (learning_url,view,pk) if pk is not None else "%s/%s/" % (learning_url,view)
 
 
-class test_Django(SimpleTestCase):
+def when(year,month,day,hour=0):
+    return pytz.utc.localize(datetime.datetime(year,month,day,hour))
+
+
+class a_test_Django(SimpleTestCase):
     """ Class for all the Django """
 
     def setUp(self):
@@ -39,36 +46,37 @@ class test_Django(SimpleTestCase):
         self.original_forvo_key_file = learning.views.forvo_key_file
 
 
+
     def tearDown(self):
 
         learning.views.forvo_key_file = self.original_forvo_key_file 
 
 
-    def test_Achievement(self):
+    def a_test_Achievement(self):
 
         self.assertEqual(str(Achievement(name="plain",progression=1)),"plain")
 
 
-    def test_Program(self):
+    def a_test_Program(self):
 
         self.assertEqual(str(Program(name="plain")),"plain")
 
 
-    def test_ProgramWord(self):
+    def a_test_ProgramWord(self):
 
         program = Program(name="plain")
         program.save()
         self.assertEqual(str(ProgramWord(program=program,word="jane")),"plain - jane")
 
 
-    def test_Student(self):
+    def a_test_Student(self):
 
         user = User(username="tester")
         user.save()
         self.assertEqual(str(Student(teacher=user,first_name="plain",last_name="jane")),"plain jane (tester)")
 
 
-    def test_StudentWord(self):
+    def a_test_StudentWord(self):
 
         user = User(username="tester")
         user.save()
@@ -77,7 +85,7 @@ class test_Django(SimpleTestCase):
         self.assertEqual(str(StudentWord(student=student,word="one")),"plain jane (tester) - one")
 
 
-    def test_Progress(self):
+    def a_test_Progress(self):
 
         user = User(username="tester")
         user.save()
@@ -85,14 +93,39 @@ class test_Django(SimpleTestCase):
         achievement.save()
         student = Student(teacher=user,first_name="plain",last_name="jane")
         student.save()
-        at = datetime.datetime(2007,7,7)
+        at = when(2007,7,7)
+        progress = Progress(student=student,word="here",achievement=achievement,hold=True,at=at)
+        progress.save()
         self.assertEqual(
-            str(Progress(student=student,word="here",achievement=achievement,hold=True,at=at)),
-            "plain jane (tester) - here - Sight (True) - 2007-07-07 00:00:00"
+            str(Progress.objects.get(pk=progress.pk)),
+            "plain jane (tester) - here - Sight (True) - 2007-07-07 00:00:00+00:00"
         )
 
+    def test_chart(self):
 
-    def test_register(self):
+        # start
+
+        user = User(username="tester")
+        user.save()
+        sight = Achievement(name="Sight",slug="sight",progression=1)
+        sight.save()
+        sound = Achievement(name="Sound",slug="sound",progression=2)
+        sound.save()
+        student = Student(teacher=user,first_name="plain",last_name="jane")
+        student.save()
+
+        Progress(student=student,word="here",achievement=sight,hold=True,at=when(2007,7,1,9)).save()
+        Progress(student=student,word="here",achievement=sight,hold=False,at=when(2007,7,1,10)).save()
+        Progress(student=student,word="here",achievement=sight,hold=True,at=when(2007,7,1,11)).save()
+        Progress(student=student,word="there",achievement=sight,hold=True,at=when(2007,7,1,9)).save()
+        Progress(student=student,word="there",achievement=sight,hold=False,at=when(2007,7,1,10)).save()
+
+        start = learning.chart.start(student.id,when(2007,07,2))
+
+        self.assertEqual(start,{sight.id: {"here": 1}})
+
+
+    def a_test_register(self):
 
         client = APIClient()
 
@@ -120,7 +153,7 @@ class test_Django(SimpleTestCase):
         token = Token.objects.get(user=user)
 
 
-    def test_token(self):
+    def a_test_token(self):
 
         client = APIClient()
 
@@ -146,7 +179,7 @@ class test_Django(SimpleTestCase):
         })
 
 
-    def test_achievement(self):
+    def a_test_achievement(self):
 
         client = APIClient()
         user = User.objects.get(username="vagrant")
@@ -284,7 +317,7 @@ class test_Django(SimpleTestCase):
         ])
 
 
-    def test_program(self):
+    def a_test_program(self):
 
         client = APIClient()
         user = User.objects.get(username="vagrant")
@@ -435,7 +468,7 @@ class test_Django(SimpleTestCase):
         ])
 
 
-    def test_student(self):
+    def a_test_student(self):
 
         client = APIClient()
         user = User.objects.get(username="vagrant")
@@ -1229,8 +1262,14 @@ class test_Django(SimpleTestCase):
             }
         ])
 
+        # Chart
 
-    def test_audio(self):
+        chart = dict(client.get("/api/v0/student/%s/chart/" % (silly_billy_id)).data)
+
+        print chart
+
+
+    def a_test_audio(self):
 
         client = APIClient()
         user = User.objects.get(username="vagrant")
