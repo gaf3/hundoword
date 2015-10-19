@@ -1,5 +1,6 @@
 import os
 import sys
+import copy
 import traceback
 import datetime
 import pytz
@@ -16,6 +17,7 @@ from hundoword_django import settings
 
 from learning.models import *
 from learning.serializers import *
+from learning import chart
 from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
 
@@ -99,6 +101,9 @@ def achievement(request,pk='',action=''):
 
                 if 'progression' in request.DATA:
                     achievement.progression = request.DATA['progression']
+
+                if 'color' in request.DATA:
+                    achievement.color = request.DATA['color']
 
                 achievement.save()
 
@@ -369,7 +374,7 @@ def student(request,pk='',action=''):
                 serializer = PositionSerializer(StudentWord.objects.filter(**filter), many=True)
                 return Response(serializer.data)
 
-            # Progress
+            # History
 
             elif action == "history": 
 
@@ -391,6 +396,49 @@ def student(request,pk='',action=''):
 
                 serializer = ProgressSerializer(Progress.objects.filter(**filter), many=True)
                 return Response(serializer.data)
+
+            # Chart
+
+            elif action == "chart": 
+
+                # First select all the words we're using
+
+                filter = {
+                    "student": student
+                }
+
+                if "words" in request.GET:
+                    filter["word__in"] = request.GET["words"].split(",")
+
+                if "focus" in request.GET:
+                    filter["focus"] = request.GET["focus"].lower() == "true"
+
+                words = [student_word.word for student_word in StudentWord.objects.filter(**filter)]
+
+                if "achievements" in request.GET:
+                    achievements = Achievement.objects.filter(id__in=request.GET["achievements"].split(","))
+                else:
+                    achievements = Achievement.objects.all()
+
+                achievement_ids = [achievement.pk for achievement in achievements]
+                by = request.GET["by"] if "by" in request.GET else "day"
+
+                from_date = None
+                to_date = None
+
+                if "from" in request.GET:
+                    from_date = pytz.utc.localize(datetime.datetime.strptime(request.GET["from"], '%Y-%m-%d'))
+
+                if "to" in request.GET:
+                    to_date = pytz.utc.localize(datetime.datetime.strptime(request.GET["to"], '%Y-%m-%d'))
+
+                (data,times) = chart.build(student.pk,by,words,achievement_ids,from_date,to_date)
+
+                return Response({
+                    "words": words, 
+                    "times": times,
+                    "data": data
+                })
 
         elif request.method == 'POST' and pk:
 

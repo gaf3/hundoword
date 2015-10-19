@@ -6,7 +6,8 @@
             "name": "Introduction",
             "slug": "introduction",
             "description": "Just shows the word and an icon to click the speaker.",
-            "progression": 1
+            "progression": 1,
+            "color": "#ACD39E"
         }
     },
     {
@@ -16,7 +17,8 @@
             "name": "Sight Match",
             "slug": "sight-match",
             "description": "Show the word above and they have to click the word in a group below. First click either pass or fail.",
-            "progression": 2
+            "progression": 2,
+            "color": "#5AAE61"
         }
     },
     {
@@ -26,7 +28,8 @@
             "name": "Sight Cross",
             "slug": "sight-cross",
             "description": "Two lists of words, click one, then click the other. If wrong, both get crossed out red.",
-            "progression": 3
+            "progression": 3,
+            "color": "#167837"
         }
     },
     {
@@ -36,7 +39,8 @@
             "name": "Sight Spell",
             "slug": "sight-spell",
             "description": "Show the word above and they have to type in characters to match the spelling.",
-            "progression": 4
+            "progression": 4,
+            "color": "#92C5DE"
         }
     },
     {
@@ -46,7 +50,8 @@
             "name": "Sight Search",
             "slug": "sight-search",
             "description": "Basic word search. Student clicks letters, circling in row. When circle matches, word is crossed out. Indifferent button to give up.",
-            "progression": 5
+            "progression": 5,
+            "color": "#4393C3"
         }
     },
     {
@@ -56,7 +61,8 @@
             "name": "Sound Match",
             "slug": "sound-match",
             "description": "Play the sound (and button to replay), pick from a list.",
-            "progression": 6
+            "progression": 6,
+            "color": "#2166AC"
         }
     },
     {
@@ -66,7 +72,8 @@
             "name": "Sound Cross",
             "slug": "sound-cross",
             "description": "Line of speakers and line of words.  Play the speaker, match the words.",
-            "progression": 7
+            "progression": 7,
+            "color": "#C2A5CF"
         }
     },
     {
@@ -76,7 +83,8 @@
             "name": "Sound Spell",
             "slug": "sound-spell",
             "description": "Show the word above and they have to type in characters to match the spelling.",
-            "progression": 8
+            "progression": 8,
+            "color": "#9970AB"
         }
     },
     {
@@ -86,7 +94,8 @@
             "name": "Sound Search",
             "slug": "sound-search",
             "description": "Basic word search. List of speakers for words to search for. Student clicks letters, circling in row. When circle matches, word is green. Indifferent button to give up.",
-            "progression": 9
+            "progression": 9,
+            "color": "#762A83"
         }
     }
 ]
