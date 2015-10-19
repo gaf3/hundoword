@@ -52,31 +52,31 @@ class test_Django(SimpleTestCase):
         learning.views.forvo_key_file = self.original_forvo_key_file 
 
 
-    def a_test_Achievement(self):
+    def test_Achievement(self):
 
         self.assertEqual(str(Achievement(name="plain",progression=1)),"plain")
 
 
-    def a_test_Program(self):
+    def test_Program(self):
 
         self.assertEqual(str(Program(name="plain")),"plain")
 
 
-    def a_test_ProgramWord(self):
+    def test_ProgramWord(self):
 
         program = Program(name="plain")
         program.save()
         self.assertEqual(str(ProgramWord(program=program,word="jane")),"plain - jane")
 
 
-    def a_test_Student(self):
+    def test_Student(self):
 
         user = User(username="tester")
         user.save()
         self.assertEqual(str(Student(teacher=user,first_name="plain",last_name="jane")),"plain jane (tester)")
 
 
-    def a_test_StudentWord(self):
+    def test_StudentWord(self):
 
         user = User(username="tester")
         user.save()
@@ -85,7 +85,7 @@ class test_Django(SimpleTestCase):
         self.assertEqual(str(StudentWord(student=student,word="one")),"plain jane (tester) - one")
 
 
-    def a_test_Progress(self):
+    def test_Progress(self):
 
         user = User(username="tester")
         user.save()
@@ -101,7 +101,7 @@ class test_Django(SimpleTestCase):
             "plain jane (tester) - here - Sight (True) - 2007-07-07 00:00:00+00:00"
         )
 
-    def a_test_chart(self):
+    def test_chart(self):
 
         ### start
 
@@ -361,7 +361,7 @@ class test_Django(SimpleTestCase):
         ))
 
 
-    def a_test_register(self):
+    def test_register(self):
 
         client = APIClient()
 
@@ -389,7 +389,7 @@ class test_Django(SimpleTestCase):
         token = Token.objects.get(user=user)
 
 
-    def a_test_token(self):
+    def test_token(self):
 
         client = APIClient()
 
@@ -415,7 +415,7 @@ class test_Django(SimpleTestCase):
         })
 
 
-    def a_test_achievement(self):
+    def test_achievement(self):
 
         client = APIClient()
         user = User.objects.get(username="vagrant")
@@ -553,7 +553,7 @@ class test_Django(SimpleTestCase):
         ])
 
 
-    def a_test_program(self):
+    def test_program(self):
 
         client = APIClient()
         user = User.objects.get(username="vagrant")
@@ -1652,10 +1652,8 @@ class test_Django(SimpleTestCase):
             }
         })
 
-        chart = dict(client.get("/api/v0/student/%s/chart/?by=week" % (silly_billy_id)).data)
 
-
-    def a_test_audio(self):
+    def test_audio(self):
 
         client = APIClient()
         user = User.objects.get(username="vagrant")
