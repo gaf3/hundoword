@@ -17,6 +17,7 @@ from hundoword_django import settings
 
 from learning.models import *
 from learning.serializers import *
+from learning import chart
 from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
 
@@ -399,171 +400,36 @@ def student(request,pk='',action=''):
 
                 # First select all the words we're using
 
-                words_filter = {
+                filter = {
                     "student": student
                 }
 
                 if "words" in request.GET:
-                    words_filter["word__in"] = request.GET["words"].split(",")
+                    filter["word__in"] = request.GET["words"].split(",")
 
                 if "focus" in request.GET:
-                    words_filter["focus"] = request.GET["focus"].lower() == "true"
+                    filter["focus"] = request.GET["focus"].lower() == "true"
 
-                words = [student_word.word for student_word in StudentWord.objects.filter(**words_filter)]
+                words = [student_word.word for student_word in StudentWord.objects.filter(**filter)]
 
-                # Now select all the progress we're using
+                if "achievements" in request.GET:
+                    achievements = Achievement.objects.filter(id__in=request.GET["achievements"].split(","))
+                else:
+                    achievements = Achievement.objects.all()
 
-                progress_filter = {
-                    "student": student,
-                    "word__in": words
-                }
+                achievement_ids = [achievement.pk for achievement in achievements]
+                by = request.GET["by"] if "by" in request.GET else "day"
 
                 from_date = None
                 to_date = None
 
-                if "achievements" in request.GET:
-                    achievements = Achievement.objects.filter(pk_in=request.GET["achievements"].split(","))
-                    progress_filter["achievement__in"] = [achievement.pk for achievement in achievements]
-                else:
-                    achievements = Achievement.objects.all()
-
                 if "from" in request.GET:
                     from_date = pytz.utc.localize(datetime.datetime.strptime(request.GET["from"], '%Y-%m-%d'))
-                    progress_filter["at__gte"] = from_date
 
                 if "to" in request.GET:
                     to_date = pytz.utc.localize(datetime.datetime.strptime(request.GET["to"], '%Y-%m-%d'))
-                    progress_filter["at__lt"] = to_date
 
-                # This is a base data structure for words and 
-                # acheivements.  We'll use this to start a spot
-                # of data
-
-                base = {}
-                for achievement in achievements:
-                    base[achievement.id] = {}
-                    for word in words:
-                        base[achievement.id][word] = 0
-
-                start = copy.deepcopy(base)
-
-                # If we have a from date, we need to determine the 
-                # status up to that date.  This suggests we can do 
-                # the whole thing with a giant query.  We'll look 
-                # into that later.
-
-                if from_date is not None:
-                    query = """
-                        SELECT
-                            learning_progress.achievement_id,
-                            learning_progress.word
-                        FROM
-                            hundoword_django.learning_progress,
-                            (
-                                SELECT
-                                    achievement_id,
-                                    word,
-                                    MAX(at) AS at
-                                FROM 
-                                    hundoword_django.learning_progress
-                                WHERE
-                                    learning_progress.student_id=%s AND
-                                    at < %s AND
-                                    achievement_id IN (%s) AND
-                                    word IN (%s)
-                                GROUP BY
-                                    achievement_id,
-                                    word
-                            ) AS latest
-                        WHERE
-                            learning_progress.student_id=latest.student_id AND
-                            learning_progress.achievement_id=latest.achievement_id AND
-                            learning_progress.word=latest.word AND
-                            learning_progress.hold=1
-                        GROUP BY
-                            learning_progress.achievement_id
-                    """ % (
-                        (','.join(['%s' for achievement_id in start.keys()])),
-                        (','.join(['%s' for word in words]))
-                    )
-
-                    cursor = connection.cursor()
-                    cursor.execute(query, [student.id,from_date]+start.keys()+words)
-                    row = cursor.fetchone()
-                    while row is not None:
-                        start[row[0]][row[1]] = 1
-                        row = cursor.fetchone()
-
-                # Determine how we're breaking things up by the by arg. 
-                # The format will create a key of data.  The delta will
-                # be how we increment and collate the results.
-
-                if "by" in request.GET and request.GET["by"] == "month":
-                    format = "%b %Y"
-                    delta = {"months": 1}
-                elif "by" in request.GET and request.GET["by"] == "week":
-                    format = "Week %W %Y"
-                    delta = {"weeks": 1}
-                elif "by" in request.GET and request.GET["by"] == "2week":
-                    format = "Week %W %Y"
-                    delta = {"weeks": 2}
-                else:
-                    format = "%Y-%m-%d"
-                    delta = {"days": 1}
-
-                # Get all the progress
-
-                progression = Progress.objects.filter(**progress_filter).order_by('at')
-
-                # This is the data structure presenting what's filled.  We'll
-                # overlay this onto blanks/previous structure later
-
-                filled = {}
-                for progress in progression:
-                    when = progress.at.strftime(format)
-                    if when not in filled:
-                        filled[when] = copy.deepcopy(base)
-                    filled[when][progress.achievement.id][word] = progress.hold
-
-                # This is the final data strcuture
-                data = {}
-
-                # If we have don't have a from date, we start with the first
-                # we found in the data
-                if from_date is None:
-                    from_date = progression[0].at.date();
-                    data[from_date.strftime(format)] = copy.deepcopy(start)
-
-                # If we don't have a to date, end with today
-                if to_date is None:
-                    to_date = pytz.utc.localize(datetime.datetime.utcnow()).date()+datetime.timedelta(days=1)
-
-                # This is the last achievement counts, filled with wherever 
-                # we start with those counts
-                last = {}
-                for achievement_id in start:
-                    last[achievement_id] = 0
-                    for word in start[achievement_id]:
-                        last[achievement_id] += start[achievement_id][word]
-
-                # These are the times, the x axis labels
-                times = []
-
-                # While the current data is less then where we're going to
-                current = from_date
-                while current <= to_date:
-
-                    when = current.strftime(format)
-                    times.append(when)
-                    data[when] = copy.deepcopy(last)
-
-                    if when in filled:
-                        for achievement_id in filled[when]:
-                            for word in filled[when][achievement_id]:
-                                data[when][achievement_id] += filled[when][achievement_id][word]
-
-                    last = data[when]
-                    current += datetime.timedelta(**delta)
+                (data,times) = chart.build(student.pk,by,words,achievement_ids,from_date,to_date)
 
                 return Response({
                     "words": words, 

@@ -33,7 +33,7 @@ def when(year,month,day,hour=0):
     return pytz.utc.localize(datetime.datetime(year,month,day,hour))
 
 
-class a_test_Django(SimpleTestCase):
+class test_Django(SimpleTestCase):
     """ Class for all the Django """
 
     def setUp(self):
@@ -101,9 +101,9 @@ class a_test_Django(SimpleTestCase):
             "plain jane (tester) - here - Sight (True) - 2007-07-07 00:00:00+00:00"
         )
 
-    def test_chart(self):
+    def a_test_chart(self):
 
-        # start
+        ### start
 
         user = User(username="tester")
         user.save()
@@ -114,15 +114,251 @@ class a_test_Django(SimpleTestCase):
         student = Student(teacher=user,first_name="plain",last_name="jane")
         student.save()
 
-        Progress(student=student,word="here",achievement=sight,hold=True,at=when(2007,7,1,9)).save()
+        Progress(student=student,word="here",achievement=sight,hold=True,at=when(2007,6,30,9)).save()
         Progress(student=student,word="here",achievement=sight,hold=False,at=when(2007,7,1,10)).save()
         Progress(student=student,word="here",achievement=sight,hold=True,at=when(2007,7,1,11)).save()
         Progress(student=student,word="there",achievement=sight,hold=True,at=when(2007,7,1,9)).save()
         Progress(student=student,word="there",achievement=sight,hold=False,at=when(2007,7,1,10)).save()
+        Progress(student=student,word="here",achievement=sound,hold=True,at=when(2007,7,2,9)).save()
+        Progress(student=student,word="here",achievement=sight,hold=True,at=when(2007,7,2,9)).save()
+        Progress(student=student,word="there",achievement=sight,hold=True,at=when(2007,7,2,9)).save()
+        Progress(student=student,word="everywhere",achievement=sound,hold=True,at=when(2007,7,2)).save()
 
-        start = learning.chart.start(student.id,when(2007,07,2))
+        # from
 
-        self.assertEqual(start,{sight.id: {"here": 1}})
+        self.assertEqual(learning.chart.start(student.id,["here","there","everywhere"],[sight.id,sound.id],when(2007,7,2)),{
+            sight.id: {"here": 1,"there": 0}
+        })
+        self.assertEqual(learning.chart.start(student.id,["here","there","everywhere"],[sight.id,sound.id],when(2007,7,3)),{
+            sight.id: {"here": 1,"there": 1},
+            sound.id: {"here": 1, "everywhere": 1}
+        })
+
+        # words
+
+        self.assertEqual(learning.chart.start(student.id,["here","there"],[sight.id,sound.id],when(2007,7,3)),{
+            sight.id: {"here": 1,"there": 1},
+            sound.id: {"here": 1}
+        })
+
+        # achievement_ids
+
+        self.assertEqual(learning.chart.start(student.id,["here","there"],[sight.id],when(2007,7,3)),{
+            sight.id: {"here": 1,"there": 1}
+        })
+
+        ### finish
+
+        # by
+
+        self.assertEqual(learning.chart.finish(student.id,"day",["here","there","everywhere"],[sight.id,sound.id]),(
+            {
+                "2007-06-30": {
+                    sight.id: {"here": 1}
+                },
+                "2007-07-01": {
+                    sight.id: {"here": 1,"there": 0}
+                },
+                "2007-07-02": {
+                    sight.id: {"here": 1,"there": 1},
+                    sound.id: {"here": 1, "everywhere": 1}
+                }
+            },
+            when(2007,6,30,9),
+            when(2007,7,2,9)
+        ))
+        self.assertEqual(learning.chart.finish(student.id,"week",["here","there","everywhere"],[sight.id,sound.id]),(
+            {
+                "2007-06-25": {
+                    sight.id: {"here": 1,"there": 0}
+                },
+                "2007-07-02": {
+                    sight.id: {"here": 1,"there": 1},
+                    sound.id: {"here": 1, "everywhere": 1}
+                }
+            },
+            when(2007,7,1,10),
+            when(2007,7,2,9)
+        ))
+        self.assertEqual(learning.chart.finish(student.id,"month",["here","there","everywhere"],[sight.id,sound.id]),(
+            {
+                "2007-06": {
+                    sight.id: {"here": 1}
+                },
+                "2007-07": {
+                    sight.id: {"here": 1,"there": 1},
+                    sound.id: {"here": 1, "everywhere": 1}
+                }
+            },
+            when(2007,6,30,9),
+            when(2007,7,2,9)
+        ))
+
+        # from/to
+
+        self.assertEqual(learning.chart.finish(student.id,"day",["here","there","everywhere"],[sight.id,sound.id],when(2007,7,1),when(2007,7,2)),(
+            {
+                "2007-07-01": {
+                    sight.id: {"here": 1,"there": 0}
+                }
+            },
+            when(2007,7,1,10),
+            when(2007,7,1,11)
+        ))
+
+        # words
+
+        self.assertEqual(learning.chart.finish(student.id,"day",["here","there"],[sight.id,sound.id],),(
+            {
+                "2007-06-30": {
+                    sight.id: {"here": 1}
+                },
+                "2007-07-01": {
+                    sight.id: {"here": 1,"there": 0}
+                },
+                "2007-07-02": {
+                    sight.id: {"here": 1,"there": 1},
+                    sound.id: {"here": 1}
+                }
+            },
+            when(2007,6,30,9),
+            when(2007,7,2,9)
+        ))
+
+        # achievement_ids
+
+        self.assertEqual(learning.chart.finish(student.id,"day",["here","there"],[sight.id]),(
+            {
+                "2007-06-30": {
+                    sight.id: {"here": 1}
+                },
+                "2007-07-01": {
+                    sight.id: {"here": 1,"there": 0}
+                },
+                "2007-07-02": {
+                    sight.id: {"here": 1,"there": 1}
+                }
+            },
+            when(2007,6,30,9),
+            when(2007,7,2,9)
+        ))
+
+        ### build
+
+        # by
+
+        self.assertEqual(learning.chart.build(student.id,"day",["here","there","everywhere"],[sight.id,sound.id]),(
+            {
+                "2007-06-30": {
+                    sight.id: 1,
+                    sound.id: 0
+                },
+                "2007-07-01": {
+                    sight.id: 1,
+                    sound.id: 0
+                },
+                "2007-07-02": {
+                    sight.id: 2,
+                    sound.id: 2
+                }
+            },
+            [
+                "2007-06-30",
+                "2007-07-01",
+                "2007-07-02"
+            ]
+        ))
+        self.assertEqual(learning.chart.build(student.id,"week",["here","there","everywhere"],[sight.id,sound.id]),(
+            {
+                "2007-06-25": {
+                    sight.id: 1,
+                    sound.id: 0
+                },
+                "2007-07-02": {
+                    sight.id: 2,
+                    sound.id: 2
+                }
+            },
+            [
+                "2007-06-25",
+                "2007-07-02"
+            ]
+        ))
+        self.assertEqual(learning.chart.build(student.id,"month",["here","there","everywhere"],[sight.id,sound.id]),(
+            {
+                "2007-06": {
+                    sight.id: 1,
+                    sound.id: 0
+                },
+                "2007-07": {
+                    sight.id: 2,
+                    sound.id: 2
+                }
+            },
+            [
+                "2007-06",
+                "2007-07"
+            ]
+        ))
+
+        # from/to
+
+        self.assertEqual(learning.chart.build(student.id,"day",["here","there","everywhere"],[sight.id,sound.id],when(2007,7,1),when(2007,7,2)),(
+            {
+                "2007-07-01": {
+                    sight.id: 1,
+                    sound.id: 0
+                }
+            },
+            [
+                "2007-07-01"
+            ]
+        ))
+
+        # words
+
+        self.assertEqual(learning.chart.build(student.id,"day",["here","there"],[sight.id,sound.id],),(
+            {
+                "2007-06-30": {
+                    sight.id: 1,
+                    sound.id: 0
+                },
+                "2007-07-01": {
+                    sight.id: 1,
+                    sound.id: 0
+                },
+                "2007-07-02": {
+                    sight.id: 2,
+                    sound.id: 1
+                }
+            },
+            [
+                "2007-06-30",
+                "2007-07-01",
+                "2007-07-02"
+            ]
+        ))
+
+        # achievement_ids
+
+        self.assertEqual(learning.chart.build(student.id,"day",["here","there"],[sight.id]),(
+            {
+                "2007-06-30": {
+                    sight.id: 1
+                },
+                "2007-07-01": {
+                    sight.id: 1
+                },
+                "2007-07-02": {
+                    sight.id: 2
+                }
+            },
+            [
+                "2007-06-30",
+                "2007-07-01",
+                "2007-07-02"
+            ]
+        ))
 
 
     def a_test_register(self):
@@ -468,7 +704,7 @@ class a_test_Django(SimpleTestCase):
         ])
 
 
-    def a_test_student(self):
+    def test_student(self):
 
         client = APIClient()
         user = User.objects.get(username="vagrant")
@@ -1036,7 +1272,7 @@ class a_test_Django(SimpleTestCase):
 
         history = [dict(progress) for progress in client.get("/api/v0/student/%s/history" % silly_billy_id).data]
 
-        self.assertItemsEqual(history,[
+        self.assertEqual(history,[
             {
                 "word": "there",
                 "achievement": spell_id,
@@ -1071,7 +1307,7 @@ class a_test_Django(SimpleTestCase):
 
         history = [dict(progress) for progress in client.get("/api/v0/student/%s/history/?words=here,there" % silly_billy_id).data]
 
-        self.assertItemsEqual(history,[
+        self.assertEqual(history,[
             {
                 "word": "there",
                 "achievement": spell_id,
@@ -1106,7 +1342,7 @@ class a_test_Django(SimpleTestCase):
 
         history = [dict(progress) for progress in client.get("/api/v0/student/%s/history/?words=here" % silly_billy_id).data]
 
-        self.assertItemsEqual(history,[
+        self.assertEqual(history,[
             {
                 "word": "here",
                 "achievement": sight_id,
@@ -1129,7 +1365,7 @@ class a_test_Django(SimpleTestCase):
 
         history = [dict(progress) for progress in client.get("/api/v0/student/%s/history/?achievements=%s,%s" % (silly_billy_id,sight_id,spell_id)).data]
 
-        self.assertItemsEqual(history,[
+        self.assertEqual(history,[
             {
                 "word": "here",
                 "achievement": spell_id,
@@ -1170,7 +1406,7 @@ class a_test_Django(SimpleTestCase):
 
         history = [dict(progress) for progress in client.get("/api/v0/student/%s/history/?achievements=%s" % (silly_billy_id,spell_id)).data]
 
-        self.assertItemsEqual(history,[
+        self.assertEqual(history,[
             {
                 "word": "here",
                 "achievement": spell_id,
@@ -1199,7 +1435,7 @@ class a_test_Django(SimpleTestCase):
 
         history = [dict(progress) for progress in client.get("/api/v0/student/%s/history/?achievements=%s" % (silly_billy_id,spell_id)).data]
 
-        self.assertItemsEqual(history,[
+        self.assertEqual(history,[
             {
                 "word": "here",
                 "achievement": spell_id,
@@ -1231,7 +1467,7 @@ class a_test_Django(SimpleTestCase):
         for progress in history:
             del progress['at']
 
-        self.assertItemsEqual(history,[
+        self.assertEqual(history,[
             {
                 "word": "here",
                 "achievement": spell_id,
@@ -1241,7 +1477,7 @@ class a_test_Django(SimpleTestCase):
 
         history = [dict(progress) for progress in client.get("/api/v0/student/%s/history/?from=2015-09-21&to=2015-09-24" % (silly_billy_id)).data]
 
-        self.assertItemsEqual(history,[
+        self.assertEqual(history,[
             {
                 "word": "there",
                 "achievement": spell_id,
@@ -1266,7 +1502,157 @@ class a_test_Django(SimpleTestCase):
 
         chart = dict(client.get("/api/v0/student/%s/chart/" % (silly_billy_id)).data)
 
-        print chart
+        self.assertEqual(chart,{
+            "words": ["here","there"],
+            "times": [
+                "2015-09-20",
+                "2015-09-21",
+                "2015-09-22",
+                "2015-09-23",
+                "2015-09-24",
+                "2015-09-25"
+            ],
+            "data": {
+                "2015-09-20": {sight_id: 1, spell_id: 0},
+                "2015-09-21": {sight_id: 1, spell_id: 0},
+                "2015-09-22": {sight_id: 1, spell_id: 1},
+                "2015-09-23": {sight_id: 1, spell_id: 0},
+                "2015-09-24": {sight_id: 1, spell_id: 0},
+                "2015-09-25": {sight_id: 1, spell_id: 1}
+            }
+        })
+
+        chart = dict(client.get("/api/v0/student/%s/chart/?by=week" % (silly_billy_id)).data)
+
+        self.assertEqual(chart,{
+            "words": ["here","there"],
+            "times": [
+                "2015-09-14",
+                "2015-09-21"
+            ],
+            "data": {
+                "2015-09-14": {sight_id: 1, spell_id: 0},
+                "2015-09-21": {sight_id: 1, spell_id: 1}
+            }
+        })
+
+        chart = dict(client.get("/api/v0/student/%s/chart/?by=month" % (silly_billy_id)).data)
+
+        self.assertEqual(chart,{
+            "words": ["here","there"],
+            "times": [
+                "2015-09"
+            ],
+            "data": {
+                "2015-09": {sight_id: 1, spell_id: 1}
+            }
+        })
+
+        response = client.post("/api/v0/student/%s/focus" % silly_billy_id,{
+            "words": ["there"]
+        }, format='json')
+        self.assertEqual(response.status_code,status.HTTP_202_ACCEPTED);
+
+        response = client.post("/api/v0/student/%s/blur" % silly_billy_id,{
+            "words": ["here"]
+        }, format='json')
+        self.assertEqual(response.status_code,status.HTTP_202_ACCEPTED);
+
+        chart = dict(client.get("/api/v0/student/%s/chart/?words=here,there" % (silly_billy_id)).data)
+
+        self.assertEqual(chart,{
+            "words": ["here","there"],
+            "times": [
+                "2015-09-20",
+                "2015-09-21",
+                "2015-09-22",
+                "2015-09-23",
+                "2015-09-24",
+                "2015-09-25"
+            ],
+            "data": {
+                "2015-09-20": {sight_id: 1, spell_id: 0},
+                "2015-09-21": {sight_id: 1, spell_id: 0},
+                "2015-09-22": {sight_id: 1, spell_id: 1},
+                "2015-09-23": {sight_id: 1, spell_id: 0},
+                "2015-09-24": {sight_id: 1, spell_id: 0},
+                "2015-09-25": {sight_id: 1, spell_id: 1}
+            }
+        })
+
+        chart = dict(client.get("/api/v0/student/%s/chart/?words=here" % (silly_billy_id)).data)
+
+        self.assertEqual(chart,{
+            "words": ["here"],
+            "times": [
+                "2015-09-20",
+                "2015-09-21",
+                "2015-09-22",
+                "2015-09-23",
+                "2015-09-24",
+                "2015-09-25"
+            ],
+            "data": {
+                "2015-09-20": {sight_id: 1, spell_id: 0},
+                "2015-09-21": {sight_id: 1, spell_id: 0},
+                "2015-09-22": {sight_id: 1, spell_id: 0},
+                "2015-09-23": {sight_id: 1, spell_id: 0},
+                "2015-09-24": {sight_id: 1, spell_id: 0},
+                "2015-09-25": {sight_id: 1, spell_id: 1}
+            }
+        })
+
+        chart = dict(client.get("/api/v0/student/%s/chart/?focus=true" % (silly_billy_id)).data)
+
+        self.assertEqual(chart,{
+            "words": ["there"],
+            "times": [
+                "2015-09-22",
+                "2015-09-23",
+                "2015-09-24"
+            ],
+            "data": {
+                "2015-09-22": {sight_id: 0, spell_id: 1},
+                "2015-09-23": {sight_id: 0, spell_id: 0},
+                "2015-09-24": {sight_id: 0, spell_id: 0}
+            }
+        })
+
+        chart = dict(client.get("/api/v0/student/%s/chart/?achievements=%s" % (silly_billy_id,spell_id)).data)
+
+        self.assertEqual(chart,{
+            "words": ["here","there"],
+            "times": [
+                "2015-09-22",
+                "2015-09-23",
+                "2015-09-24",
+                "2015-09-25"
+            ],
+            "data": {
+                "2015-09-22": {spell_id: 1},
+                "2015-09-23": {spell_id: 0},
+                "2015-09-24": {spell_id: 0},
+                "2015-09-25": {spell_id: 1}
+            }
+        })
+
+        chart = dict(client.get("/api/v0/student/%s/chart/?from=2015-09-22&to=2015-09-25" % (silly_billy_id)).data)
+
+        self.assertEqual(chart,{
+            "words": ["here","there"],
+            "times": [
+                "2015-09-22",
+                "2015-09-23",
+                "2015-09-24"
+            ],
+            "data": {
+                "2015-09-22": {sight_id: 1, spell_id: 1},
+                "2015-09-23": {sight_id: 1, spell_id: 0},
+                "2015-09-24": {sight_id: 1, spell_id: 0}
+            }
+        })
+
+        chart = dict(client.get("/api/v0/student/%s/chart/?by=week" % (silly_billy_id)).data)
 
 
     def a_test_audio(self):
