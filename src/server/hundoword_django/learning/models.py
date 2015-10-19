@@ -79,13 +79,13 @@ class Progress(models.Model):
     student = models.ForeignKey(Student,related_name='progress')
     achievement = models.ForeignKey(Achievement)
     word = models.CharField(max_length=128)
-    hold = models.BooleanField()
+    held = models.BooleanField()
     at = models.DateTimeField('date/time',blank=True,default=timezone.now)
 
     class Meta:
         ordering = ['-id']
 
     def __unicode__(self):
-        return "%s - %s - %s (%s) - %s" % (self.student, self.word, self.achievement, self.hold, self.at)
+        return "%s - %s - %s (%s) - %s" % (self.student, self.word, self.achievement, self.held, self.at)
 
 

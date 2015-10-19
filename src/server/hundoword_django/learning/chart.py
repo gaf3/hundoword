@@ -26,7 +26,7 @@ def start(student_id,words,achievement_ids,from_date):
         SELECT
             learning_progress.achievement_id,
             learning_progress.word,
-            learning_progress.hold
+            learning_progress.held
         FROM
             learning_progress,
             (
@@ -98,7 +98,7 @@ def finish(student_id,by,words,achievement_ids,from_date=None,to_date=None):
             %s AS `when`,
             learning_progress.achievement_id,
             learning_progress.word,
-            learning_progress.hold,
+            learning_progress.held,
             learning_progress.at
         FROM
             learning_progress,
