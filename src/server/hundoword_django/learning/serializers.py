@@ -34,35 +34,14 @@ class AchievementSerializer(serializers.ModelSerializer):
         return str(obj)
 
 
-class ProgramWordSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = ProgramWord
-        readonly_fields = ('id','program')
-
-    def to_representation(self, obj):
-        return obj.word
-
-
 class ProgramSerializer(serializers.ModelSerializer):
-
-    words = ProgramWordSerializer(required=False,many=True)
 
     class Meta:
         model = Program
-        readonly_fields = ('id','words')
+        readonly_fields = ('id')
 
     def get_display(self, obj):
         return str(obj)
-
-
-class StudentWordSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = StudentWord
-
-    def to_representation(self, obj):
-        return obj.word
 
 
 class StudentSerializer(serializers.ModelSerializer):
@@ -71,18 +50,11 @@ class StudentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Student
-        fields = ('id','first_name', 'last_name', 'age', 'words')
-        readonly_fields = ('id','teacher','words')
+        fields = ('id','first_name', 'last_name', 'age', 'words', 'focus')
+        readonly_fields = ('id','teacher','position')
 
     def get_display(self, obj):
         return str(obj)
-
-
-class PositionSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = StudentWord
-        fields = ('word','focus','achievements')
 
 
 class ProgressSerializer(serializers.ModelSerializer):

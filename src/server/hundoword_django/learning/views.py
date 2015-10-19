@@ -199,10 +199,10 @@ def program(request,pk='',action=''):
                 if 'description' in request.DATA:
                     program.description = request.DATA['description']
 
-                program.save()
+                if 'words' in request.DATA:
+                    program.words = request.DATA['words']
 
-                if "words" in request.DATA:
-                    program.words.bulk_create([ProgramWord(program=program,word=word) for word in set(request.DATA["words"])])
+                program.save()
 
                 serializer = ProgramSerializer(program)
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -231,42 +231,16 @@ def program(request,pk='',action=''):
 
             if not action:
 
-                with transaction.atomic():
+                serializer = ProgramSerializer(program,data=request.DATA, partial=True)
 
-                    data = dict(request.DATA)
+                if serializer.is_valid():
 
-                    if "words" in request.DATA:
-                        program.words.exclude(word__in=data["words"]).delete()
-                        creates = set(data["words"]) - set(program.words.values_list('word', flat=True))
-                        program.words.bulk_create([ProgramWord(program=program,word=word) for word in creates])
-                        del data["words"]
+                    serializer.save()
+                    return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
 
-                    serializer = ProgramSerializer(program,data=data, partial=True)
+                else: # pragma: no cover
 
-                    if serializer.is_valid():
-
-                        serializer.save()
-                        return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
-
-                    else: # pragma: no cover
-
-                        transaction.rollback()
-                        return errors_response(serializer)
-
-            elif action == "append": 
-
-                creates = set(request.DATA["words"]) - set(program.words.values_list('word', flat=True))
-                program.words.bulk_create([ProgramWord(program=program,word=word) for word in creates])
-
-                serializer = ProgramSerializer(program)
-                return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
-
-            elif action == "remove": 
-
-                program.words.filter(word__in=request.DATA["words"]).delete()
-
-                serializer = ProgramSerializer(program)
-                return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+                    return errors_response(serializer)
 
         # Delete
 
@@ -302,6 +276,15 @@ def student(request,pk='',action=''):
                 if not isinstance(word,str) and not isinstance(word,unicode):
                     return Response({"words": ["All array items be be strings."]}, status=status.HTTP_400_BAD_REQUEST)
 
+        if 'focus' in request.DATA:
+
+            if not isinstance(request.DATA["focus"],list):
+                return Response({"focus": ["Must be an array."]}, status=status.HTTP_400_BAD_REQUEST)
+
+            for word in request.DATA["focus"]:
+                if not isinstance(word,str) and not isinstance(word,unicode):
+                    return Response({"focus": ["All array items be be strings."]}, status=status.HTTP_400_BAD_REQUEST)
+
         # Create
 
         if request.method == 'POST' and not pk:
@@ -312,24 +295,39 @@ def student(request,pk='',action=''):
             if 'last_name' not in request.DATA:
                 return Response({"last_name": ["This field is required."]}, status=status.HTTP_400_BAD_REQUEST)
 
-            with transaction.atomic():
+            student = Student(
+                teacher=request.user,
+                first_name=request.DATA['first_name'],
+                last_name=request.DATA['last_name'],
+                words=[],
+                focus=[],
+                position={}
+            )
 
-                student = Student(
-                    teacher=request.user,
-                    first_name=request.DATA['first_name'],
-                    last_name=request.DATA['last_name']
-                )
+            if 'age' in request.DATA:
+                student.age = request.DATA['age']
 
-                if 'age' in request.DATA:
-                    student.age = request.DATA['age']
+            if 'words' in request.DATA:
+                for word in request.DATA['words']:
+                    if word not in student.words:
+                        student.words.append(word)
 
-                student.save()
+            if 'focus' in request.DATA:
 
-                if "words" in request.DATA:
-                    student.words.bulk_create([StudentWord(student=student,word=word) for word in set(request.DATA["words"])])
+                extra = []
+                for word in request.DATA['focus']:
+                    if word not in student.words:
+                        extra.append("Word %s not found." % word)
+                    elif word not in student.focus:
+                        student.focus.append(word)
 
-                serializer = StudentSerializer(student)
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
+                if extra:
+                    return Response({"focus": extra}, status=status.HTTP_400_BAD_REQUEST)
+
+            student.save()
+
+            serializer = StudentSerializer(student)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         # List
 
@@ -350,29 +348,23 @@ def student(request,pk='',action=''):
                 serializer = StudentSerializer(student)
                 return Response(serializer.data)
 
-            # Focus
-
-            elif action == "focus": 
-
-                serializer = StudentWordSerializer(StudentWord.objects.filter(student=student,focus=True), many=True)
-                return Response(serializer.data)
-
             # Position
 
             elif action == "position": 
 
-                filter = {
-                    "student": student
-                }
+                position = {}
 
                 if "words" in request.GET:
-                    filter["word__in"] = request.GET["words"].split(",")
+                    words = request.GET["words"].split(",")
+                elif "focus" in request.GET and request.GET["focus"].lower() == "true":
+                    words = student.focus
+                else:
+                    words = student.words
 
-                if "focus" in request.GET:
-                    filter["focus"] = request.GET["focus"].lower() == "true"
+                for word in words:
+                    position[word] = student.position[word] if word in student.position else {}
 
-                serializer = PositionSerializer(StudentWord.objects.filter(**filter), many=True)
-                return Response(serializer.data)
+                return Response(position)
 
             # History
 
@@ -401,19 +393,12 @@ def student(request,pk='',action=''):
 
             elif action == "chart": 
 
-                # First select all the words we're using
-
-                filter = {
-                    "student": student
-                }
-
                 if "words" in request.GET:
-                    filter["word__in"] = request.GET["words"].split(",")
-
-                if "focus" in request.GET:
-                    filter["focus"] = request.GET["focus"].lower() == "true"
-
-                words = [student_word.word for student_word in StudentWord.objects.filter(**filter)]
+                    words = request.GET["words"].split(",")
+                elif "focus" in request.GET and request.GET["focus"].lower() == "true":
+                    words = student.focus
+                else:
+                    words = student.words
 
                 if "achievements" in request.GET:
                     achievements = Achievement.objects.filter(id__in=request.GET["achievements"].split(","))
@@ -448,47 +433,56 @@ def student(request,pk='',action=''):
 
             if not action:
 
-                with transaction.atomic():
+                if 'words' in request.DATA:
+                    words = request.DATA['words']
+                else:
+                    words = student.words
 
-                    data = dict(request.DATA)
+                if 'focus' in request.DATA:
 
-                    if "words" in request.DATA:
-                        student.words.exclude(word__in=data["words"]).delete()
-                        creates = set(data["words"]) - set(student.words.values_list('word', flat=True))
-                        student.words.bulk_create([StudentWord(student=student,word=word) for word in creates])
-                        del data["words"]
+                    extra = []
+                    for word in request.DATA['focus']:
+                        if word not in words:
+                            extra.append("Word %s not found." % word)
 
-                    serializer = StudentSerializer(student,data=data, partial=True)
+                    if extra:
+                        return Response({"focus": extra}, status=status.HTTP_400_BAD_REQUEST)
 
-                    if serializer.is_valid():
+                if serializer.is_valid():
 
-                        serializer.save()
-                        return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+                    serializer.save()
+                    return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
 
-                    else: # pragma: no cover
+                else: # pragma: no cover
 
-                        transaction.rollback()
-                        return errors_response(serializer)
+                    return errors_response(serializer)
 
-            elif action == "append": 
-
-                creates = set(request.DATA["words"]) - set(student.words.values_list('word', flat=True))
-                student.words.bulk_create([StudentWord(student=student,word=word) for word in creates])
-
-                serializer = StudentSerializer(student)
-                return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
-
-            elif action == "remove": 
-
-                student.words.filter(word__in=request.DATA["words"]).delete()
-
-                serializer = StudentSerializer(student)
-                return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
-
-            elif action in ["focus","blur"]: 
+            elif action == "focus": 
 
                 if 'words' not in request.DATA:
                     return Response({"words": ["This field is required."]}, status=status.HTTP_400_BAD_REQUEST)
+
+                for word in request.DATA['words']:
+                    if word in student.words:
+
+
+                student_words = StudentWord.objects.filter(student=student,word__in=request.DATA["words"])
+
+                missing = set(request.DATA["words"]) - set([student_word.word for student_word in student_words])
+
+                if missing:
+                    return Response({"detail": "Words not found","words": list(missing)}, status=status.HTTP_404_NOT_FOUND)
+
+                student_words.update(focus=action == "focus")
+                serializer = PositionSerializer(student_words, many=True)
+                return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+
+            elif action == "blur": 
+
+                if 'words' not in request.DATA:
+                    return Response({"words": ["This field is required."]}, status=status.HTTP_400_BAD_REQUEST)
+
+                for word in request.DATA
 
                 student_words = StudentWord.objects.filter(student=student,word__in=request.DATA["words"])
 

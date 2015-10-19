@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
+from jsonfield import JSONField
 
 # Create your models here.
 
@@ -23,6 +24,7 @@ class Program(models.Model):
 
     name = models.CharField(max_length=128,unique=True)
     description = models.CharField(max_length=255,blank=True,default="")
+    words = JSONField()
 
     class Meta:
         ordering = ['name']
@@ -31,25 +33,15 @@ class Program(models.Model):
         return self.name
 
 
-class ProgramWord(models.Model):
-
-    program = models.ForeignKey(Program,related_name='words')
-    word = models.CharField(max_length=128)
-
-    class Meta:
-        ordering = ['program','word']
-        unique_together = (('program', 'word'),)
-
-    def __unicode__(self):
-        return "%s - %s" % (self.program, self.word)
-
-
 class Student(models.Model):
 
     teacher = models.ForeignKey(User)
     first_name = models.CharField(max_length=128,blank=True,default="")
     last_name = models.CharField(max_length=128,blank=True,default="")
     age = models.IntegerField(blank=True,null=True)
+    words = JSONField()
+    focus = JSONField()
+    position = JSONField()
 
     class Meta:
         unique_together = (('teacher', 'last_name', 'first_name'),)
@@ -57,21 +49,6 @@ class Student(models.Model):
 
     def __unicode__(self):
         return "%s %s (%s)" % (self.first_name, self.last_name, self.teacher)
-
-
-class StudentWord(models.Model):
-
-    student = models.ForeignKey(Student,related_name='words')
-    word = models.CharField(max_length=128)
-    focus = models.BooleanField(default=False)
-    achievements = models.ManyToManyField(Achievement)
-
-    class Meta:
-        ordering = ['student','word']
-        unique_together = (('student', 'word'),)
-
-    def __unicode__(self):
-        return "%s - %s" % (self.student, self.word)
 
 
 class Progress(models.Model):
