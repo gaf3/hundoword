@@ -89,7 +89,7 @@ class ProgressSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Progress
-        fields = ('word','achievement','hold','at')
+        fields = ('word','achievement','held','at')
 
 
 

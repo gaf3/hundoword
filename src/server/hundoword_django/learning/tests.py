@@ -94,7 +94,7 @@ class test_Django(SimpleTestCase):
         student = Student(teacher=user,first_name="plain",last_name="jane")
         student.save()
         at = when(2007,7,7)
-        progress = Progress(student=student,word="here",achievement=achievement,hold=True,at=at)
+        progress = Progress(student=student,word="here",achievement=achievement,held=True,at=at)
         progress.save()
         self.assertEqual(
             str(Progress.objects.get(pk=progress.pk)),
@@ -114,15 +114,15 @@ class test_Django(SimpleTestCase):
         student = Student(teacher=user,first_name="plain",last_name="jane")
         student.save()
 
-        Progress(student=student,word="here",achievement=sight,hold=True,at=when(2007,6,30,9)).save()
-        Progress(student=student,word="here",achievement=sight,hold=False,at=when(2007,7,1,10)).save()
-        Progress(student=student,word="here",achievement=sight,hold=True,at=when(2007,7,1,11)).save()
-        Progress(student=student,word="there",achievement=sight,hold=True,at=when(2007,7,1,9)).save()
-        Progress(student=student,word="there",achievement=sight,hold=False,at=when(2007,7,1,10)).save()
-        Progress(student=student,word="here",achievement=sound,hold=True,at=when(2007,7,2,9)).save()
-        Progress(student=student,word="here",achievement=sight,hold=True,at=when(2007,7,2,9)).save()
-        Progress(student=student,word="there",achievement=sight,hold=True,at=when(2007,7,2,9)).save()
-        Progress(student=student,word="everywhere",achievement=sound,hold=True,at=when(2007,7,2)).save()
+        Progress(student=student,word="here",achievement=sight,held=True,at=when(2007,6,30,9)).save()
+        Progress(student=student,word="here",achievement=sight,held=False,at=when(2007,7,1,10)).save()
+        Progress(student=student,word="here",achievement=sight,held=True,at=when(2007,7,1,11)).save()
+        Progress(student=student,word="there",achievement=sight,held=True,at=when(2007,7,1,9)).save()
+        Progress(student=student,word="there",achievement=sight,held=False,at=when(2007,7,1,10)).save()
+        Progress(student=student,word="here",achievement=sound,held=True,at=when(2007,7,2,9)).save()
+        Progress(student=student,word="here",achievement=sight,held=True,at=when(2007,7,2,9)).save()
+        Progress(student=student,word="there",achievement=sight,held=True,at=when(2007,7,2,9)).save()
+        Progress(student=student,word="everywhere",achievement=sound,held=True,at=when(2007,7,2)).save()
 
         # from
 
@@ -1108,7 +1108,7 @@ class test_Django(SimpleTestCase):
         self.assertEqual(response.status_code,status.HTTP_202_ACCEPTED);
         self.assertEqual(response.data["word"],"here")
         self.assertEqual(response.data["achievement"],sight_id)
-        self.assertEqual(response.data["hold"],True)
+        self.assertEqual(response.data["held"],True)
         self.assertEqual(response.data["at"],"2015-09-20T00:00:00Z")
 
         response = client.post("/api/v0/student/%s/attain" % silly_billy_id,{
@@ -1120,7 +1120,7 @@ class test_Django(SimpleTestCase):
         self.assertEqual(response.status_code,status.HTTP_202_ACCEPTED);
         self.assertEqual(response.data["word"],"here")
         self.assertEqual(response.data["achievement"],sight_id)
-        self.assertEqual(response.data["hold"],True)
+        self.assertEqual(response.data["held"],True)
 
         # Yield 
 
@@ -1189,7 +1189,7 @@ class test_Django(SimpleTestCase):
         self.assertEqual(response.status_code,status.HTTP_202_ACCEPTED);
         self.assertEqual(response.data["word"],"there")
         self.assertEqual(response.data["achievement"],spell_id)
-        self.assertEqual(response.data["hold"],False)
+        self.assertEqual(response.data["held"],False)
 
         response = client.post("/api/v0/student/%s/yield" % silly_billy_id,{
             "word": "there",
@@ -1200,7 +1200,7 @@ class test_Django(SimpleTestCase):
         self.assertEqual(response.status_code,status.HTTP_202_ACCEPTED);
         self.assertEqual(response.data["word"],"there")
         self.assertEqual(response.data["achievement"],spell_id)
-        self.assertEqual(response.data["hold"],False)
+        self.assertEqual(response.data["held"],False)
 
         # Position
 
@@ -1285,31 +1285,31 @@ class test_Django(SimpleTestCase):
             {
                 "word": "there",
                 "achievement": spell_id,
-                "hold": False,
+                "held": False,
                 "at": "2015-09-24T00:00:00Z"
             },
             {
                 "word": "there",
                 "achievement": spell_id,
-                "hold": False,
+                "held": False,
                 "at": "2015-09-23T00:00:00Z"
             },
             {
                 "word": "there",
                 "achievement": spell_id,
-                "hold": True,
+                "held": True,
                 "at": "2015-09-22T00:00:00Z"
             },
             {
                 "word": "here",
                 "achievement": sight_id,
-                "hold": True,
+                "held": True,
                 "at": "2015-09-21T00:00:00Z"
             },
             {
                 "word": "here",
                 "achievement": sight_id,
-                "hold": True,
+                "held": True,
                 "at": "2015-09-20T00:00:00Z"
             }
         ])
@@ -1320,31 +1320,31 @@ class test_Django(SimpleTestCase):
             {
                 "word": "there",
                 "achievement": spell_id,
-                "hold": False,
+                "held": False,
                 "at": "2015-09-24T00:00:00Z"
             },
             {
                 "word": "there",
                 "achievement": spell_id,
-                "hold": False,
+                "held": False,
                 "at": "2015-09-23T00:00:00Z"
             },
             {
                 "word": "there",
                 "achievement": spell_id,
-                "hold": True,
+                "held": True,
                 "at": "2015-09-22T00:00:00Z"
             },
             {
                 "word": "here",
                 "achievement": sight_id,
-                "hold": True,
+                "held": True,
                 "at": "2015-09-21T00:00:00Z"
             },
             {
                 "word": "here",
                 "achievement": sight_id,
-                "hold": True,
+                "held": True,
                 "at": "2015-09-20T00:00:00Z"
             }
         ])
@@ -1355,13 +1355,13 @@ class test_Django(SimpleTestCase):
             {
                 "word": "here",
                 "achievement": sight_id,
-                "hold": True,
+                "held": True,
                 "at": "2015-09-21T00:00:00Z"
             },
             {
                 "word": "here",
                 "achievement": sight_id,
-                "hold": True,
+                "held": True,
                 "at": "2015-09-20T00:00:00Z"
             }
         ])
@@ -1378,37 +1378,37 @@ class test_Django(SimpleTestCase):
             {
                 "word": "here",
                 "achievement": spell_id,
-                "hold": True,
+                "held": True,
                 "at": "2015-09-25T00:00:00Z"
             },
             {
                 "word": "there",
                 "achievement": spell_id,
-                "hold": False,
+                "held": False,
                 "at": "2015-09-24T00:00:00Z"
             },
             {
                 "word": "there",
                 "achievement": spell_id,
-                "hold": False,
+                "held": False,
                 "at": "2015-09-23T00:00:00Z"
             },
             {
                 "word": "there",
                 "achievement": spell_id,
-                "hold": True,
+                "held": True,
                 "at": "2015-09-22T00:00:00Z"
             },
             {
                 "word": "here",
                 "achievement": sight_id,
-                "hold": True,
+                "held": True,
                 "at": "2015-09-21T00:00:00Z"
             },
             {
                 "word": "here",
                 "achievement": sight_id,
-                "hold": True,
+                "held": True,
                 "at": "2015-09-20T00:00:00Z"
             }
         ])
@@ -1419,25 +1419,25 @@ class test_Django(SimpleTestCase):
             {
                 "word": "here",
                 "achievement": spell_id,
-                "hold": True,
+                "held": True,
                 "at": "2015-09-25T00:00:00Z"
             },
             {
                 "word": "there",
                 "achievement": spell_id,
-                "hold": False,
+                "held": False,
                 "at": "2015-09-24T00:00:00Z"
             },
             {
                 "word": "there",
                 "achievement": spell_id,
-                "hold": False,
+                "held": False,
                 "at": "2015-09-23T00:00:00Z"
             },
             {
                 "word": "there",
                 "achievement": spell_id,
-                "hold": True,
+                "held": True,
                 "at": "2015-09-22T00:00:00Z"
             }
         ])
@@ -1448,25 +1448,25 @@ class test_Django(SimpleTestCase):
             {
                 "word": "here",
                 "achievement": spell_id,
-                "hold": True,
+                "held": True,
                 "at": "2015-09-25T00:00:00Z"
             },
             {
                 "word": "there",
                 "achievement": spell_id,
-                "hold": False,
+                "held": False,
                 "at": "2015-09-24T00:00:00Z"
             },
             {
                 "word": "there",
                 "achievement": spell_id,
-                "hold": False,
+                "held": False,
                 "at": "2015-09-23T00:00:00Z"
             },
             {
                 "word": "there",
                 "achievement": spell_id,
-                "hold": True,
+                "held": True,
                 "at": "2015-09-22T00:00:00Z"
             }
         ])
@@ -1480,7 +1480,7 @@ class test_Django(SimpleTestCase):
             {
                 "word": "here",
                 "achievement": spell_id,
-                "hold": True
+                "held": True
             }
         ])
 
@@ -1490,19 +1490,19 @@ class test_Django(SimpleTestCase):
             {
                 "word": "there",
                 "achievement": spell_id,
-                "hold": False,
+                "held": False,
                 "at": "2015-09-23T00:00:00Z"
             },
             {
                 "word": "there",
                 "achievement": spell_id,
-                "hold": True,
+                "held": True,
                 "at": "2015-09-22T00:00:00Z"
             },
             {
                 "word": "here",
                 "achievement": sight_id,
-                "hold": True,
+                "held": True,
                 "at": "2015-09-21T00:00:00Z"
             }
         ])

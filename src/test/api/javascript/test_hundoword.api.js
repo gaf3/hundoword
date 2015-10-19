@@ -652,24 +652,28 @@ QUnit.test("create", function(assert) {
         name: make_achievement("Sight"), 
         slug: make_achievement("sight"), 
         description: "See it", 
-        progression: 100
+        progression: 100,
+        color: "blue"
     });
     assert.equal(sight.name,make_achievement("Sight"));
     assert.equal(sight.description,"See it");
     assert.equal(sight.progression,100);
+    assert.equal(sight.color,"blue");
 
     var pass = assert.async();
     api.achievement.create({
             name: make_achievement("Sound"), 
             slug: make_achievement("sound"), 
             description: "Hear it", 
-            progression: 101
+            progression: 101,
+            color: "green"
         },
         function (data) {
             assert.equal(data.name,make_achievement("Sound"));
             assert.equal(data.slug,make_achievement("sound"));
             assert.equal(data.description,"Hear it");
             assert.equal(data.progression,101);
+            assert.equal(data.color,"green");
             pass();
         },
         function () {
@@ -689,7 +693,8 @@ QUnit.test("select", function(assert) {
         name: make_achievement("Sight"), 
         slug: make_achievement("sight"), 
         description: "See it", 
-        progression: 100
+        progression: 100,
+        color: "blue"
     });
 
     assert.deepEqual(
@@ -699,7 +704,8 @@ QUnit.test("select", function(assert) {
             name: make_achievement("Sight"),
             slug: make_achievement("sight"),
             description: "See it",
-            progression: 100
+            progression: 100,
+            color: "blue"
         }
     );
 
@@ -713,7 +719,8 @@ QUnit.test("select", function(assert) {
                     name: make_achievement("Sight"),
                     slug: make_achievement("sight"),
                     description: "See it",
-                    progression: 100
+                    progression: 100,
+                    color: "blue"
                 }
             );
             pass();
@@ -735,7 +742,8 @@ QUnit.test("slug", function(assert) {
         name: make_achievement("Sight"), 
         slug: make_achievement("sight"), 
         description: "See it", 
-        progression: 100
+        progression: 100,
+        color: "blue"
     });
 
     assert.deepEqual(
@@ -745,7 +753,8 @@ QUnit.test("slug", function(assert) {
             name: make_achievement("Sight"),
             slug: make_achievement("sight"),
             description: "See it",
-            progression: 100
+            progression: 100,
+            color: "blue"
         }
     );
 
@@ -759,7 +768,8 @@ QUnit.test("slug", function(assert) {
                     name: make_achievement("Sight"),
                     slug: make_achievement("sight"),
                     description: "See it",
-                    progression: 100
+                    progression: 100,
+                    color: "blue"
                 }
             );
             pass();
@@ -781,13 +791,15 @@ QUnit.test("list", function(assert) {
         name: make_achievement("Sight"), 
         slug: make_achievement("sight"), 
         description: "See it", 
-        progression: 100
+        progression: 100,
+        color: "blue"
     });
     var sound = api.achievement.create({
         name: make_achievement("Sound"), 
         slug: make_achievement("sound"), 
         description: "Hear it", 
-        progression: 101
+        progression: 101,
+        color: "green"
     });
 
     assert.deepEqual(
@@ -798,14 +810,16 @@ QUnit.test("list", function(assert) {
                 name: make_achievement("Sight"),
                 slug: make_achievement("sight"),
                 description: "See it",
-                progression: 100
+                progression: 100,
+                color: "blue"
             },
             {
                 id: sound.id,
                 name: make_achievement("Sound"),
                 slug: make_achievement("sound"),
                 description: "Hear it",
-                progression: 101
+                progression: 101,
+                color: "green"
             }
         ]
     );
@@ -821,14 +835,16 @@ QUnit.test("list", function(assert) {
                         name: make_achievement("Sight"),
                         slug: make_achievement("sight"),
                         description: "See it",
-                        progression: 100
+                        progression: 100,
+                        color: "blue"
                     },
                     {
                         id: sound.id,
                         name: make_achievement("Sound"),
                         slug: make_achievement("sound"),
                         description: "Hear it",
-                        progression: 101
+                        progression: 101,
+                        color: "green"
                     }
                 ]
             );
@@ -851,7 +867,8 @@ QUnit.test("update", function(assert) {
         name: make_achievement("Sight"), 
         slug: make_achievement("sight"), 
         description: "See it", 
-        progression: 100
+        progression: 100,
+        color: "blue"
     });
 
     assert.deepEqual(
@@ -861,7 +878,8 @@ QUnit.test("update", function(assert) {
             name: make_achievement("Sight"),
             slug: make_achievement("sight"),
             description: "View it",
-            progression: 100
+            progression: 100,
+            color: "blue"
         }
     );
 
@@ -872,7 +890,8 @@ QUnit.test("update", function(assert) {
             name: make_achievement("Sight"),
             slug: make_achievement("sight"),
             description: "View it",
-          progression: 100
+            progression: 100,
+            color: "blue"
         }
     );
 
@@ -886,7 +905,8 @@ QUnit.test("update", function(assert) {
                     name: make_achievement("Sight"),
                     slug: make_achievement("sight"),
                     description: "See it",
-                    progression: 100
+                    progression: 100,
+                    color: "blue"
                 }
             );
             pass();
@@ -908,13 +928,15 @@ QUnit.test("delete", function(assert) {
         name: make_achievement("Sight"), 
         slug: make_achievement("sight"), 
         description: "See it", 
-        progression: 100
+        progression: 100,
+        color: "blue"
     });
     var sound = api.achievement.create({
         name: make_achievement("Sound"), 
         slug: make_achievement("sound"), 
         description: "Hear it", 
-        progression: 101
+        progression: 101,
+        color: "green"
     });
 
     assert.deepEqual(api.achievement.delete(sight.id),{});
@@ -927,7 +949,8 @@ QUnit.test("delete", function(assert) {
                 name: make_achievement("Sound"),
                 slug: make_achievement("sound"),
                 description: "Hear it",
-                progression: 101
+                progression: 101,
+                color: "green"
             }
         ]
     );
@@ -1684,7 +1707,7 @@ QUnit.test("attain", function(assert) {
 
     assert.equal(progress.word,"fun");
     assert.equal(progress.achievement,sight.id);
-    assert.equal(progress.hold,true);
+    assert.equal(progress.held,true);
     assert.equal(progress.at,"2015-09-22T00:00:00Z");
 
     var pass = assert.async();
@@ -1692,7 +1715,7 @@ QUnit.test("attain", function(assert) {
         function (data) {
             assert.equal(data.word,"time");
             assert.equal(data.achievement,sound.id);
-            assert.equal(data.hold,true);
+            assert.equal(data.held,true);
             assert.equal(data.at,"2015-09-23T00:00:00Z");
             pass();
         },
@@ -1727,7 +1750,7 @@ QUnit.test("yield", function(assert) {
 
     assert.equal(progress.word,"fun");
     assert.equal(progress.achievement,sight.id);
-    assert.equal(progress.hold,false);
+    assert.equal(progress.held,false);
     assert.equal(progress.at,"2015-09-22T00:00:00Z");
 
     var pass = assert.async();
@@ -1735,7 +1758,7 @@ QUnit.test("yield", function(assert) {
         function (data) {
             assert.equal(data.word,"time");
             assert.equal(data.achievement,sound.id);
-            assert.equal(data.hold,false);
+            assert.equal(data.held,false);
             assert.equal(data.at,"2015-09-23T00:00:00Z");
             pass();
         },
@@ -1890,11 +1913,11 @@ QUnit.test("history", function(assert) {
     assert.equal(history.length,2);
     assert.equal(history[0].word,"time");
     assert.equal(history[0].achievement,sound.id);
-    assert.equal(history[0].hold,false);
+    assert.equal(history[0].held,false);
     assert.equal(history[0].at,"2015-09-23T00:00:00Z");
     assert.equal(history[1].word,"fun");
     assert.equal(history[1].achievement,sight.id);
-    assert.equal(history[1].hold,true);
+    assert.equal(history[1].held,true);
     assert.equal(history[1].at,"2015-09-22T00:00:00Z");
 
     api.student.attain(sane_jane.id,"fun",sound.id,"2015-09-24T00:00:00Z");
@@ -1904,23 +1927,23 @@ QUnit.test("history", function(assert) {
     assert.equal(history.length,2);
     assert.equal(history[0].word,"fun");
     assert.equal(history[0].achievement,sound.id);
-    assert.equal(history[0].hold,true);
+    assert.equal(history[0].held,true);
     assert.equal(history[1].word,"fun");
     assert.equal(history[1].achievement,sight.id);
-    assert.equal(history[1].hold,true);
+    assert.equal(history[1].held,true);
 
     var history = api.student.history(sane_jane.id,["fun"],[sight.id]);
 
     assert.equal(history.length,1);
     assert.equal(history[0].word,"fun");
     assert.equal(history[0].achievement,sight.id);
-    assert.equal(history[0].hold,true);
+    assert.equal(history[0].held,true);
 
     var history = api.student.history(sane_jane.id,null,null,"2015-09-24");
 
     assert.equal(history[0].word,"fun");
     assert.equal(history[0].achievement,sound.id);
-    assert.equal(history[0].hold,true);
+    assert.equal(history[0].held,true);
     assert.equal(history[0].at,"2015-09-24T00:00:00Z");
 
     var history = api.student.history(sane_jane.id,null,null,null,"2015-09-23");
@@ -1928,7 +1951,7 @@ QUnit.test("history", function(assert) {
     assert.equal(history.length,1);
     assert.equal(history[0].word,"fun");
     assert.equal(history[0].achievement,sight.id);
-    assert.equal(history[0].hold,true);
+    assert.equal(history[0].held,true);
 
     var pass = assert.async();
     api.student.history(sane_jane.id,["fun"],[sight.id],null,null,
@@ -1936,7 +1959,7 @@ QUnit.test("history", function(assert) {
             assert.equal(data.length,1);
             assert.equal(data[0].word,"fun");
             assert.equal(data[0].achievement,sight.id);
-            assert.equal(data[0].hold,true);
+            assert.equal(data[0].held,true);
             pass();
         },
         function () {

@@ -518,7 +518,7 @@ def student(request,pk='',action=''):
 
                 with transaction.atomic():
 
-                    progress = Progress(student=student,achievement=achievement,word=word,hold=(action == "attain"))
+                    progress = Progress(student=student,achievement=achievement,word=word,held=(action == "attain"))
                     if at is not None:
                         progress.at = at
                     progress.save()
