@@ -113,16 +113,27 @@ There's already an existing user/pass: vagrant/vagrant or you can create a new o
   * id - Student to select
 * `#/student/<id>/game/` - Games: Where a student can play games and attain/yield achievements
   * id - Student to select
-* `#/student/<id>/position/words=<word>,<word>,focus=true/false` - Position: Where a student stands on each of their words' achievements.
+* `#/student/<id>/position/?words=<word>,<word>,focus=true/false` - Position: Where a student stands on each of their words' achievements.
   * id - Student to select
   * words - Only show position for these words
   * focus - Only show position for words the Student is focusing on or not focusing on
-* `#/student/<id>/history/words=<word>,<word>&achievements=<achievement_id>,<achievement_id>&from=<from>&to=<to>` - History: All the attains and yields a studnt has made
+* `#/student/<id>/chart/?by=<by>&focus=<focus>&words=<word>,<word>&achievements=<achievement_id>,<achievement_id>&from=<from>&to=<to>` - Chart: Charts where a student was at with different achievements
+  * id - Student to select
+  * by - What to group by (shows last status for that period, uses previous period if no change)
+    * date - Group by Date
+    * week - Group by week, starting on Monday
+    * month - Group by month
+  * focus - Only chart progress for words currently being focused on
+  * words - Only chart progress for these words
+  * achievements - Only chart progress for these achievements (by id)
+  * from - Only chart progress from this date (YYYY-MM-DD)
+  * to - Only chart progress to this date (YYYY-MM-DD - exclusive, up to but not including this date)
+* `#/student/<id>/history/?words=<word>,<word>&achievements=<achievement_id>,<achievement_id>&from=<from>&to=<to>` - History: All the attains and yields a studnt has made
   * id - Student to select
   * words - Only show history for these words
   * achievements - Only show history for these achievements (by id)
   * from - Only show history from this date (YYYY-MM-DD)
-  * to - Only show history to this date (YYYY-MM-DD)
+  * to - Only show history to this date (YYYY-MM-DD - exclusive, up to but not including this date)
 
 ## Admin 
 
@@ -396,7 +407,7 @@ In all JavaScript API functions, the arguments success, error, and complete are 
   * Position - Retrieves Student Position with words and Achievements using id
     * Request - `GET http://192.168.72.87/api/v0/student/<id>/position/?words=<word>,<word>`
       * words = Only return positions for these words
-      * focus = Only return position for this focus (true/false)
+      * focus = Only return position for this focus ('true'/'false')
     * Response - `200 Ok`
       * Array - ordered by word
         * word 
@@ -417,6 +428,24 @@ In all JavaScript API functions, the arguments success, error, and complete are 
         * hold - Whether the Achieveent was attained or yielded
         * at - Date and time 
     * JavaScript - `api.student.history(id,words[],achievements[],hold,from,to,success,error,complete)`
+  * Chart - Retrieves data for making a chart
+    * Request - `GET http://192.168.72.87/api/v0/student/<id>/chart/?by=<by>&focus=<focus>&words=<word>,<word>&achievements=<achievement_id>,<achievement_id>&from=<from>&to=<to>`
+      * by - What to group by (shows last status for that period, uses previous period if no change)
+        * date - Group by Date
+        * week - Group by week, starting on Monday
+        * month - Group by month
+      * focus - Only chart progress for words currently being focused on ('true'/'false')
+      * words - Only chart progress for these words
+      * achievements - Only Only chart progress for these achievements (by id)
+      * from - Only Only chart progress from this date (YYYY-MM-DD)
+      * to - Only Only chart progress to this date (YYYY-MM-DD - Exclusive, up to, not including this date)
+    * Response - `200 Ok`
+      * Object - If date range is specified, data will the filled in. Zeroes previous, last values after.
+        * times - Array - Times of the data in the proper order as strings.
+        * data - Object - The data to graph
+          * time - Object - Achievement data for that time
+            * achievement_id - Number, has the count for this Achievement at this time
+    * JavaScript - `api.student.chart(id,by,focus,words[],achievements[],hold,from,to,success,error,complete)`
   * Delete - Deletes a Student
     * Request - `DELETE http://192.168.72.87/api/v0/student/<id>/`
     * Response - `200 Ok`
