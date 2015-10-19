@@ -1947,6 +1947,174 @@ QUnit.test("history", function(assert) {
 
 });
 
+QUnit.test("chart", function(assert) {
+
+    var api = new HundoWord.API(hundoword_django_host + "/api/v0/");
+    check_user(api,"tester0","tester0","tester0@hundoword.com");
+
+    var sane_jane = api.student.create({first_name: "Sane", last_name: "Jane", age: 5,words:["here","there"]});
+    var sight = api.achievement.create({
+        name: make_achievement("Sight"), 
+        slug: make_achievement("sight"), 
+        description: "See it", 
+        progression: 100
+    });
+    var sound = api.achievement.create({
+        name: make_achievement("Sound"), 
+        slug: make_achievement("sound"), 
+        description: "Hear it", 
+        progression: 101
+    });
+
+    api.student.attain(sane_jane.id,"here",sight.id,"2015-09-20T00:00:00Z");
+    api.student.attain(sane_jane.id,"here",sight.id,"2015-09-21T00:00:00Z");
+    api.student.attain(sane_jane.id,"there",sound.id,"2015-09-22T00:00:00Z");
+    api.student.yield(sane_jane.id,"there",sound.id,"2015-09-23T00:00:00Z");
+    api.student.yield(sane_jane.id,"there",sound.id,"2015-09-24T00:00:00Z");
+    api.student.attain(sane_jane.id,"here",sound.id,"2015-09-25T00:00:00Z");
+
+    api.student.focus(sane_jane.id,["there"]);
+
+    function sight_sound(sight_count,sound_count) {
+        counts = {};
+
+        if (sight_count !== null) {
+            counts[sight.id] = sight_count;
+        }
+        if (sound_count !== null) {
+            counts[sound.id] = sound_count;
+        }
+        return counts;
+    }
+
+    assert.deepEqual(api.student.chart(sane_jane.id,"date",null,null,[sight.id,sound.id]),{
+        words: ["here","there"],
+        times: [
+            "2015-09-20",
+            "2015-09-21",
+            "2015-09-22",
+            "2015-09-23",
+            "2015-09-24",
+            "2015-09-25"
+        ],
+        data: {
+            "2015-09-20": sight_sound(1,0),
+            "2015-09-21": sight_sound(1,0),
+            "2015-09-22": sight_sound(1,1),
+            "2015-09-23": sight_sound(1,0),
+            "2015-09-24": sight_sound(1,0),
+            "2015-09-25": sight_sound(1,1)
+        }
+    })
+
+    assert.deepEqual(api.student.chart(sane_jane.id,"week",null,null,[sight.id,sound.id]),{
+        words: ["here","there"],
+        times: [
+            "2015-09-14",
+            "2015-09-21"
+        ],
+        data: {
+            "2015-09-14": sight_sound(1,0),
+            "2015-09-21": sight_sound(1,1)
+        }
+    })
+
+    assert.deepEqual(api.student.chart(sane_jane.id,"month",null,null,[sight.id,sound.id]),{
+        words: ["here","there"],
+        times: [
+            "2015-09"
+        ],
+        data: {
+            "2015-09": sight_sound(1,1)
+        }
+    })
+
+    assert.deepEqual(api.student.chart(sane_jane.id,"date",["here","there"],null,[sight.id,sound.id]),{
+        words: ["here","there"],
+        times: [
+            "2015-09-20",
+            "2015-09-21",
+            "2015-09-22",
+            "2015-09-23",
+            "2015-09-24",
+            "2015-09-25"
+        ],
+        data: {
+            "2015-09-20": sight_sound(1,0),
+            "2015-09-21": sight_sound(1,0),
+            "2015-09-22": sight_sound(1,1),
+            "2015-09-23": sight_sound(1,0),
+            "2015-09-24": sight_sound(1,0),
+            "2015-09-25": sight_sound(1,1)
+        }
+    })
+
+    assert.deepEqual(api.student.chart(sane_jane.id,"date",null,["here"],[sight.id,sound.id]),{
+        words: ["here"],
+        times: [
+            "2015-09-20",
+            "2015-09-21",
+            "2015-09-22",
+            "2015-09-23",
+            "2015-09-24",
+            "2015-09-25"
+        ],
+        data: {
+            "2015-09-20": sight_sound(1,0),
+            "2015-09-21": sight_sound(1,0),
+            "2015-09-22": sight_sound(1,0),
+            "2015-09-23": sight_sound(1,0),
+            "2015-09-24": sight_sound(1,0),
+            "2015-09-25": sight_sound(1,1)
+        }
+    })
+
+    assert.deepEqual(api.student.chart(sane_jane.id,"date",null,null,[sight.id,sound.id],"2015-09-22","2015-09-25"),{
+        words: ["here","there"],
+        times: [
+            "2015-09-22",
+            "2015-09-23",
+            "2015-09-24"
+        ],
+        data: {
+            "2015-09-22": sight_sound(1,1),
+            "2015-09-23": sight_sound(1,0),
+            "2015-09-24": sight_sound(1,0)
+        }
+    })
+
+    var pass = assert.async();
+    api.student.chart(sane_jane.id,"date",null,null,[sight.id,sound.id],null,null,
+        function (data) {
+            assert.deepEqual(data,{
+                words: ["here","there"],
+                times: [
+                    "2015-09-20",
+                    "2015-09-21",
+                    "2015-09-22",
+                    "2015-09-23",
+                    "2015-09-24",
+                    "2015-09-25"
+                ],
+                data: {
+                    "2015-09-20": sight_sound(1,0),
+                    "2015-09-21": sight_sound(1,0),
+                    "2015-09-22": sight_sound(1,1),
+                    "2015-09-23": sight_sound(1,0),
+                    "2015-09-24": sight_sound(1,0),
+                    "2015-09-25": sight_sound(1,1)
+                }
+            });
+            pass();
+        },
+        function () {
+            assert.ok(false);
+            pass();
+        }
+    );
+
+});
+
 QUnit.test("delete", function(assert) {
 
     var api = new HundoWord.API(hundoword_django_host + "/api/v0/");

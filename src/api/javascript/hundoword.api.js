@@ -152,6 +152,29 @@ HundoWord.Student.prototype.history = function(id,words,achievements,from,to,suc
     return this.rest("GET",this.build_url(id,"history",parameters),null,success,error,complete);
 }
 
+HundoWord.Student.prototype.chart = function(id,by,focus,words,achievements,from,to,success,error,complete) {
+    var parameters = {};
+    if (by) {
+        parameters["by"] = by;
+    }
+    if (focus) {
+        parameters["focus"] = focus;
+    }
+    if (words) {
+        parameters["words"] = words.join(',');
+    }
+    if (achievements) {
+        parameters["achievements"] = achievements.join(',');
+    }
+    if (from) {
+        parameters["from"] = from;
+    }
+    if (to) {
+        parameters["to"] = to;
+    }
+    return this.rest("GET",this.build_url(id,"chart",parameters),null,success,error,complete);
+}
+
 
 // API
 
