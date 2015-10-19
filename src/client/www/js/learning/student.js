@@ -54,4 +54,4 @@ Learning.template("Student",Learning.load("student/item"),null,Learning.partials
 Learning.route("student","/student/","Students","Student","list");
 Learning.route("student/select","/student/{student_id:^\\d+$}/","Student","Student","select");
 Learning.route("student/new","/student/new/","Student","Student","new");
-Learning.route("student/chart","/student/{student_id:^\\d+$}/chart/","Student","Student","select");
+

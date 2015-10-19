@@ -32,7 +32,18 @@
                     <span>{{=it.achievement.progression}}</span>
                 </div>
                 <div class="changing" style="display: none">
-                    <input id='name' value='{{!it.achievement.progression || ""}}' type="text" placeholder="Achievement name to be listed" class="uk-form-width-large"/>
+                    <input id='progression' value='{{!it.achievement.progression || ""}}' type="text" placeholder="Achievement name to be listed" class="uk-form-width-large"/>
+                </div>
+            </div>
+        </div>
+        <div class="uk-form-row">
+            <label class="uk-form-label" for="achievement-color">Color</label>
+            <div class="uk-form-controls">
+                <div class="selecting">
+                    <span><i class="uk-icon-square" style="color: {{!it.achievement.color}};"/></span>
+                </div>
+                <div class="changing" style="display: none">
+                    <input id='color' value='{{!it.achievement.color || ""}}' type="text" placeholder="For charts" class="uk-form-width-large"/>
                 </div>
             </div>
         </div>

@@ -1,0 +1,46 @@
+{{#def.Header}}
+<div class="uk-overflow-container">
+    {{#def.StudentTabs}}
+    <br/>
+    <form class="uk-form">
+        <div>
+            <fieldset data-uk-margin>
+                <strong>By</strong>
+                <select id="by" class="uk-form-select" OnChange="Learning.current.controller.search()">
+                    <option value="date"{{? Learning.current.query.by == 'date' }} selected{{?}}>Date</option>
+                    <option value="week"{{? Learning.current.query.by == 'week' }} selected{{?}}>Week</option>
+                    <option value="month"{{? Learning.current.query.by == 'month' }} selected{{?}}>Month</option>
+                </select>
+                <strong>Focus</strong>
+                <input 
+                    id="focus" 
+                    type="checkbox" OnClick="Learning.current.controller.search()" 
+                    {{? Learning.current.query.focus && Learning.current.query.focus.toLowerCase() == 'true' }}checked{{?}}
+                >
+                <strong>Words</strong>
+                <input 
+                    id="words" value="{{=Learning.current.query.words ? Learning.current.query.words.replace(/,/g,' ') : ''}}" type="text"
+                    OnKeyPress="if (event.keyCode == 13) { Learning.current.controller.search(); }"
+                >
+                <strong>From</strong> <input type="" id="from" value="{{!Learning.current.query.from}}" data-uk-datepicker="{format:'YYYY-MM-DD'}">
+                <strong>To</strong> <input type="" id="to" value="{{!Learning.current.query.to}}" data-uk-datepicker="{format:'YYYY-MM-DD'}">
+                <button OnClick="Learning.current.controller.search();" class="uk-button uk-button-primary">
+                    <i class="uk-icon-search"></i>
+                </button>
+                <br/>
+                <ul id="achievements" class="uk-subnav uk-subnav-pill">
+                    {{~it.achievements :achievement}}
+                    <li 
+                        onClick="Learning.current.controller.toggle(this)" achievement-id='{{=achievement.id}}' 
+                        {{? Learning.current.query.achievements && Learning.current.query.achievements.indexOf(achievement.id) > -1}}class="uk-active"{{?}}
+                    >
+                        <a><i class="uk-icon-square" style="color: {{!achievement.color}};"/> {{=achievement.name}}</a>
+                    </li>
+                    {{~}}
+                </ul>
+            </fieldset>
+        </div>
+    </form>
+    <canvas id="chart" width="800" height="600"/>
+</div>
+{{#def.Footer}}

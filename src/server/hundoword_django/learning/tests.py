@@ -449,7 +449,8 @@ class test_Django(SimpleTestCase):
             "name": "Plain",
             "slug": "plain",
             "description": "Plain ol' example",
-            "progression": 100
+            "progression": 100,
+            "color": "blue"
         }, format='json')
 
         achievement = Achievement.objects.get(name="plain")
@@ -460,7 +461,8 @@ class test_Django(SimpleTestCase):
             "name": "Plain",
             "slug": "plain",
             "description": "Plain ol' example",
-            "progression": 100
+            "progression": 100,
+            "color": "blue"
         })
 
         # Select
@@ -475,7 +477,8 @@ class test_Django(SimpleTestCase):
             "name": "Plain",
             "slug": "plain",
             "description": "Plain ol' example",
-            "progression": 100
+            "progression": 100,
+            "color": "blue"
         })
 
         # Slug
@@ -490,7 +493,8 @@ class test_Django(SimpleTestCase):
             "name": "Plain",
             "slug": "plain",
             "description": "Plain ol' example",
-            "progression": 100
+            "progression": 100,
+            "color": "blue"
         })
 
         # Update 
@@ -504,7 +508,8 @@ class test_Django(SimpleTestCase):
             "name": "Plain",
             "slug": "plain",
             "description": "Plain old example",
-            "progression": 100
+            "progression": 100,
+            "color": "blue"
         })
 
         self.assertEqual(client.get("/api/v0/achievement/%s" % plain_id).data,{
@@ -512,12 +517,13 @@ class test_Django(SimpleTestCase):
             "name": "Plain",
             "slug": "plain",
             "description": "Plain old example",
-            "progression": 100
+            "progression": 100,
+            "color": "blue"
         })
 
         # List
 
-        achievement = Achievement(name="Jane",slug="jane",progression=99)
+        achievement = Achievement(name="Jane",slug="jane",color="red",progression=99)
         achievement.save()
         jane_id = achievement.pk
 
@@ -527,14 +533,16 @@ class test_Django(SimpleTestCase):
                 "name": "Jane",
                 "slug": "jane",
                 "description": "",
-                "progression": 99
+                "progression": 99,
+                "color": "red"
             },
             {
                 "id": plain_id,
                 "name": "Plain",
                 "slug": "plain",
                 "description": "Plain old example",
-                "progression": 100
+                "progression": 100,
+                "color": "blue"
             }
         ])
 
@@ -548,7 +556,8 @@ class test_Django(SimpleTestCase):
                 "name": "Jane",
                 "slug": "jane",
                 "description": "",
-                "progression": 99
+                "progression": 99,
+                "color": "red"
             }
         ])
 

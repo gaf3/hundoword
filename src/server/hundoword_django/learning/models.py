@@ -10,6 +10,7 @@ class Achievement(models.Model):
     slug = models.CharField(max_length=32,unique=True)
     description = models.CharField(max_length=255,blank=True,default="")
     progression = models.IntegerField(unique=True)
+    color = models.CharField(max_length=16,blank=True,default="")
 
     class Meta:
         ordering = ['progression']

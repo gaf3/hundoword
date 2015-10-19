@@ -102,6 +102,9 @@ def achievement(request,pk='',action=''):
                 if 'progression' in request.DATA:
                     achievement.progression = request.DATA['progression']
 
+                if 'color' in request.DATA:
+                    achievement.color = request.DATA['color']
+
                 achievement.save()
 
                 serializer = AchievementSerializer(achievement)
