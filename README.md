@@ -73,7 +73,7 @@ Without this, none of the pronounciation works.  I think we're eventually just g
   * student 
   * achievement
   * word
-  * hold - Whether attained or yielded
+  * held - Whether attained or yielded
   * at - The date and time of the progress
 
 ## Achievements / Games
@@ -390,7 +390,7 @@ In all JavaScript API functions, the arguments success, error, and complete are 
     * Response - `202 Accepted`
       * word 
       * achievement (id)
-      * hold = True - The Achievement was attained
+      * held = True - The Achievement was attained
       * at - Date and time (YYYY-MM-DDTHH:MM:SSZ)
     * JavaScript - `api.student.attain(id,word,achievement,at,success,error,complete)`
   * Yield - Yields an achievement for a word for a Student
@@ -401,7 +401,7 @@ In all JavaScript API functions, the arguments success, error, and complete are 
     * Response - `202 Accepted`
       * word 
       * achievement (id)
-      * hold = False - The Achievement was yielded
+      * held = False - The Achievement was yielded
       * at - Date and time (YYYY-MM-DDTHH:MM:SSZ)
     * JavaScript - `api.student.yield(id,word,achievement,at,success,error,complete)`
   * Position - Retrieves Student Position with words and Achievements using id
@@ -425,9 +425,9 @@ In all JavaScript API functions, the arguments success, error, and complete are 
       * Array - ordered by at descending
         * word 
         * achievement (id)
-        * hold - Whether the Achieveent was attained or yielded
+        * held - Whether the Achieveent was attained or yielded
         * at - Date and time 
-    * JavaScript - `api.student.history(id,words[],achievements[],hold,from,to,success,error,complete)`
+    * JavaScript - `api.student.history(id,words[],achievements[],held,from,to,success,error,complete)`
   * Chart - Retrieves data for making a chart
     * Request - `GET http://192.168.72.87/api/v0/student/<id>/chart/?by=<by>&focus=<focus>&words=<word>,<word>&achievements=<achievement_id>,<achievement_id>&from=<from>&to=<to>`
       * by - What to group by (shows last status for that period, uses previous period if no change)
@@ -445,7 +445,7 @@ In all JavaScript API functions, the arguments success, error, and complete are 
         * data - Object - The data to graph
           * time - Object - Achievement data for that time
             * achievement_id - Number, has the count for this Achievement at this time
-    * JavaScript - `api.student.chart(id,by,focus,words[],achievements[],hold,from,to,success,error,complete)`
+    * JavaScript - `api.student.chart(id,by,focus,words[],achievements[],held,from,to,success,error,complete)`
   * Delete - Deletes a Student
     * Request - `DELETE http://192.168.72.87/api/v0/student/<id>/`
     * Response - `200 Ok`
