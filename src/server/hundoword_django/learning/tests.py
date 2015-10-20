@@ -178,14 +178,14 @@ class test_Django(SimpleTestCase):
 
         # Append / Remove / Focus / Blur
 
-        student.words_append(["dude"])
+        student.append_words(["dude"])
         self.assertEqual(student.words,["this","that","dude"])
-        student.words_focus(["dude"])
+        student.focus_words(["dude"])
         self.assertEqual(student.focus,["this","dude"])
-        student.words_remove(["dude"])
+        student.remove_words(["dude"])
         self.assertEqual(student.words,["this","that"])
         self.assertEqual(student.focus,["this"])
-        student.words_blur(["this"])
+        student.blur_words(["this"])
         self.assertEqual(student.words,["this","that"])
         self.assertEqual(student.focus,[])
 

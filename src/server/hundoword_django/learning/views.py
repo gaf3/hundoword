@@ -397,7 +397,7 @@ def student(request,pk='',action=''):
 
             elif action == "append": 
 
-                student.words_append(words_request(request.DATA))
+                student.append_words(words_request(request.DATA))
                 student.save()
                 serializer = StudentSerializer(student)
                 return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
@@ -406,7 +406,7 @@ def student(request,pk='',action=''):
 
             elif action == "remove": 
 
-                student.words_remove(words_request(request.DATA))
+                student.remove_words(words_request(request.DATA))
                 student.save()
                 serializer = StudentSerializer(student)
                 return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
@@ -415,14 +415,14 @@ def student(request,pk='',action=''):
 
             elif action == "focus": 
 
-                student.words_focus(words_request(request.DATA))
+                student.focus_words(words_request(request.DATA))
                 student.save()
                 serializer = StudentSerializer(student)
                 return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
 
             elif action == "blur": 
 
-                student.words_blur(words_request(request.DATA))
+                student.blur_words(words_request(request.DATA))
                 student.save()
                 serializer = StudentSerializer(student)
                 return Response(serializer.data, status=status.HTTP_202_ACCEPTED)

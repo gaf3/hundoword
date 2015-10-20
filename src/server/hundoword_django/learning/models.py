@@ -108,13 +108,13 @@ class Student(models.Model):
         super(Student, self).save(*args, **kwargs) 
 
 
-    def words_append(self,words): 
+    def append_words(self,words): 
 
         for word in words:
             if word not in self.words:
                 self.words.append(word)
 
-    def words_remove(self,words): 
+    def remove_words(self,words): 
 
         for word in words:
             if word in self.words:
@@ -122,13 +122,13 @@ class Student(models.Model):
             if word in self.focus:
                 self.focus.pop(self.focus.index(word))
 
-    def words_focus(self,words): 
+    def focus_words(self,words): 
 
         for word in words:
             if word not in self.focus:
                 self.focus.append(word)
 
-    def words_blur(self,words): 
+    def blur_words(self,words): 
 
         for word in words:
             if word in self.focus:
