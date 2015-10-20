@@ -380,11 +380,11 @@ class test_Django(SimpleTestCase):
         self.assertEqual(learning.chart.build(student.id,"day",["here","there","everywhere"],[sight.id,sound.id]),(
             [
                 {
-                    "achievement_id": sight.id,
+                    "achievement": sight.id,
                     "totals": [1,1,2]
                 },
                 {
-                    "achievement_id": sound.id,
+                    "achievement": sound.id,
                     "totals": [0,0,2]
                 }
             ],
@@ -397,11 +397,11 @@ class test_Django(SimpleTestCase):
         self.assertEqual(learning.chart.build(student.id,"week",["here","there","everywhere"],[sight.id,sound.id]),(
             [
                 {
-                    "achievement_id": sight.id,
+                    "achievement": sight.id,
                     "totals": [1,2]
                 },
                 {
-                    "achievement_id": sound.id,
+                    "achievement": sound.id,
                     "totals": [0,2]
                 }
             ],
@@ -413,11 +413,11 @@ class test_Django(SimpleTestCase):
         self.assertEqual(learning.chart.build(student.id,"month",["here","there","everywhere"],[sight.id,sound.id]),(
             [
                 {
-                    "achievement_id": sight.id,
+                    "achievement": sight.id,
                     "totals": [1,2]
                 },
                 {
-                    "achievement_id": sound.id,
+                    "achievement": sound.id,
                     "totals": [0,2]
                 }
             ],
@@ -432,11 +432,11 @@ class test_Django(SimpleTestCase):
         self.assertEqual(learning.chart.build(student.id,"day",["here","there","everywhere"],[sight.id,sound.id],when(2007,7,1),when(2007,7,2)),(
             [
                 {
-                    "achievement_id": sight.id,
+                    "achievement": sight.id,
                     "totals": [1]
                 },
                 {
-                    "achievement_id": sound.id,
+                    "achievement": sound.id,
                     "totals": [0]
                 }
             ],
@@ -450,11 +450,11 @@ class test_Django(SimpleTestCase):
         self.assertEqual(learning.chart.build(student.id,"day",["here","there"],[sight.id,sound.id],),(
             [
                 {
-                    "achievement_id": sight.id,
+                    "achievement": sight.id,
                     "totals": [1,1,2]
                 },
                 {
-                    "achievement_id": sound.id,
+                    "achievement": sound.id,
                     "totals": [0,0,1]
                 }
             ],
@@ -470,7 +470,7 @@ class test_Django(SimpleTestCase):
         self.assertEqual(learning.chart.build(student.id,"day",["here","there"],[sight.id]),(
             [
                 {
-                    "achievement_id": sight.id,
+                    "achievement": sight.id,
                     "totals": [1,1,2]
                 }
             ],
@@ -1657,8 +1657,8 @@ class test_Django(SimpleTestCase):
                 "2015-09-25"
             ],
             "data": [
-                {"achievement_id": sight_id, "totals": [1,1,1,1,1,1]},
-                {"achievement_id": spell_id, "totals": [0,0,1,0,0,1]}
+                {"achievement": sight_id, "totals": [1,1,1,1,1,1]},
+                {"achievement": spell_id, "totals": [0,0,1,0,0,1]}
             ]
         })
 
@@ -1671,8 +1671,8 @@ class test_Django(SimpleTestCase):
                 "2015-09-21"
             ],
             "data": [
-                {"achievement_id": sight_id, "totals": [1,1]},
-                {"achievement_id": spell_id, "totals": [0,1]}
+                {"achievement": sight_id, "totals": [1,1]},
+                {"achievement": spell_id, "totals": [0,1]}
             ]
         })
 
@@ -1684,8 +1684,8 @@ class test_Django(SimpleTestCase):
                 "2015-09"
             ],
             "data": [
-                {"achievement_id": sight_id, "totals": [1]},
-                {"achievement_id": spell_id, "totals": [1]}
+                {"achievement": sight_id, "totals": [1]},
+                {"achievement": spell_id, "totals": [1]}
             ]
         })
 
@@ -1712,8 +1712,8 @@ class test_Django(SimpleTestCase):
                 "2015-09-25"
             ],
             "data": [
-                {"achievement_id": sight_id, "totals": [1,1,1,1,1,1]},
-                {"achievement_id": spell_id, "totals": [0,0,1,0,0,1]}
+                {"achievement": sight_id, "totals": [1,1,1,1,1,1]},
+                {"achievement": spell_id, "totals": [0,0,1,0,0,1]}
             ]
         })
 
@@ -1730,8 +1730,8 @@ class test_Django(SimpleTestCase):
                 "2015-09-25"
             ],
             "data": [
-                {"achievement_id": sight_id, "totals": [1,1,1,1,1,1]},
-                {"achievement_id": spell_id, "totals": [0,0,0,0,0,1]}
+                {"achievement": sight_id, "totals": [1,1,1,1,1,1]},
+                {"achievement": spell_id, "totals": [0,0,0,0,0,1]}
             ]
         })
 
@@ -1745,8 +1745,8 @@ class test_Django(SimpleTestCase):
                 "2015-09-24"
             ],
             "data": [
-                {"achievement_id": sight_id, "totals": [0,0,0]},
-                {"achievement_id": spell_id, "totals": [1,0,0]}
+                {"achievement": sight_id, "totals": [0,0,0]},
+                {"achievement": spell_id, "totals": [1,0,0]}
             ]
         })
 
@@ -1761,7 +1761,7 @@ class test_Django(SimpleTestCase):
                 "2015-09-25"
             ],
             "data": [
-                {"achievement_id": spell_id, "totals": [1,0,0,1]}
+                {"achievement": spell_id, "totals": [1,0,0,1]}
             ]
         })
 
@@ -1775,8 +1775,8 @@ class test_Django(SimpleTestCase):
                 "2015-09-24"
             ],
             "data": [
-                {"achievement_id": sight_id, "totals": [1,1,1]},
-                {"achievement_id": spell_id, "totals": [1,0,0]}
+                {"achievement": sight_id, "totals": [1,1,1]},
+                {"achievement": spell_id, "totals": [1,0,0]}
             ]
         })
 

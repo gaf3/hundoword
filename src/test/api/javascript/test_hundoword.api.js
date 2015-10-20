@@ -1166,7 +1166,7 @@ QUnit.test("append", function(assert) {
             id: sight.id,
             name: make_program("Fundamentals"),
             description: "Fun time",
-            words: ["dee","fun","lite","time"]
+            words: ["fun","time","dee","lite"]
         }
     );
 
@@ -1176,7 +1176,7 @@ QUnit.test("append", function(assert) {
             id: sight.id,
             name: make_program("Fundamentals"),
             description: "Fun time",
-            words: ["dee","fun","lite","time"]
+            words: ["fun","time","dee","lite"]
         }
     );
 
@@ -1189,7 +1189,7 @@ QUnit.test("append", function(assert) {
                     id: sight.id,
                     name: make_program("Fundamentals"),
                     description: "Fun time",
-                    words: ["dee","fun","groove","lite","time"]
+                    words: ["fun","time","dee","lite","groove"]
                 }
             );
             pass();
@@ -1315,12 +1315,14 @@ QUnit.test("create", function(assert) {
     assert.deepEqual(sane_jane.words,["fun","time"]);
 
     var pass = assert.async();
-    api.student.create({first_name: "Silly", last_name: "Billy", age: 3,words: ["base","time"]},
+    api.student.create({first_name: "Silly", last_name: "Billy", age: 3,words: ["base","time"],focus:["base"]},
         function (data) {
             assert.equal(data.first_name,"Silly");
             assert.equal(data.last_name,"Billy");
             assert.equal(data.age,3);
             assert.deepEqual(data.words,["base","time"]);
+            assert.deepEqual(data.focus,["base"]);
+            assert.deepEqual(data.position,{});
             pass();
         },
         function () {
@@ -1336,7 +1338,7 @@ QUnit.test("select", function(assert) {
     var api = new HundoWord.API(hundoword_django_host + "/api/v0/");
     check_user(api,"tester0","tester0","tester0@hundoword.com");
 
-    var sane_jane = api.student.create({first_name: "Sane", last_name: "Jane", age: 5,words:["fun","time"]});
+    var sane_jane = api.student.create({first_name: "Sane", last_name: "Jane", age: 5,words:["fun","time"],focus:["fun"]});
 
     assert.deepEqual(
         api.student.select(sane_jane.id),
@@ -1345,7 +1347,9 @@ QUnit.test("select", function(assert) {
             first_name: "Sane",
             last_name: "Jane",
             age: 5,
-            words: ["fun","time"]
+            words: ["fun","time"],
+            focus: ["fun"],
+            position: {}
         }
     );
 
@@ -1359,7 +1363,9 @@ QUnit.test("select", function(assert) {
                     first_name: "Sane",
                     last_name: "Jane",
                     age: 5,
-                    words: ["fun","time"]
+                    words: ["fun","time"],
+                    focus: ["fun"],
+                    position: {}
                 }
             );
             pass();
@@ -1377,8 +1383,8 @@ QUnit.test("list", function(assert) {
     var api = new HundoWord.API(hundoword_django_host + "/api/v0/");
     check_user(api,"tester0","tester0","tester0@hundoword.com");
 
-    var sane_jane = api.student.create({first_name: "Sane", last_name: "Jane", age: 5,words:["fun","time"]});
-    var silly_billy = api.student.create({first_name: "Silly", last_name: "Billy", age: 3,words: ["base","time"]});
+    var sane_jane = api.student.create({first_name: "Sane", last_name: "Jane", age: 5,words:["fun","time"],focus:["fun"]});
+    var silly_billy = api.student.create({first_name: "Silly", last_name: "Billy", age: 3,words: ["base","time"],focus:["base"]});
 
     assert.deepEqual(
         api.student.list(),
@@ -1388,14 +1394,18 @@ QUnit.test("list", function(assert) {
                 first_name: "Silly", 
                 last_name: "Billy",
                 age: 3,
-                words: ["base","time"]
+                words: ["base","time"],
+                focus: ["base"],
+                position: {}
             },
             {
                 id: sane_jane.id,
                 first_name: "Sane",
                 last_name: "Jane",
                 age: 5,
-                words: ["fun","time"]
+                words: ["fun","time"],
+                focus: ["fun"],
+                position: {}
             }
         ]
     );
@@ -1411,14 +1421,18 @@ QUnit.test("list", function(assert) {
                         first_name: "Silly", 
                         last_name: "Billy",
                         age: 3,
-                        words: ["base","time"]
+                        words: ["base","time"],
+                        focus: ["base"],
+                        position: {}
                     },
                     {
                         id: sane_jane.id,
                         first_name: "Sane",
                         last_name: "Jane",
                         age :5,
-                        words: ["fun","time"]
+                        words: ["fun","time"],
+                        focus: ["fun"],
+                        position: {}
                     }
                 ]
             );
@@ -1437,7 +1451,7 @@ QUnit.test("update", function(assert) {
     var api = new HundoWord.API(hundoword_django_host + "/api/v0/");
     check_user(api,"tester0","tester0","tester0@hundoword.com");
 
-    var sane_jane = api.student.create({first_name: "Sane", last_name: "Jane", age: 5,words:["fun","time"]});
+    var sane_jane = api.student.create({first_name: "Sane", last_name: "Jane", age: 5,words:["fun","time"],focus:["fun"]});
 
     assert.deepEqual(
         api.student.update(sane_jane.id,{age: 6}),
@@ -1446,7 +1460,9 @@ QUnit.test("update", function(assert) {
             first_name: "Sane", 
             last_name: "Jane",
             age: 6,
-            words: ["fun","time"]
+            words: ["fun","time"],
+            focus: ["fun"],
+            position: {}
         }
     );
 
@@ -1457,7 +1473,9 @@ QUnit.test("update", function(assert) {
             first_name: "Sane", 
             last_name: "Jane",
             age: 6,
-            words: ["fun","time"]
+            words: ["fun","time"],
+            focus: ["fun"],
+            position: {}
         }
     );
 
@@ -1471,7 +1489,9 @@ QUnit.test("update", function(assert) {
                     first_name: "Sane", 
                     last_name: "Jane",
                     age: 5,
-                    words: ["fun","time"]
+                    words: ["fun","time"],
+                    focus: ["fun"],
+                    position: {}
                 }
             );
             pass();
@@ -1489,7 +1509,7 @@ QUnit.test("append", function(assert) {
     var api = new HundoWord.API(hundoword_django_host + "/api/v0/");
     check_user(api,"tester0","tester0","tester0@hundoword.com");
 
-    var sane_jane = api.student.create({first_name: "Sane", last_name: "Jane", age: 5,words:["fun","time"]});
+    var sane_jane = api.student.create({first_name: "Sane", last_name: "Jane", age: 5,words:["fun","time"],focus:["fun"]});
 
     assert.deepEqual(
         api.student.append(sane_jane.id,["dee","lite"]),
@@ -1498,7 +1518,9 @@ QUnit.test("append", function(assert) {
             first_name: "Sane", 
             last_name: "Jane",
             age: 5,
-            words: ["dee","fun","lite","time"]
+            words: ["fun","time","dee","lite"],
+            focus: ["fun"],
+            position: {}
         }
     );
 
@@ -1509,7 +1531,9 @@ QUnit.test("append", function(assert) {
             first_name: "Sane", 
             last_name: "Jane",
             age: 5,
-            words: ["dee","fun","lite","time"]
+            words: ["fun","time","dee","lite"],
+            focus: ["fun"],
+            position: {}
         }
     );
 
@@ -1523,7 +1547,9 @@ QUnit.test("append", function(assert) {
                     first_name: "Sane", 
                     last_name: "Jane",
                     age: 5,
-                    words: ["dee","fun","groove","lite","time"]
+                    words: ["fun","time","dee","lite","groove"],
+                    focus: ["fun"],
+                    position: {}
                 }
             );
             pass();
@@ -1541,7 +1567,7 @@ QUnit.test("remove", function(assert) {
     var api = new HundoWord.API(hundoword_django_host + "/api/v0/");
     check_user(api,"tester0","tester0","tester0@hundoword.com");
 
-    var sane_jane = api.student.create({first_name: "Sane", last_name: "Jane", age: 5,words:["dee","fun","groove","lite","time"]});
+    var sane_jane = api.student.create({first_name: "Sane", last_name: "Jane", age: 5,words:["dee","fun","groove","lite","time"],focus: ["fun"]});
 
     assert.deepEqual(
         api.student.remove(sane_jane.id,["dee","lite"]),
@@ -1550,7 +1576,9 @@ QUnit.test("remove", function(assert) {
             first_name: "Sane", 
             last_name: "Jane",
             age: 5,
-            words: ["fun","groove","time"]
+            words: ["fun","groove","time"],
+            focus: ["fun"],
+            position: {}
         }
     );
 
@@ -1561,7 +1589,9 @@ QUnit.test("remove", function(assert) {
             first_name: "Sane", 
             last_name: "Jane",
             age: 5,
-            words: ["fun","groove","time"]
+            words: ["fun","groove","time"],
+            focus: ["fun"],
+            position: {}
         }
     );
 
@@ -1575,7 +1605,9 @@ QUnit.test("remove", function(assert) {
                     first_name: "Sane", 
                     last_name: "Jane",
                     age: 5,
-                    words: ["fun","time"]
+                    words: ["fun","time"],
+                    focus: ["fun"],
+                    position: {}
                 }
             );
             pass();
@@ -1597,34 +1629,31 @@ QUnit.test("focus", function(assert) {
 
     assert.deepEqual(
         api.student.focus(sane_jane.id,["fun","time"]),
-        [
-            {
-                word: "fun",
-                focus: true,
-                achievements: []
-            },
-            {
-                word: "time",
-                focus: true,
-                achievements: []
-            }
-        ]
+        {
+            id: sane_jane.id,
+            first_name: "Sane", 
+            last_name: "Jane",
+            age: 5,
+            words: ["fun","time","party"],
+            focus: ["fun","time"],
+            position: {}
+        }
     );
-
-    assert.deepEqual(api.student.focus(sane_jane.id),["fun","time"]);
 
     var pass = assert.async();
     api.student.focus(sane_jane.id,["party"],
         function (data) {
             assert.deepEqual(
                 data,
-                [
-                    {
-                        word: "party",
-                        focus: true,
-                        achievements: []
-                    }
-                ]
+                {
+                    id: sane_jane.id,
+                    first_name: "Sane", 
+                    last_name: "Jane",
+                    age: 5,
+                    words: ["fun","time","party"],
+                    focus: ["fun","time","party"],
+                    position: {}
+                }
             );
             pass();
         },
@@ -1641,24 +1670,19 @@ QUnit.test("blur", function(assert) {
     var api = new HundoWord.API(hundoword_django_host + "/api/v0/");
     check_user(api,"tester0","tester0","tester0@hundoword.com");
 
-    var sane_jane = api.student.create({first_name: "Sane", last_name: "Jane", age: 5,words:["fun","time","party"]});
-
-    api.student.focus(sane_jane.id,["fun","time","party"])
+    var sane_jane = api.student.create({first_name: "Sane", last_name: "Jane", age: 5,words:["fun","time","party"],focus:["fun","time","party"]});
 
     assert.deepEqual(
         api.student.blur(sane_jane.id,["fun","time"]),
-        [
-            {
-                word: "fun",
-                focus: false,
-                achievements: []
-            },
-            {
-                word: "time",
-                focus: false,
-                achievements: []
-            }
-        ]
+        {
+            id: sane_jane.id,
+            first_name: "Sane", 
+            last_name: "Jane",
+            age: 5,
+            words: ["fun","time","party"],
+            focus: ["party"],
+            position: {}
+        }
     );
 
     var pass = assert.async();
@@ -1666,13 +1690,15 @@ QUnit.test("blur", function(assert) {
         function (data) {
             assert.deepEqual(
                 data,
-                [
-                    {
-                        word: "party",
-                        focus: false,
-                        achievements: []
-                    }
-                ]
+                {
+                    id: sane_jane.id,
+                    first_name: "Sane", 
+                    last_name: "Jane",
+                    age: 5,
+                    words: ["fun","time","party"],
+                    focus: [],
+                    position: {}
+                }
             );
             pass();
         },
@@ -1795,67 +1821,39 @@ QUnit.test("position", function(assert) {
 
     assert.deepEqual(
         api.student.position(sane_jane.id),
-        [
-            {
-                word: "fun",
-                focus: true,
-                achievements: [sight.id]
-            },
-            {
-                word: "time",
-                focus: false,
-                achievements: [sound.id]
-            }
-        ]
+        {
+            "fun": [sight.id],
+            "time": [sound.id]
+        }
     );
 
     assert.deepEqual(
         api.student.position(sane_jane.id,["fun","time"]),
-        [
-            {
-                word: "fun",
-                focus: true,
-                achievements: [sight.id]
-            },
-            {
-                word: "time",
-                focus: false,
-                achievements: [sound.id]
-            }
-        ]
+        {
+            "fun": [sight.id],
+            "time": [sound.id]
+        }
     );
 
     assert.deepEqual(
         api.student.position(sane_jane.id,["fun"]),
-        [
-            {
-                word: "fun",
-                focus: true,
-                achievements: [sight.id]
-            }
-        ]
+        {
+            "fun": [sight.id]
+        }
     );
 
     assert.deepEqual(
         api.student.position(sane_jane.id,null,true),
-        [
-            {
-                word: "fun",
-                focus: true,
-                achievements: [sight.id]
-            }
-        ]
+        {
+            "fun": [sight.id]
+        }
     );
 
     assert.deepEqual(
         api.student.position(sane_jane.id,null,false),
-        [
-            {
-                word: "time",
-                focus: false,
-                achievements: [sound.id]
-            }
-        ]
+        {
+            "time": [sound.id]
+        }
     );
 
     var pass = assert.async();
@@ -1863,18 +1861,10 @@ QUnit.test("position", function(assert) {
         function (data) {
             assert.deepEqual(
                 data,
-                [
-                    {
-                        word: "fun",
-                        focus: true,
-                        achievements: [sight.id]
-                    },
-                    {
-                        word: "time",
-                        focus: false,
-                        achievements: [sound.id]
-                    }
-                ]
+                {
+                    "fun": [sight.id],
+                    "time": [sound.id]
+                }
             );
             pass();
         },
@@ -1908,58 +1898,94 @@ QUnit.test("history", function(assert) {
     api.student.attain(sane_jane.id,"fun",sight.id,"2015-09-22T00:00:00Z");
     api.student.yield(sane_jane.id,"time",sound.id,"2015-09-23T00:00:00Z");
 
-    var history = api.student.history(sane_jane.id)
-
-    assert.equal(history.length,2);
-    assert.equal(history[0].word,"time");
-    assert.equal(history[0].achievement,sound.id);
-    assert.equal(history[0].held,false);
-    assert.equal(history[0].at,"2015-09-23T00:00:00Z");
-    assert.equal(history[1].word,"fun");
-    assert.equal(history[1].achievement,sight.id);
-    assert.equal(history[1].held,true);
-    assert.equal(history[1].at,"2015-09-22T00:00:00Z");
+    assert.deepEqual(
+        api.student.history(sane_jane.id),
+        [
+            {
+                word: "time",
+                achievement: sound.id,
+                held: false,
+                at: "2015-09-23T00:00:00Z"
+            },
+            {
+                word: "fun",
+                achievement: sight.id,
+                held: true,
+                at: "2015-09-22T00:00:00Z"
+            }
+        ]
+    );
 
     api.student.attain(sane_jane.id,"fun",sound.id,"2015-09-24T00:00:00Z");
 
-    var history = api.student.history(sane_jane.id,["fun"])
+    assert.deepEqual(
+        api.student.history(sane_jane.id,["fun"]),
+        [
+            {
+                word: "fun",
+                achievement: sound.id,
+                held: true,
+                at: "2015-09-24T00:00:00Z"
+            },
+            {
+                word: "fun",
+                achievement: sight.id,
+                held: true,
+                at: "2015-09-22T00:00:00Z"
+            }
+        ]
+    );
 
-    assert.equal(history.length,2);
-    assert.equal(history[0].word,"fun");
-    assert.equal(history[0].achievement,sound.id);
-    assert.equal(history[0].held,true);
-    assert.equal(history[1].word,"fun");
-    assert.equal(history[1].achievement,sight.id);
-    assert.equal(history[1].held,true);
+    assert.deepEqual(
+        api.student.history(sane_jane.id,["fun"],[sight.id]),
+        [
+            {
+                word: "fun",
+                achievement: sight.id,
+                held: true,
+                at: "2015-09-22T00:00:00Z"
+            }
+        ]
+    );
 
-    var history = api.student.history(sane_jane.id,["fun"],[sight.id]);
+    assert.deepEqual(
+        api.student.history(sane_jane.id,null,null,"2015-09-24"),
+        [
+            {
+                word: "fun",
+                achievement: sound.id,
+                held: true,
+                at: "2015-09-24T00:00:00Z"
+            }
+        ]
+    );
 
-    assert.equal(history.length,1);
-    assert.equal(history[0].word,"fun");
-    assert.equal(history[0].achievement,sight.id);
-    assert.equal(history[0].held,true);
-
-    var history = api.student.history(sane_jane.id,null,null,"2015-09-24");
-
-    assert.equal(history[0].word,"fun");
-    assert.equal(history[0].achievement,sound.id);
-    assert.equal(history[0].held,true);
-    assert.equal(history[0].at,"2015-09-24T00:00:00Z");
-
-    var history = api.student.history(sane_jane.id,null,null,null,"2015-09-23");
-
-    assert.equal(history.length,1);
-    assert.equal(history[0].word,"fun");
-    assert.equal(history[0].achievement,sight.id);
-    assert.equal(history[0].held,true);
+    assert.deepEqual(
+        api.student.history(sane_jane.id,null,null,null,"2015-09-23"),
+        [
+            {
+                word: "fun",
+                achievement: sight.id,
+                held: true,
+                at: "2015-09-22T00:00:00Z"
+            }
+        ]
+    );
 
     var pass = assert.async();
     api.student.history(sane_jane.id,["fun"],[sight.id],null,null,
         function (data) {
-            assert.equal(data.length,1);
-            assert.equal(data[0].word,"fun");
-            assert.equal(data[0].achievement,sight.id);
-            assert.equal(data[0].held,true);
+            assert.deepEqual(
+                data,
+                [
+                    {
+                        word: "fun",
+                        achievement: sight.id,
+                        held: true,
+                        at: "2015-09-22T00:00:00Z"
+                    }
+                ]
+            );
             pass();
         },
         function () {
@@ -1998,18 +2024,6 @@ QUnit.test("chart", function(assert) {
 
     api.student.focus(sane_jane.id,["there"]);
 
-    function sight_sound(sight_count,sound_count) {
-        counts = {};
-
-        if (sight_count !== null) {
-            counts[sight.id] = sight_count;
-        }
-        if (sound_count !== null) {
-            counts[sound.id] = sound_count;
-        }
-        return counts;
-    }
-
     assert.deepEqual(api.student.chart(sane_jane.id,"date",null,null,[sight.id,sound.id]),{
         words: ["here","there"],
         times: [
@@ -2020,14 +2034,10 @@ QUnit.test("chart", function(assert) {
             "2015-09-24",
             "2015-09-25"
         ],
-        data: {
-            "2015-09-20": sight_sound(1,0),
-            "2015-09-21": sight_sound(1,0),
-            "2015-09-22": sight_sound(1,1),
-            "2015-09-23": sight_sound(1,0),
-            "2015-09-24": sight_sound(1,0),
-            "2015-09-25": sight_sound(1,1)
-        }
+        data: [
+            {achievement: sight.id, totals: [1,1,1,1,1,1]},
+            {achievement: sound.id, totals: [0,0,1,0,0,1]}
+        ]
     })
 
     assert.deepEqual(api.student.chart(sane_jane.id,"week",null,null,[sight.id,sound.id]),{
@@ -2036,10 +2046,10 @@ QUnit.test("chart", function(assert) {
             "2015-09-14",
             "2015-09-21"
         ],
-        data: {
-            "2015-09-14": sight_sound(1,0),
-            "2015-09-21": sight_sound(1,1)
-        }
+        data: [
+            {achievement: sight.id, totals: [1,1]},
+            {achievement: sound.id, totals: [0,1]}
+        ]
     })
 
     assert.deepEqual(api.student.chart(sane_jane.id,"month",null,null,[sight.id,sound.id]),{
@@ -2047,9 +2057,10 @@ QUnit.test("chart", function(assert) {
         times: [
             "2015-09"
         ],
-        data: {
-            "2015-09": sight_sound(1,1)
-        }
+        data: [
+            {achievement: sight.id, totals: [1]},
+            {achievement: sound.id, totals: [1]}
+        ]
     })
 
     assert.deepEqual(api.student.chart(sane_jane.id,"date",["here","there"],null,[sight.id,sound.id]),{
@@ -2062,14 +2073,10 @@ QUnit.test("chart", function(assert) {
             "2015-09-24",
             "2015-09-25"
         ],
-        data: {
-            "2015-09-20": sight_sound(1,0),
-            "2015-09-21": sight_sound(1,0),
-            "2015-09-22": sight_sound(1,1),
-            "2015-09-23": sight_sound(1,0),
-            "2015-09-24": sight_sound(1,0),
-            "2015-09-25": sight_sound(1,1)
-        }
+        data: [
+            {achievement: sight.id, totals: [1,1,1,1,1,1]},
+            {achievement: sound.id, totals: [0,0,1,0,0,1]}
+        ]
     })
 
     assert.deepEqual(api.student.chart(sane_jane.id,"date",null,["here"],[sight.id,sound.id]),{
@@ -2082,14 +2089,10 @@ QUnit.test("chart", function(assert) {
             "2015-09-24",
             "2015-09-25"
         ],
-        data: {
-            "2015-09-20": sight_sound(1,0),
-            "2015-09-21": sight_sound(1,0),
-            "2015-09-22": sight_sound(1,0),
-            "2015-09-23": sight_sound(1,0),
-            "2015-09-24": sight_sound(1,0),
-            "2015-09-25": sight_sound(1,1)
-        }
+        data: [
+            {achievement: sight.id, totals: [1,1,1,1,1,1]},
+            {achievement: sound.id, totals: [0,0,0,0,0,1]}
+        ]
     })
 
     assert.deepEqual(api.student.chart(sane_jane.id,"date",null,null,[sight.id,sound.id],"2015-09-22","2015-09-25"),{
@@ -2099,11 +2102,10 @@ QUnit.test("chart", function(assert) {
             "2015-09-23",
             "2015-09-24"
         ],
-        data: {
-            "2015-09-22": sight_sound(1,1),
-            "2015-09-23": sight_sound(1,0),
-            "2015-09-24": sight_sound(1,0)
-        }
+        data: [
+            {achievement: sight.id, totals: [1,1,1]},
+            {achievement: sound.id, totals: [1,0,0]}
+        ]
     })
 
     var pass = assert.async();
@@ -2119,14 +2121,10 @@ QUnit.test("chart", function(assert) {
                     "2015-09-24",
                     "2015-09-25"
                 ],
-                data: {
-                    "2015-09-20": sight_sound(1,0),
-                    "2015-09-21": sight_sound(1,0),
-                    "2015-09-22": sight_sound(1,1),
-                    "2015-09-23": sight_sound(1,0),
-                    "2015-09-24": sight_sound(1,0),
-                    "2015-09-25": sight_sound(1,1)
-                }
+                data: [
+                    {achievement: sight.id, totals: [1,1,1,1,1,1]},
+                    {achievement: sound.id, totals: [0,0,1,0,0,1]}
+                ]
             });
             pass();
         },
@@ -2156,7 +2154,9 @@ QUnit.test("delete", function(assert) {
                 first_name: "Silly", 
                 last_name: "Billy",
                 age: 3,
-                words: ["base","time"]
+                words: ["base","time"],
+                focus: [],
+                position: {}
             }
         ]
     );

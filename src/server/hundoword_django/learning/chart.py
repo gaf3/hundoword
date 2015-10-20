@@ -194,7 +194,7 @@ def build(student_id,by,words,achievement_ids,from_date=None,to_date=None):
     data = []
     for index, achievement_id in enumerate(achievement_ids):
         data.append({
-            "achievement_id": achievement_id,
+            "achievement": achievement_id,
             "totals": []
         })
 
