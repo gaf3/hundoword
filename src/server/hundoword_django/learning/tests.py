@@ -6,6 +6,7 @@ import pytz
 from django.test import SimpleTestCase, Client
 from django.core.urlresolvers import reverse
 from django.db import connection
+from django.core.exceptions import ValidationError
 
 from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
@@ -59,30 +60,147 @@ class test_Django(SimpleTestCase):
 
     def test_Program(self):
 
-        self.assertEqual(str(Program(name="plain")),"plain")
-
-
-    def test_ProgramWord(self):
-
-        program = Program(name="plain")
+        program = Program(name="blank")
         program.save()
-        self.assertEqual(str(ProgramWord(program=program,word="jane")),"plain - jane")
+
+        # Defaults are filled 
+
+        self.assertEqual(str(program),"blank")
+        self.assertEqual(program.words,[])
+
+        # Validates words
+
+        try: 
+
+            program = Program(name="string",words="this")
+            program.save()
+            self.fail()
+
+        except ValidationError as exception:
+
+            self.assertEqual(exception.message_dict,{"words": ["Must be a list."]})
+
+        try: 
+
+            program = Program(name="numbers",words=[1,2,3])
+            program.save()
+            self.fail()
+
+        except ValidationError as exception:
+
+            self.assertEqual(exception.message_dict,{"words": ["All list items be be strings."]})
+
+        # Keeps words unique but still in order
+
+        program = Program(name="plain",words=["this","that","this"])
+        program.save()
+
+        self.assertEqual(str(program),"plain")
+        self.assertEqual(program.words,["this","that"])
 
 
     def test_Student(self):
 
         user = User(username="tester")
         user.save()
-        self.assertEqual(str(Student(teacher=user,first_name="plain",last_name="jane")),"plain jane (tester)")
 
+        # Defaults are filled
 
-    def test_StudentWord(self):
-
-        user = User(username="tester")
-        user.save()
-        student = Student(teacher=user,first_name="plain",last_name="jane")
+        student = Student(teacher=user,first_name="all",last_name="blank")
         student.save()
-        self.assertEqual(str(StudentWord(student=student,word="one")),"plain jane (tester) - one")
+
+        self.assertEqual(str(student),"all blank (tester)")
+        self.assertEqual(student.words,[])
+        self.assertEqual(student.focus,[])
+        self.assertEqual(student.position,{})
+
+        # Validate words and focs
+
+        try: 
+
+            program = Student(teacher=user,first_name="not",last_name="list.",words="this")
+            program.save()
+            self.fail()
+
+        except ValidationError as exception:
+
+            self.assertEqual(exception.message_dict,{"words": ["Must be a list."]})
+
+        try: 
+
+            program = Student(teacher=user,first_name="all",last_name="numbers",words=[1,2,3])
+            program.save()
+            self.fail()
+
+        except ValidationError as exception:
+
+            self.assertEqual(exception.message_dict,{"words": ["All list items be be strings."]})
+
+        try: 
+
+            program = Student(teacher=user,first_name="not",last_name="list.",focus="this")
+            program.save()
+            self.fail()
+
+        except ValidationError as exception:
+
+            self.assertEqual(exception.message_dict,{"focus": ["Must be a list."]})
+
+        try: 
+
+            program = Student(teacher=user,first_name="all",last_name="numbers",focus=[1,2,3])
+            program.save()
+            self.fail()
+
+        except ValidationError as exception:
+
+            self.assertEqual(exception.message_dict,{"focus": ["All list items be be strings."]})
+
+        # Make sure focus words are student words
+
+        try: 
+
+            program = Student(teacher=user,first_name="all",last_name="numbers",words=["this"],focus=["that"])
+            program.save()
+            self.fail()
+
+        except ValidationError as exception:
+
+            self.assertEqual(exception.message_dict,{"focus": ["Word 'that' not found."]})
+
+        # Keeps words and focus unique but still in order
+
+        student = Student(teacher=user,first_name="all",last_name="full",words=["this","that","this"],focus=["this","this"])
+        student.save()
+
+        self.assertEqual(student.words,["this","that"])
+        self.assertEqual(student.focus,["this"])
+
+        # Append / Remove / Focus / Blur
+
+        student.words_append(["dude"])
+        self.assertEqual(student.words,["this","that","dude"])
+        student.words_focus(["dude"])
+        self.assertEqual(student.focus,["this","dude"])
+        student.words_remove(["dude"])
+        self.assertEqual(student.words,["this","that"])
+        self.assertEqual(student.focus,["this"])
+        student.words_blur(["this"])
+        self.assertEqual(student.words,["this","that"])
+        self.assertEqual(student.focus,[])
+
+        # Updating progress accordingly
+
+        achievement = Achievement(name="Sight",slug="sight",progression=1)
+        achievement.save()
+        at = when(2007,7,7)
+
+        progress = Progress(student=student,word="that",achievement=achievement,held=True,at=at)
+        progress.save()
+
+        student.progress_position(progress)
+        student.save()
+        self.assertEqual(student.position,{"that": [achievement.id]})
 
 
     def test_Progress(self):
@@ -91,15 +209,27 @@ class test_Django(SimpleTestCase):
         user.save()
         achievement = Achievement(name="Sight",slug="sight",progression=1)
         achievement.save()
-        student = Student(teacher=user,first_name="plain",last_name="jane")
+        student = Student(teacher=user,first_name="plain",last_name="jane",words=["there"])
         student.save()
         at = when(2007,7,7)
-        progress = Progress(student=student,word="here",achievement=achievement,held=True,at=at)
+
+        try: 
+
+            progress = Progress(student=student,word="here",achievement=achievement,held=True,at=at)
+            progress.save()
+            self.fail()
+
+        except ValidationError as exception:
+
+            self.assertEqual(exception.message_dict,{"word": ["Word 'here' not found."]})
+
+        progress = Progress(student=student,word="there",achievement=achievement,held=True,at=at)
         progress.save()
         self.assertEqual(
             str(Progress.objects.get(pk=progress.pk)),
-            "plain jane (tester) - here - Sight (True) - 2007-07-07 00:00:00+00:00"
+            "plain jane (tester) - there - Sight (True) - 2007-07-07 00:00:00+00:00"
         )
+
 
     def test_chart(self):
 
@@ -111,7 +241,7 @@ class test_Django(SimpleTestCase):
         sight.save()
         sound = Achievement(name="Sound",slug="sound",progression=2)
         sound.save()
-        student = Student(teacher=user,first_name="plain",last_name="jane")
+        student = Student(teacher=user,first_name="plain",last_name="jane",words=["here","there","everywhere"])
         student.save()
 
         Progress(student=student,word="here",achievement=sight,held=True,at=when(2007,6,30,9)).save()
@@ -248,20 +378,16 @@ class test_Django(SimpleTestCase):
         # by
 
         self.assertEqual(learning.chart.build(student.id,"day",["here","there","everywhere"],[sight.id,sound.id]),(
-            {
-                "2007-06-30": {
-                    sight.id: 1,
-                    sound.id: 0
+            [
+                {
+                    "achievement_id": sight.id,
+                    "totals": [1,1,2]
                 },
-                "2007-07-01": {
-                    sight.id: 1,
-                    sound.id: 0
-                },
-                "2007-07-02": {
-                    sight.id: 2,
-                    sound.id: 2
+                {
+                    "achievement_id": sound.id,
+                    "totals": [0,0,2]
                 }
-            },
+            ],
             [
                 "2007-06-30",
                 "2007-07-01",
@@ -269,32 +395,32 @@ class test_Django(SimpleTestCase):
             ]
         ))
         self.assertEqual(learning.chart.build(student.id,"week",["here","there","everywhere"],[sight.id,sound.id]),(
-            {
-                "2007-06-25": {
-                    sight.id: 1,
-                    sound.id: 0
+            [
+                {
+                    "achievement_id": sight.id,
+                    "totals": [1,2]
                 },
-                "2007-07-02": {
-                    sight.id: 2,
-                    sound.id: 2
+                {
+                    "achievement_id": sound.id,
+                    "totals": [0,2]
                 }
-            },
+            ],
             [
                 "2007-06-25",
                 "2007-07-02"
             ]
         ))
         self.assertEqual(learning.chart.build(student.id,"month",["here","there","everywhere"],[sight.id,sound.id]),(
-            {
-                "2007-06": {
-                    sight.id: 1,
-                    sound.id: 0
+            [
+                {
+                    "achievement_id": sight.id,
+                    "totals": [1,2]
                 },
-                "2007-07": {
-                    sight.id: 2,
-                    sound.id: 2
+                {
+                    "achievement_id": sound.id,
+                    "totals": [0,2]
                 }
-            },
+            ],
             [
                 "2007-06",
                 "2007-07"
@@ -304,12 +430,16 @@ class test_Django(SimpleTestCase):
         # from/to
 
         self.assertEqual(learning.chart.build(student.id,"day",["here","there","everywhere"],[sight.id,sound.id],when(2007,7,1),when(2007,7,2)),(
-            {
-                "2007-07-01": {
-                    sight.id: 1,
-                    sound.id: 0
+            [
+                {
+                    "achievement_id": sight.id,
+                    "totals": [1]
+                },
+                {
+                    "achievement_id": sound.id,
+                    "totals": [0]
                 }
-            },
+            ],
             [
                 "2007-07-01"
             ]
@@ -318,20 +448,16 @@ class test_Django(SimpleTestCase):
         # words
 
         self.assertEqual(learning.chart.build(student.id,"day",["here","there"],[sight.id,sound.id],),(
-            {
-                "2007-06-30": {
-                    sight.id: 1,
-                    sound.id: 0
+            [
+                {
+                    "achievement_id": sight.id,
+                    "totals": [1,1,2]
                 },
-                "2007-07-01": {
-                    sight.id: 1,
-                    sound.id: 0
-                },
-                "2007-07-02": {
-                    sight.id: 2,
-                    sound.id: 1
+                {
+                    "achievement_id": sound.id,
+                    "totals": [0,0,1]
                 }
-            },
+            ],
             [
                 "2007-06-30",
                 "2007-07-01",
@@ -342,17 +468,12 @@ class test_Django(SimpleTestCase):
         # achievement_ids
 
         self.assertEqual(learning.chart.build(student.id,"day",["here","there"],[sight.id]),(
-            {
-                "2007-06-30": {
-                    sight.id: 1
-                },
-                "2007-07-01": {
-                    sight.id: 1
-                },
-                "2007-07-02": {
-                    sight.id: 2
+            [
+                {
+                    "achievement_id": sight.id,
+                    "totals": [1,1,2]
                 }
-            },
+            ],
             [
                 "2007-06-30",
                 "2007-07-01",
@@ -426,24 +547,11 @@ class test_Django(SimpleTestCase):
         response = client.post("/api/v0/achievement/",{}, format='json')
 
         self.assertEqual(response.status_code,status.HTTP_400_BAD_REQUEST);
-        self.assertEqual(response.data,{"name": ["This field is required."]})
-
-        response = client.post("/api/v0/achievement/",{
-            "name": "Plain",
-            "description": "Plain ol' example"
-        }, format='json')
-
-        self.assertEqual(response.status_code,status.HTTP_400_BAD_REQUEST);
-        self.assertEqual(response.data,{"slug": ["This field is required."]})
-
-        response = client.post("/api/v0/achievement/",{
-            "name": "Plain",
-            "slug": "plain",
-            "description": "Plain ol' example"
-        }, format='json')
-
-        self.assertEqual(response.status_code,status.HTTP_400_BAD_REQUEST);
-        self.assertEqual(response.data,{"progression": ["This field is required."]})
+        self.assertEqual(response.data,{
+            "name": ["This field is required."],
+            "slug": ["This field is required."],
+            "progression": ["This field is required."]
+        })
 
         response = client.post("/api/v0/achievement/",{
             "name": "Plain",
@@ -568,24 +676,21 @@ class test_Django(SimpleTestCase):
         user = User.objects.get(username="vagrant")
         client.force_authenticate(user=user)
 
-        # Words validation
-
-        response = client.post("/api/v0/program/",{"words": "oops"}, format='json')
-
-        self.assertEqual(response.status_code,status.HTTP_400_BAD_REQUEST);
-        self.assertEqual(response.data,{"words": ["Must be an array."]})
-
-        response = client.post("/api/v0/program/",{"words": [0]}, format='json')
-
-        self.assertEqual(response.status_code,status.HTTP_400_BAD_REQUEST);
-        self.assertEqual(response.data,{"words": ["All array items be be strings."]})
-
-        # Create
+        # Fields validation
 
         response = client.post("/api/v0/program/",{}, format='json')
 
         self.assertEqual(response.status_code,status.HTTP_400_BAD_REQUEST);
         self.assertEqual(response.data,{"name": ["This field is required."]})
+
+        # Words validation
+
+        response = client.post("/api/v0/program/",{"name": "plain", "words": "oops"}, format='json')
+
+        self.assertEqual(response.status_code,status.HTTP_400_BAD_REQUEST);
+        self.assertEqual(response.data,{"words": ["Must be a list."]})
+
+        # Create
 
         response = client.post("/api/v0/program/",{
             "name": "plain",
@@ -600,7 +705,7 @@ class test_Django(SimpleTestCase):
             "id": plain_id,
             "name": "plain",
             "description": "Plain ol' example",
-            "words": ["he","it","she"]
+            "words": ["he","she","it"]
         })
 
         # Select
@@ -614,10 +719,15 @@ class test_Django(SimpleTestCase):
             "id": plain_id,
             "name": "plain",
             "description": "Plain ol' example",
-            "words": ["he","it","she"]
+            "words": ["he","she","it"]
         })
 
         # Update 
+
+        response = client.post("/api/v0/program/%s" % plain_id,{"words": "oops"}, format='json')
+
+        self.assertEqual(response.status_code,status.HTTP_400_BAD_REQUEST);
+        self.assertEqual(response.data,{"words": ["Must be a list."]})
 
         response = client.post("/api/v0/program/%s" % plain_id,{
             "description": "Plain old example",
@@ -640,6 +750,16 @@ class test_Django(SimpleTestCase):
 
         # Append 
 
+        response = client.post("/api/v0/program/%s/append" % plain_id,{}, format='json')
+
+        self.assertEqual(response.status_code,status.HTTP_400_BAD_REQUEST);
+        self.assertEqual(response.data,{"words": ["This field is required."]})
+
+        response = client.post("/api/v0/program/%s/append" % plain_id,{"words": "oops"}, format='json')
+
+        self.assertEqual(response.status_code,status.HTTP_400_BAD_REQUEST);
+        self.assertEqual(response.data,{"words": ["Must be a list."]})
+
         response = client.post("/api/v0/program/%s/append" % plain_id,{
             "words": ["here","everywhere"]
         }, format='json')
@@ -648,17 +768,27 @@ class test_Django(SimpleTestCase):
             "id": plain_id,
             "name": "plain",
             "description": "Plain old example",
-            "words": ["everywhere","here","it","there"]
+            "words": ["it","there","here","everywhere"]
         })
 
         self.assertEqual(client.get("/api/v0/program/%s" % plain_id).data,{
             "id": plain_id,
             "name": "plain",
             "description": "Plain old example",
-            "words": ["everywhere","here","it","there"]
+            "words": ["it","there","here","everywhere"]
         })
 
         # Remove 
+
+        response = client.post("/api/v0/program/%s/remove" % plain_id,{}, format='json')
+
+        self.assertEqual(response.status_code,status.HTTP_400_BAD_REQUEST);
+        self.assertEqual(response.data,{"words": ["This field is required."]})
+
+        response = client.post("/api/v0/program/%s/remove" % plain_id,{"words": "oops"}, format='json')
+
+        self.assertEqual(response.status_code,status.HTTP_400_BAD_REQUEST);
+        self.assertEqual(response.data,{"words": ["Must be a list."]})
 
         response = client.post("/api/v0/program/%s/remove" % plain_id,{
             "words": ["here","there"]
@@ -668,14 +798,14 @@ class test_Django(SimpleTestCase):
             "id": plain_id,
             "name": "plain",
             "description": "Plain old example",
-            "words": ["everywhere","it"]
+            "words": ["it","everywhere"]
         })
 
         self.assertEqual(client.get("/api/v0/program/%s" % plain_id).data,{
             "id": plain_id,
             "name": "plain",
             "description": "Plain old example",
-            "words": ["everywhere","it"]
+            "words": ["it","everywhere"]
         })
 
         # List
@@ -695,7 +825,7 @@ class test_Django(SimpleTestCase):
                 "id": plain_id,
                 "name": "plain",
                 "description": "Plain old example",
-                "words": ["everywhere","it"]
+                "words": ["it","everywhere"]
             }
         ])
 
@@ -722,29 +852,24 @@ class test_Django(SimpleTestCase):
         loser = User(username="loser")
         loser.save()
 
-        # Words validation
-
-        response = client.post("/api/v0/student/",{"words": "oops"}, format='json')
-
-        self.assertEqual(response.status_code,status.HTTP_400_BAD_REQUEST);
-        self.assertEqual(response.data,{"words": ["Must be an array."]})
-
-        response = client.post("/api/v0/student/",{"words": [0]}, format='json')
-
-        self.assertEqual(response.status_code,status.HTTP_400_BAD_REQUEST);
-        self.assertEqual(response.data,{"words": ["All array items be be strings."]})
-
-        # Create
+        # Fields valication
 
         response = client.post("/api/v0/student/",{}, format='json')
 
         self.assertEqual(response.status_code,status.HTTP_400_BAD_REQUEST);
-        self.assertEqual(response.data,{"first_name": ["This field is required."]})
+        self.assertEqual(response.data,{
+            "first_name": ["This field is required."],
+            "last_name": ["This field is required."]
+        })
 
-        response = client.post("/api/v0/student/",{"first_name": "sane"}, format='json')
+        # Words validation
+
+        response = client.post("/api/v0/student/",{"first_name": "sane", "last_name": "jane", "words": "oops"}, format='json')
 
         self.assertEqual(response.status_code,status.HTTP_400_BAD_REQUEST);
-        self.assertEqual(response.data,{"last_name": ["This field is required."]})
+        self.assertEqual(response.data,{"words": ["Must be a list."]})
+
+        # Create
 
         response = client.post("/api/v0/student/",{
             "first_name": "sane",
@@ -761,7 +886,9 @@ class test_Django(SimpleTestCase):
             "first_name": "sane",
             "last_name": "jane",
             "age": 5,
-            "words": ["he","it","she"]
+            "words": ["he","she","it"],
+            "focus": [],
+            "position": {}
         })
 
         # Select
@@ -780,10 +907,12 @@ class test_Django(SimpleTestCase):
             "first_name": "sane",
             "last_name": "jane",
             "age": 5,
-            "words": ["he","it","she"]
+            "words": ["he","she","it"],
+            "focus": [],
+            "position": {}
         })
 
-        # Update 
+        # Not owned
 
         client.force_authenticate(user=loser)
 
@@ -793,6 +922,15 @@ class test_Django(SimpleTestCase):
         self.assertEqual(response.data,{"detail": "Student not found"})
 
         client.force_authenticate(user=user)
+
+        # Bad words
+
+        response = client.post("/api/v0/student/%s" % sane_jane_id,{"words": "oops"})
+
+        self.assertEqual(response.status_code,status.HTTP_400_BAD_REQUEST);
+        self.assertEqual(response.data,{"words": ["Must be a list."]})
+
+        # Update
 
         response = client.post("/api/v0/student/%s" % sane_jane_id,{
             "age": 6,
@@ -804,7 +942,9 @@ class test_Django(SimpleTestCase):
             "first_name": "sane",
             "last_name": "jane",
             "age": 6,
-            "words": ["it","there"]
+            "words": ["it","there"],
+            "focus": [],
+            "position": {}
         })
 
         self.assertEqual(client.get("/api/v0/student/%s" % sane_jane_id).data,{
@@ -812,7 +952,9 @@ class test_Django(SimpleTestCase):
             "first_name": "sane",
             "last_name": "jane",
             "age": 6,
-            "words": ["it","there"]
+            "words": ["it","there"],
+            "focus": [],
+            "position": {}
         })
 
         # Append 
@@ -826,6 +968,16 @@ class test_Django(SimpleTestCase):
 
         client.force_authenticate(user=user)
 
+        response = client.post("/api/v0/student/%s/append" % sane_jane_id,{}, format='json')
+
+        self.assertEqual(response.status_code,status.HTTP_400_BAD_REQUEST);
+        self.assertEqual(response.data,{"words": ["This field is required."]})
+
+        response = client.post("/api/v0/student/%s/append" % sane_jane_id,{"words": "oops"}, format='json')
+
+        self.assertEqual(response.status_code,status.HTTP_400_BAD_REQUEST);
+        self.assertEqual(response.data,{"words": ["Must be a list."]})
+
         response = client.post("/api/v0/student/%s/append" % sane_jane_id,{
             "words": ["here","everywhere"]
         }, format='json')
@@ -835,7 +987,9 @@ class test_Django(SimpleTestCase):
             "first_name": "sane",
             "last_name": "jane",
             "age": 6,
-            "words": ["everywhere","here","it","there"]
+            "words": ["it","there","here","everywhere"],
+            "focus": [],
+            "position": {}
         })
 
         self.assertEqual(client.get("/api/v0/student/%s" % sane_jane_id).data,{
@@ -843,7 +997,9 @@ class test_Django(SimpleTestCase):
             "first_name": "sane",
             "last_name": "jane",
             "age": 6,
-            "words": ["everywhere","here","it","there"]
+            "words": ["it","there","here","everywhere"],
+            "focus": [],
+            "position": {}
         })
 
         # Remove 
@@ -857,6 +1013,16 @@ class test_Django(SimpleTestCase):
 
         client.force_authenticate(user=user)
 
+        response = client.post("/api/v0/student/%s/append" % sane_jane_id,{}, format='json')
+
+        self.assertEqual(response.status_code,status.HTTP_400_BAD_REQUEST);
+        self.assertEqual(response.data,{"words": ["This field is required."]})
+
+        response = client.post("/api/v0/student/%s/append" % sane_jane_id,{"words": "oops"}, format='json')
+
+        self.assertEqual(response.status_code,status.HTTP_400_BAD_REQUEST);
+        self.assertEqual(response.data,{"words": ["Must be a list."]})
+
         response = client.post("/api/v0/student/%s/remove" % sane_jane_id,{
             "words": ["here","there"]
         }, format='json')
@@ -866,7 +1032,9 @@ class test_Django(SimpleTestCase):
             "first_name": "sane",
             "last_name": "jane",
             "age": 6,
-            "words": ["everywhere","it"]
+            "words": ["it","everywhere"],
+            "focus": [],
+            "position": {}
         })
 
         self.assertEqual(client.get("/api/v0/student/%s" % sane_jane_id).data,{
@@ -874,7 +1042,9 @@ class test_Django(SimpleTestCase):
             "first_name": "sane",
             "last_name": "jane",
             "age": 6,
-            "words": ["everywhere","it"]
+            "words": ["it","everywhere"],
+            "focus": [],
+            "position": {}
         })
 
         # List
@@ -895,14 +1065,18 @@ class test_Django(SimpleTestCase):
                 "first_name": "silly",
                 "last_name": "billy",
                 "age": 7,
-                "words": []
+                "words": [],
+                "focus": [],
+                "position": {}
             },
             {
                 "id": sane_jane_id,
                 "first_name": "sane",
                 "last_name": "jane",
                 "age": 6,
-                "words": ["everywhere","it"]
+                "words": ["it","everywhere"],
+                "focus": [],
+                "position": {}
             }
         ])
 
@@ -925,7 +1099,9 @@ class test_Django(SimpleTestCase):
                 "first_name": "silly",
                 "last_name": "billy",
                 "age": 7,
-                "words": []
+                "words": [],
+                "focus": [],
+                "position": {}
             }
         ])
 
@@ -945,6 +1121,11 @@ class test_Django(SimpleTestCase):
         self.assertEqual(response.status_code,status.HTTP_400_BAD_REQUEST);
         self.assertEqual(response.data,{"words": ["This field is required."]})
 
+        response = client.post("/api/v0/student/%s/focus" % silly_billy_id,{"words": "oops"}, format='json')
+
+        self.assertEqual(response.status_code,status.HTTP_400_BAD_REQUEST);
+        self.assertEqual(response.data,{"words": ["Must be a list."]})
+
         response = client.post("/api/v0/student/%s/append" % silly_billy_id,{
             "words": ["here"]
         }, format='json')
@@ -954,8 +1135,8 @@ class test_Django(SimpleTestCase):
             "words": ["here","there"]
         }, format='json')
 
-        self.assertEqual(response.status_code,status.HTTP_404_NOT_FOUND);
-        self.assertEqual(response.data,{"detail": "Words not found","words": ["there"]})
+        self.assertEqual(response.status_code,status.HTTP_400_BAD_REQUEST);
+        self.assertEqual(response.data,{"focus": ["Word 'there' not found."]})
 
         response = client.post("/api/v0/student/%s/append" % silly_billy_id,{
             "words": ["there","everywhere"]
@@ -967,28 +1148,15 @@ class test_Django(SimpleTestCase):
         }, format='json')
 
         self.assertEqual(response.status_code,status.HTTP_202_ACCEPTED);
-        self.assertEqual(response.data,[
-            {
-                "word": "here",
-                "focus": True,
-                "achievements": []
-            },
-            {
-                "word": "there",
-                "focus": True,
-                "achievements": []
-            }
-        ])
-
-        response = client.get("/api/v0/student/%s/focus" % silly_billy_id,format='json')
-
-        self.assertEqual(response.status_code,status.HTTP_200_OK);
-        self.assertEqual(response.data,["here","there"]);
-
-        response = client.post("/api/v0/student/%s/remove" % silly_billy_id,{
-            "words": ["here","there","everywhere"]
-        }, format='json')
-        self.assertEqual(response.status_code,status.HTTP_202_ACCEPTED);
+        self.assertEqual(response.data,{
+            "id": silly_billy_id,
+            "first_name": "silly",
+            "last_name": "billy",
+            "age": 7,
+            "words": ["here","there","everywhere"],
+            "focus": ["here","there"],
+            "position": {}
+        })
 
         # Blur 
 
@@ -1001,22 +1169,20 @@ class test_Django(SimpleTestCase):
 
         client.force_authenticate(user=user)
 
+        response = client.post("/api/v0/student/%s/remove" % silly_billy_id,{
+            "words": ["there","everywhere"]
+        }, format='json')
+        self.assertEqual(response.status_code,status.HTTP_202_ACCEPTED);
+
         response = client.post("/api/v0/student/%s/blur" % silly_billy_id,{}, format='json')
 
         self.assertEqual(response.status_code,status.HTTP_400_BAD_REQUEST);
         self.assertEqual(response.data,{"words": ["This field is required."]})
 
-        response = client.post("/api/v0/student/%s/append" % silly_billy_id,{
-            "words": ["here"]
-        }, format='json')
-        self.assertEqual(response.status_code,status.HTTP_202_ACCEPTED);
-
-        response = client.post("/api/v0/student/%s/blur" % silly_billy_id,{
-            "words": ["here","there"]
-        }, format='json')
-
-        self.assertEqual(response.status_code,status.HTTP_404_NOT_FOUND);
-        self.assertEqual(response.data,{"detail": "Words not found","words": ["there"]})
+        response = client.post("/api/v0/student/%s/blur" % silly_billy_id,{"words": "oops"}, format='json')
+        
+        self.assertEqual(response.status_code,status.HTTP_400_BAD_REQUEST);
+        self.assertEqual(response.data,{"words": ["Must be a list."]})
 
         response = client.post("/api/v0/student/%s/append" % silly_billy_id,{
             "words": ["there","everywhere"]
@@ -1033,18 +1199,15 @@ class test_Django(SimpleTestCase):
         }, format='json')
 
         self.assertEqual(response.status_code,status.HTTP_202_ACCEPTED);
-        self.assertEqual(response.data,[
-            {
-                "word": "here",
-                "focus": False,
-                "achievements": []
-            },
-            {
-                "word": "there",
-                "focus": False,
-                "achievements": []
-            }
-        ])
+        self.assertEqual(response.data,{
+            "id": silly_billy_id,
+            "first_name": "silly",
+            "last_name": "billy",
+            "age": 7,
+            "words": ["here","there","everywhere"],
+            "focus": [],
+            "position": {}
+        })
 
         response = client.post("/api/v0/student/%s/remove" % silly_billy_id,{
             "words": ["here","there","everywhere"]
@@ -1080,24 +1243,24 @@ class test_Django(SimpleTestCase):
         }, format='json')
 
         self.assertEqual(response.status_code,status.HTTP_404_NOT_FOUND);
-        self.assertEqual(response.data,{"detail": "Word not found"})
-
-        response = client.post("/api/v0/student/%s/append" % silly_billy_id,{
-            "words": ["here"]
-        }, format='json')
-        self.assertEqual(response.status_code,status.HTTP_202_ACCEPTED);
-
-        response = client.post("/api/v0/student/%s/attain" % silly_billy_id,{
-            "word": "here",
-            "achievement": 0
-        }, format='json')
-
-        self.assertEqual(response.status_code,status.HTTP_404_NOT_FOUND);
         self.assertEqual(response.data,{"detail": "Achievement not found"})
 
         achievement = Achievement(name="Sight",slug="sight",progression=100)
         achievement.save()
         sight_id = achievement.id
+
+        response = client.post("/api/v0/student/%s/attain" % silly_billy_id,{
+            "word": "here",
+            "achievement": sight_id
+        }, format='json')
+
+        self.assertEqual(response.status_code,status.HTTP_400_BAD_REQUEST);
+        self.assertEqual(response.data,{"word": ["Word 'here' not found."]})
+
+        response = client.post("/api/v0/student/%s/append" % silly_billy_id,{
+            "words": ["here"]
+        }, format='json')
+        self.assertEqual(response.status_code,status.HTTP_202_ACCEPTED);
 
         response = client.post("/api/v0/student/%s/attain" % silly_billy_id,{
             "word": "here",
@@ -1155,24 +1318,24 @@ class test_Django(SimpleTestCase):
         }, format='json')
 
         self.assertEqual(response.status_code,status.HTTP_404_NOT_FOUND);
-        self.assertEqual(response.data,{"detail": "Word not found"})
-
-        response = client.post("/api/v0/student/%s/append" % silly_billy_id,{
-            "words": ["there"]
-        }, format='json')
-        self.assertEqual(response.status_code,status.HTTP_202_ACCEPTED);
-
-        response = client.post("/api/v0/student/%s/yield" % silly_billy_id,{
-            "word": "there",
-            "achievement": 0
-        }, format='json')
-
-        self.assertEqual(response.status_code,status.HTTP_404_NOT_FOUND);
         self.assertEqual(response.data,{"detail": "Achievement not found"})
 
         achievement = Achievement(name="Spell",slug="spell",progression=101)
         achievement.save()
         spell_id = achievement.id
+
+        response = client.post("/api/v0/student/%s/yield" % silly_billy_id,{
+            "word": "there",
+            "achievement": spell_id
+        }, format='json')
+
+        self.assertEqual(response.status_code,status.HTTP_400_BAD_REQUEST);
+        self.assertEqual(response.data,{"word": ["Word 'there' not found."]})
+
+        response = client.post("/api/v0/student/%s/append" % silly_billy_id,{
+            "words": ["there"]
+        }, format='json')
+        self.assertEqual(response.status_code,status.HTTP_202_ACCEPTED);
 
         response = client.post("/api/v0/student/%s/attain" % silly_billy_id,{
             "word": "there",
@@ -1218,55 +1381,27 @@ class test_Django(SimpleTestCase):
         }, format='json')
         self.assertEqual(response.status_code,status.HTTP_202_ACCEPTED);
 
-        self.assertEqual(client.get("/api/v0/student/%s/position" % silly_billy_id).data,[
-            {
-                "word": "here",
-                "focus": True,
-                "achievements": [sight_id]
-            },
-            {
-                "word": "there",
-                "focus": False,
-                "achievements": []
-            }
-        ])
+        self.assertEqual(client.get("/api/v0/student/%s/position" % silly_billy_id).data,{
+            "here": [sight_id],
+            "there": []
+        })
 
-        self.assertEqual(client.get("/api/v0/student/%s/position?words=here,there" % silly_billy_id).data,[
-            {
-                "word": "here",
-                "focus": True,
-                "achievements": [sight_id]
-            },
-            {
-                "word": "there",
-                "focus": False,
-                "achievements": []
-            }
-        ])
+        self.assertEqual(client.get("/api/v0/student/%s/position?words=here,there" % silly_billy_id).data,{
+            "here": [sight_id],
+            "there": []
+        })
 
-        self.assertEqual(client.get("/api/v0/student/%s/position?words=here" % silly_billy_id).data,[
-            {
-                "word": "here",
-                "focus": True,
-                "achievements": [sight_id]
-            }
-        ])
+        self.assertEqual(client.get("/api/v0/student/%s/position?words=here" % silly_billy_id).data,{
+            "here": [sight_id]
+        })
 
-        self.assertEqual(client.get("/api/v0/student/%s/position?focus=true" % silly_billy_id).data,[
-            {
-                "word": "here",
-                "focus": True,
-                "achievements": [sight_id]
-            }
-        ])
+        self.assertEqual(client.get("/api/v0/student/%s/position?focus=true" % silly_billy_id).data,{
+            "here": [sight_id]
+        })
 
-        self.assertEqual(client.get("/api/v0/student/%s/position?focus=false" % silly_billy_id).data,[
-            {
-                "word": "there",
-                "focus": False,
-                "achievements": []
-            }
-        ])
+        self.assertEqual(client.get("/api/v0/student/%s/position?focus=false" % silly_billy_id).data,{
+            "there": []
+        })
 
         # History
 
@@ -1521,14 +1656,10 @@ class test_Django(SimpleTestCase):
                 "2015-09-24",
                 "2015-09-25"
             ],
-            "data": {
-                "2015-09-20": {sight_id: 1, spell_id: 0},
-                "2015-09-21": {sight_id: 1, spell_id: 0},
-                "2015-09-22": {sight_id: 1, spell_id: 1},
-                "2015-09-23": {sight_id: 1, spell_id: 0},
-                "2015-09-24": {sight_id: 1, spell_id: 0},
-                "2015-09-25": {sight_id: 1, spell_id: 1}
-            }
+            "data": [
+                {"achievement_id": sight_id, "totals": [1,1,1,1,1,1]},
+                {"achievement_id": spell_id, "totals": [0,0,1,0,0,1]}
+            ]
         })
 
         chart = dict(client.get("/api/v0/student/%s/chart/?by=week" % (silly_billy_id)).data)
@@ -1539,10 +1670,10 @@ class test_Django(SimpleTestCase):
                 "2015-09-14",
                 "2015-09-21"
             ],
-            "data": {
-                "2015-09-14": {sight_id: 1, spell_id: 0},
-                "2015-09-21": {sight_id: 1, spell_id: 1}
-            }
+            "data": [
+                {"achievement_id": sight_id, "totals": [1,1]},
+                {"achievement_id": spell_id, "totals": [0,1]}
+            ]
         })
 
         chart = dict(client.get("/api/v0/student/%s/chart/?by=month" % (silly_billy_id)).data)
@@ -1552,9 +1683,10 @@ class test_Django(SimpleTestCase):
             "times": [
                 "2015-09"
             ],
-            "data": {
-                "2015-09": {sight_id: 1, spell_id: 1}
-            }
+            "data": [
+                {"achievement_id": sight_id, "totals": [1]},
+                {"achievement_id": spell_id, "totals": [1]}
+            ]
         })
 
         response = client.post("/api/v0/student/%s/focus" % silly_billy_id,{
@@ -1579,14 +1711,10 @@ class test_Django(SimpleTestCase):
                 "2015-09-24",
                 "2015-09-25"
             ],
-            "data": {
-                "2015-09-20": {sight_id: 1, spell_id: 0},
-                "2015-09-21": {sight_id: 1, spell_id: 0},
-                "2015-09-22": {sight_id: 1, spell_id: 1},
-                "2015-09-23": {sight_id: 1, spell_id: 0},
-                "2015-09-24": {sight_id: 1, spell_id: 0},
-                "2015-09-25": {sight_id: 1, spell_id: 1}
-            }
+            "data": [
+                {"achievement_id": sight_id, "totals": [1,1,1,1,1,1]},
+                {"achievement_id": spell_id, "totals": [0,0,1,0,0,1]}
+            ]
         })
 
         chart = dict(client.get("/api/v0/student/%s/chart/?words=here" % (silly_billy_id)).data)
@@ -1601,14 +1729,10 @@ class test_Django(SimpleTestCase):
                 "2015-09-24",
                 "2015-09-25"
             ],
-            "data": {
-                "2015-09-20": {sight_id: 1, spell_id: 0},
-                "2015-09-21": {sight_id: 1, spell_id: 0},
-                "2015-09-22": {sight_id: 1, spell_id: 0},
-                "2015-09-23": {sight_id: 1, spell_id: 0},
-                "2015-09-24": {sight_id: 1, spell_id: 0},
-                "2015-09-25": {sight_id: 1, spell_id: 1}
-            }
+            "data": [
+                {"achievement_id": sight_id, "totals": [1,1,1,1,1,1]},
+                {"achievement_id": spell_id, "totals": [0,0,0,0,0,1]}
+            ]
         })
 
         chart = dict(client.get("/api/v0/student/%s/chart/?focus=true" % (silly_billy_id)).data)
@@ -1620,11 +1744,10 @@ class test_Django(SimpleTestCase):
                 "2015-09-23",
                 "2015-09-24"
             ],
-            "data": {
-                "2015-09-22": {sight_id: 0, spell_id: 1},
-                "2015-09-23": {sight_id: 0, spell_id: 0},
-                "2015-09-24": {sight_id: 0, spell_id: 0}
-            }
+            "data": [
+                {"achievement_id": sight_id, "totals": [0,0,0]},
+                {"achievement_id": spell_id, "totals": [1,0,0]}
+            ]
         })
 
         chart = dict(client.get("/api/v0/student/%s/chart/?achievements=%s" % (silly_billy_id,spell_id)).data)
@@ -1637,12 +1760,9 @@ class test_Django(SimpleTestCase):
                 "2015-09-24",
                 "2015-09-25"
             ],
-            "data": {
-                "2015-09-22": {spell_id: 1},
-                "2015-09-23": {spell_id: 0},
-                "2015-09-24": {spell_id: 0},
-                "2015-09-25": {spell_id: 1}
-            }
+            "data": [
+                {"achievement_id": spell_id, "totals": [1,0,0,1]}
+            ]
         })
 
         chart = dict(client.get("/api/v0/student/%s/chart/?from=2015-09-22&to=2015-09-25" % (silly_billy_id)).data)
@@ -1654,11 +1774,10 @@ class test_Django(SimpleTestCase):
                 "2015-09-23",
                 "2015-09-24"
             ],
-            "data": {
-                "2015-09-22": {sight_id: 1, spell_id: 1},
-                "2015-09-23": {sight_id: 1, spell_id: 0},
-                "2015-09-24": {sight_id: 1, spell_id: 0}
-            }
+            "data": [
+                {"achievement_id": sight_id, "totals": [1,1,1]},
+                {"achievement_id": spell_id, "totals": [1,0,0]}
+            ]
         })
 
 

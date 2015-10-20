@@ -5,6 +5,15 @@ from learning.models import *
 from django.contrib.auth.models import User
 
 
+class JSONField(serializers.Field):
+
+    def to_internal_value(self, data):
+        return data
+
+    def to_representation(self, value):
+        return value
+
+
 class CreateUserSerializer(serializers.ModelSerializer):
 
     email = serializers.EmailField(required=True,allow_blank=False)
@@ -36,6 +45,8 @@ class AchievementSerializer(serializers.ModelSerializer):
 
 class ProgramSerializer(serializers.ModelSerializer):
 
+    words = JSONField()
+
     class Meta:
         model = Program
         readonly_fields = ('id')
@@ -46,11 +57,13 @@ class ProgramSerializer(serializers.ModelSerializer):
 
 class StudentSerializer(serializers.ModelSerializer):
 
-    words = StudentWordSerializer(required=False,many=True)
+    words = JSONField()
+    focus = JSONField()
+    position = JSONField()
 
     class Meta:
         model = Student
-        fields = ('id','first_name', 'last_name', 'age', 'words', 'focus')
+        fields = ('id','first_name', 'last_name', 'age', 'words', 'focus', 'position')
         readonly_fields = ('id','teacher','position')
 
     def get_display(self, obj):

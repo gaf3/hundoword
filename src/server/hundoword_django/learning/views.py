@@ -8,6 +8,7 @@ import pytz
 from django.db import transaction
 from django.db.models import Q
 from django.utils.timezone import get_current_timezone
+from django.core.exceptions import ValidationError
 
 from rest_framework import status, permissions
 from rest_framework.decorators import api_view, permission_classes
@@ -38,12 +39,51 @@ def exception_response(exception,detail=None,status=status.HTTP_500_INTERNAL_SER
     return Response({"detail": detail}, status=status)
 
 
+def validation_response(exception,status=status.HTTP_400_BAD_REQUEST):
+
+    if settings.DEBUG: # pragma: no cover
+        print exception.message_dict
+
+    return Response(exception.message_dict, status=status)
+
+
 def errors_response(serializer,status=status.HTTP_400_BAD_REQUEST):
 
     if settings.DEBUG: # pragma: no cover
         print serializer.errors
 
     return Response(serializer.errors, status=status)
+
+
+def serialize_request(model,data,required,optional):
+
+    values = {}
+    errors = {}
+
+    for field in required:
+        if field in data:
+            values[field] = data[field]
+        else:
+            errors[field] = ["This field is required."]
+
+    if errors:
+        raise ValidationError(errors)
+
+    for field in optional:
+        if field in data:
+            values[field] = data[field]
+
+    return model(**values)
+
+
+def words_request(data,field="words"):
+
+    if field not in data:
+        raise ValidationError({field: ["This field is required."]})
+
+    validate_words(field,data[field])
+
+    return data[field]
 
 
 @api_view(['POST'])
@@ -80,35 +120,10 @@ def achievement(request,pk='',action=''):
 
         if request.method == 'POST' and not pk:
 
-            if 'name' not in request.DATA:
-                return Response({"name": ["This field is required."]}, status=status.HTTP_400_BAD_REQUEST)
-
-            if 'slug' not in request.DATA:
-                return Response({"slug": ["This field is required."]}, status=status.HTTP_400_BAD_REQUEST)
-
-            if 'progression' not in request.DATA:
-                return Response({"progression": ["This field is required."]}, status=status.HTTP_400_BAD_REQUEST)
-
-            with transaction.atomic():
-
-                achievement = Achievement(name=request.DATA['name'])
-
-                if 'slug' in request.DATA:
-                    achievement.slug = request.DATA['slug']
-
-                if 'description' in request.DATA:
-                    achievement.description = request.DATA['description']
-
-                if 'progression' in request.DATA:
-                    achievement.progression = request.DATA['progression']
-
-                if 'color' in request.DATA:
-                    achievement.color = request.DATA['color']
-
-                achievement.save()
-
-                serializer = AchievementSerializer(achievement)
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            achievement = serialize_request(Achievement,request.DATA,['name','slug','progression'],['description','color'])
+            achievement.save()
+            serializer = AchievementSerializer(achievement)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         # List
 
@@ -139,17 +154,10 @@ def achievement(request,pk='',action=''):
         elif request.method == 'POST' and pk:
 
             achievement = Achievement.objects.get(pk=pk)
-
             serializer = AchievementSerializer(achievement,data=request.DATA, partial=True)
-
-            if serializer.is_valid():
-
-                serializer.save()
-                return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
-
-            else: # pragma: no cover
-
-                return errors_response(serializer)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
 
         # Delete
 
@@ -163,6 +171,10 @@ def achievement(request,pk='',action=''):
 
         return exception_response(exception, "Achievement not found", status=status.HTTP_404_NOT_FOUND)
 
+    except ValidationError as exception:
+
+        return validation_response(exception)
+
     except Exception as exception: # pragma: no cover
 
         return exception_response(exception)
@@ -174,38 +186,14 @@ def program(request,pk='',action=''):
 
     try:
 
-        # Words is universal to usage
-
-        if 'words' in request.DATA:
-
-            if not isinstance(request.DATA["words"],list):
-                return Response({"words": ["Must be an array."]}, status=status.HTTP_400_BAD_REQUEST)
-
-            for word in request.DATA["words"]:
-                if not isinstance(word,str) and not isinstance(word,unicode):
-                    return Response({"words": ["All array items be be strings."]}, status=status.HTTP_400_BAD_REQUEST)
-
         # Create
 
         if request.method == 'POST' and not pk:
 
-            if 'name' not in request.DATA:
-                return Response({"name": ["This field is required."]}, status=status.HTTP_400_BAD_REQUEST)
-
-            with transaction.atomic():
-
-                program = Program(name=request.DATA['name'])
-
-                if 'description' in request.DATA:
-                    program.description = request.DATA['description']
-
-                if 'words' in request.DATA:
-                    program.words = request.DATA['words']
-
-                program.save()
-
-                serializer = ProgramSerializer(program)
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            program = serialize_request(Program,request.DATA,['name'],['description','words'])
+            program.save()
+            serializer = ProgramSerializer(program)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         # List
 
@@ -227,20 +215,34 @@ def program(request,pk='',action=''):
 
             program = Program.objects.get(pk=pk)
 
-            # Update 
+            # Update
 
             if not action:
 
                 serializer = ProgramSerializer(program,data=request.DATA, partial=True)
+                serializer.is_valid(raise_exception=True)
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
 
-                if serializer.is_valid():
+            # Append
 
-                    serializer.save()
-                    return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+            elif action == "append": 
 
-                else: # pragma: no cover
+                program.words.extend(words_request(request.DATA))
+                program.save()
+                serializer = ProgramSerializer(program)
+                return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
 
-                    return errors_response(serializer)
+            # Remove
+
+            elif action == "remove": 
+
+                for word in words_request(request.DATA):
+                    if word in program.words:
+                        program.words.pop(program.words.index(word))
+                program.save()
+                serializer = ProgramSerializer(program)
+                return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
 
         # Delete
 
@@ -254,6 +256,10 @@ def program(request,pk='',action=''):
 
         return exception_response(exception, "Program not found", status=status.HTTP_404_NOT_FOUND)
 
+    except ValidationError as exception:
+
+        return validation_response(exception)
+
     except Exception as exception: # pragma: no cover
 
         return exception_response(exception)
@@ -265,67 +271,13 @@ def student(request,pk='',action=''):
 
     try:
 
-        # Words is universal to usage
-
-        if 'words' in request.DATA:
-
-            if not isinstance(request.DATA["words"],list):
-                return Response({"words": ["Must be an array."]}, status=status.HTTP_400_BAD_REQUEST)
-
-            for word in request.DATA["words"]:
-                if not isinstance(word,str) and not isinstance(word,unicode):
-                    return Response({"words": ["All array items be be strings."]}, status=status.HTTP_400_BAD_REQUEST)
-
-        if 'focus' in request.DATA:
-
-            if not isinstance(request.DATA["focus"],list):
-                return Response({"focus": ["Must be an array."]}, status=status.HTTP_400_BAD_REQUEST)
-
-            for word in request.DATA["focus"]:
-                if not isinstance(word,str) and not isinstance(word,unicode):
-                    return Response({"focus": ["All array items be be strings."]}, status=status.HTTP_400_BAD_REQUEST)
-
         # Create
 
         if request.method == 'POST' and not pk:
 
-            if 'first_name' not in request.DATA:
-                return Response({"first_name": ["This field is required."]}, status=status.HTTP_400_BAD_REQUEST)
-
-            if 'last_name' not in request.DATA:
-                return Response({"last_name": ["This field is required."]}, status=status.HTTP_400_BAD_REQUEST)
-
-            student = Student(
-                teacher=request.user,
-                first_name=request.DATA['first_name'],
-                last_name=request.DATA['last_name'],
-                words=[],
-                focus=[],
-                position={}
-            )
-
-            if 'age' in request.DATA:
-                student.age = request.DATA['age']
-
-            if 'words' in request.DATA:
-                for word in request.DATA['words']:
-                    if word not in student.words:
-                        student.words.append(word)
-
-            if 'focus' in request.DATA:
-
-                extra = []
-                for word in request.DATA['focus']:
-                    if word not in student.words:
-                        extra.append("Word %s not found." % word)
-                    elif word not in student.focus:
-                        student.focus.append(word)
-
-                if extra:
-                    return Response({"focus": extra}, status=status.HTTP_400_BAD_REQUEST)
-
+            student = serialize_request(Student,request.DATA,['first_name','last_name'],['age','words','focus'])
+            student.teacher = request.user
             student.save()
-
             serializer = StudentSerializer(student)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
@@ -356,8 +308,11 @@ def student(request,pk='',action=''):
 
                 if "words" in request.GET:
                     words = request.GET["words"].split(",")
-                elif "focus" in request.GET and request.GET["focus"].lower() == "true":
-                    words = student.focus
+                elif "focus" in request.GET:
+                    if request.GET["focus"].lower() == "true":
+                        words = student.focus
+                    else:
+                        words = [word for word in student.words if word not in student.focus] 
                 else:
                     words = student.words
 
@@ -433,66 +388,43 @@ def student(request,pk='',action=''):
 
             if not action:
 
-                if 'words' in request.DATA:
-                    words = request.DATA['words']
-                else:
-                    words = student.words
+                serializer = StudentSerializer(student,data=request.DATA, partial=True)
+                serializer.is_valid(raise_exception=True)
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
 
-                if 'focus' in request.DATA:
+            # Append
 
-                    extra = []
-                    for word in request.DATA['focus']:
-                        if word not in words:
-                            extra.append("Word %s not found." % word)
+            elif action == "append": 
 
-                    if extra:
-                        return Response({"focus": extra}, status=status.HTTP_400_BAD_REQUEST)
+                student.words_append(words_request(request.DATA))
+                student.save()
+                serializer = StudentSerializer(student)
+                return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
 
-                if serializer.is_valid():
+            # Remove
 
-                    serializer.save()
-                    return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+            elif action == "remove": 
 
-                else: # pragma: no cover
+                student.words_remove(words_request(request.DATA))
+                student.save()
+                serializer = StudentSerializer(student)
+                return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
 
-                    return errors_response(serializer)
+            # Focus
 
             elif action == "focus": 
 
-                if 'words' not in request.DATA:
-                    return Response({"words": ["This field is required."]}, status=status.HTTP_400_BAD_REQUEST)
-
-                for word in request.DATA['words']:
-                    if word in student.words:
-
-
-                student_words = StudentWord.objects.filter(student=student,word__in=request.DATA["words"])
-
-                missing = set(request.DATA["words"]) - set([student_word.word for student_word in student_words])
-
-                if missing:
-                    return Response({"detail": "Words not found","words": list(missing)}, status=status.HTTP_404_NOT_FOUND)
-
-                student_words.update(focus=action == "focus")
-                serializer = PositionSerializer(student_words, many=True)
+                student.words_focus(words_request(request.DATA))
+                student.save()
+                serializer = StudentSerializer(student)
                 return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
 
             elif action == "blur": 
 
-                if 'words' not in request.DATA:
-                    return Response({"words": ["This field is required."]}, status=status.HTTP_400_BAD_REQUEST)
-
-                for word in request.DATA
-
-                student_words = StudentWord.objects.filter(student=student,word__in=request.DATA["words"])
-
-                missing = set(request.DATA["words"]) - set([student_word.word for student_word in student_words])
-
-                if missing:
-                    return Response({"detail": "Words not found","words": list(missing)}, status=status.HTTP_404_NOT_FOUND)
-
-                student_words.update(focus=action == "focus")
-                serializer = PositionSerializer(student_words, many=True)
+                student.words_blur(words_request(request.DATA))
+                student.save()
+                serializer = StudentSerializer(student)
                 return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
 
             elif action in ["attain","yield"]: 
@@ -504,7 +436,6 @@ def student(request,pk='',action=''):
                     return Response({"achievement": ["This field is required."]}, status=status.HTTP_400_BAD_REQUEST)
 
                 word = request.DATA["word"]
-                student_word = StudentWord.objects.get(student=student,word=word)
                 achievement = Achievement.objects.get(pk=request.DATA["achievement"])
                 at = None
                 if "at" in request.DATA:
@@ -517,15 +448,8 @@ def student(request,pk='',action=''):
                         progress.at = at
                     progress.save()
 
-                    if action == "attain" and achievement not in student_word.achievements.all():
-
-                        student_word.achievements.add(achievement)
-                        student_word.save();
-
-                    elif action == "yield" and achievement in student_word.achievements.all():
-
-                        student_word.achievements.remove(achievement)
-                        student_word.save();
+                    student.progress_position(progress)
+                    student.save()
 
                 serializer = ProgressSerializer(progress)
                 return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
@@ -542,13 +466,13 @@ def student(request,pk='',action=''):
 
         return exception_response(exception, "Student not found", status=status.HTTP_404_NOT_FOUND)
 
-    except StudentWord.DoesNotExist as exception:
-
-        return exception_response(exception, "Word not found", status=status.HTTP_404_NOT_FOUND)
-
     except Achievement.DoesNotExist as exception:
 
         return exception_response(exception, "Achievement not found", status=status.HTTP_404_NOT_FOUND)
+
+    except ValidationError as exception:
+
+        return validation_response(exception)
 
     except Exception as exception: # pragma: no cover
 

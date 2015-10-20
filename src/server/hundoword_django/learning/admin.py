@@ -11,7 +11,5 @@ class ProgramAdmin(admin.ModelAdmin):
 
 admin.site.register(Achievement,AchievementAdmin)
 admin.site.register(Program,ProgramAdmin)
-admin.site.register(ProgramWord)
 admin.site.register(Student)
-admin.site.register(StudentWord)
 admin.site.register(Progress)
