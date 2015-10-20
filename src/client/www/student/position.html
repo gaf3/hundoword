@@ -29,24 +29,26 @@
                 </tr>
             </thead>
             <tbody>
-                {{~it.positions :position}}
+                {{~it.words :word}}
+                {{? $.inArray(word,it.student.words) > -1}}
                 <tr>
-                    <td>{{=position.word}}</td>
+                    <td>{{=word}}</td>
                     <td>
                         <input 
-                            type="checkbox" OnClick="Learning.current.controller.focus(event,'{{=position.word}}');" 
-                            {{? position.focus }}checked{{?}}
+                            type="checkbox" OnClick="Learning.current.controller.focus(event,'{{=word}}');" 
+                            {{? $.inArray(word,it.student.focus) > -1 }}checked{{?}}
                         >
                     </td>
                     {{~it.achievements :achievement}}
                     <td>
                         <input 
-                            type="checkbox" OnClick="Learning.current.controller.progress(event,'{{=position.word}}',{{=achievement.id}});" 
-                            {{? position.achievements.indexOf(achievement.id) > -1 }}checked{{?}}
+                            type="checkbox" OnClick="Learning.current.controller.progress(event,'{{=word}}',{{=achievement.id}});" 
+                            {{? word in it.positions && $.inArray(achievement.id,it.positions[word]) > -1 }}checked{{?}}
                         >
                     </td>
                     {{~}}
                 </tr>
+                {{?}}
                 {{~}}
             </tbody>
         </table>

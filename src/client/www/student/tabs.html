@@ -6,7 +6,7 @@
     <li class="{{? !it.student.id }}uk-disabled{{?? Learning.current.route.name == 'student/focus' }}uk-active{{?}}">
         <a href="{{=Learning.link('student/focus',it.student.id)}}">Focus</a>
     </li>
-    <li class="{{? !it.student.id }}uk-disabled{{?? Learning.current.route.name == 'student/games' || Learning.current.route.name == 'student/game'}}uk-active{{?}}">
+    <li class="{{? !it.student.id }}uk-disabled{{?? Learning.current.paths[2] == 'game'}}uk-active{{?}}">
         <a href="{{=Learning.link('student/games',it.student.id)}}">Games</a>
     </li>
     <li class="{{? !it.student.id }}uk-disabled{{?? Learning.current.route.name == 'student/position' }}uk-active{{?}}">

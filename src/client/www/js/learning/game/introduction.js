@@ -30,4 +30,4 @@ Learning.controller("Introduction","Game",{
 
 Learning.template("Introduction",Learning.load("game/introduction"),null,Learning.partials);
 
-Learning.route("game/introduction","/student/{student_id:^\\d+$}/game/introduction/","Introduction","Introduction","words");
+Learning.route("game/introduction","/student/{student_id:^\\d+$}/game/introduction/","Introduction","Introduction","choose");

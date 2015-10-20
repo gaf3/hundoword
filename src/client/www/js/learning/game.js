@@ -6,10 +6,9 @@ Learning.controller("Game","Changeable",{
         };
         this.application.render(this.it);
     },
-    words: function() {
-        if (!("words" in this.words)) {
-            this.words = hwAPI.student.focus(this.application.current.path.student_id);
-        }
+    choose: function() {
+        var student = hwAPI.student.select(this.application.current.path.student_id);
+        this.words = student.focus;
         this.it = {
             student: hwAPI.student.select(this.application.current.path.student_id),
             achievement: hwAPI.achievement.slug(Learning.current.paths[3]),
@@ -25,9 +24,8 @@ Learning.controller("Game","Changeable",{
         $("#select").val('');
     },
     focus: function() {
-        var words = hwAPI.student.focus(this.application.current.path.student_id);
-        for (var word = 0; word < words.length; word++) {
-            $("#words li[word=" + words[word] + "]").addClass("uk-active");
+        for (var word = 0; word < this.it.student.words.length; word++) {
+            $("#words li[word=" + this.it.student.words[word] + "]").addClass("uk-active");
         }
     },
     clear: function() {

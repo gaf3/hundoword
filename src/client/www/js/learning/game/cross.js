@@ -130,5 +130,5 @@ Learning.controller("Cross","Game",{
 
 Learning.template("Cross",Learning.load("game/cross"),null,Learning.partials);
 
-Learning.route("game/sight-cross","/student/{student_id:^\\d+$}/game/sight-cross/","Cross","Cross","words");
-Learning.route("game/sound-cross","/student/{student_id:^\\d+$}/game/sound-cross/","Cross","Cross","words");
+Learning.route("game/sight-cross","/student/{student_id:^\\d+$}/game/sight-cross/","Cross","Cross","choose");
+Learning.route("game/sound-cross","/student/{student_id:^\\d+$}/game/sound-cross/","Cross","Cross","choose");

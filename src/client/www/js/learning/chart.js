@@ -3,10 +3,12 @@ Learning.controller("Chart","Changeable",{
         this.it = {
             student: hwAPI.student.select(this.application.current.path.student_id),
             achievements: hwAPI.achievement.list(),
-            achievement_names: {}
+            achievement_names: {},
+            achievement_colors: {}
         };
         for (var achievement = 0; achievement < this.it.achievements.length; achievement++) {
             this.it.achievement_names[this.it.achievements[achievement].id] = this.it.achievements[achievement].name;
+            this.it.achievement_colors[this.it.achievements[achievement].id] = this.it.achievements[achievement].color;
         }
         var by = null;
         if (this.application.current.query.by) {
@@ -43,29 +45,17 @@ Learning.controller("Chart","Changeable",{
             labels: chart.times,
             datasets: []
         }
-        var achievement_sets = {};
-        for (var achievement = 0; achievement < this.it.achievements.length; achievement++) {
-            if (!(this.it.achievements[achievement].id in chart.data[chart.times[0]])) {
-                continue;
-            }
-            achievement_sets[this.it.achievements[achievement].id] = data.datasets.length;
+        for (var dataset = 0; dataset < chart.data.length; dataset++) {
+            console.log(chart.data[dataset]);
             data.datasets.push({
-                label: this.it.achievements[achievement].name,
-                strokeColor: this.it.achievements[achievement].color,
-                pointColor: this.it.achievements[achievement].color,
+                label: this.it.achievement_names[chart.data[dataset].achievement],
+                strokeColor: this.it.achievement_colors[chart.data[dataset].achievement],
+                pointColor: this.it.achievement_colors[chart.data[dataset].achievement],
                 pointStrokeColor: "#fff",
                 pointHighlightFill: "#fff",
-                pointHighlightStroke: this.it.achievements[achievement].color,
-                data: []
+                pointHighlightStroke: this.it.achievement_colors[chart.data[dataset].achievement],
+                data: chart.data[dataset].totals
             });
-        }
-        for (var time = 0; time < chart.times.length; time++) {
-            for (var achievement_id in chart.data[chart.times[time]]) {
-                if (!chart.data[chart.times[time]].hasOwnProperty(achievement_id)) {
-                    continue;
-                }
-                data.datasets[achievement_sets[achievement_id]].data.push(chart.data[chart.times[time]][achievement_id]);
-            }
         }
         new Chart(context).Line(data,{datasetFill: false});
     },
