@@ -29,5 +29,5 @@ Learning.controller("Spell","Game",{
 
 Learning.template("Spell",Learning.load("game/spell"),null,Learning.partials);
 
-Learning.route("game/sight-spell","/student/{student_id:^\\d+$}/game/sight-spell/","Spell","Spell","words");
-Learning.route("game/sound-spell","/student/{student_id:^\\d+$}/game/sound-spell/","Spell","Spell","words");
+Learning.route("game/sight-spell","/student/{student_id:^\\d+$}/game/sight-spell/","Spell","Spell","choose");
+Learning.route("game/sound-spell","/student/{student_id:^\\d+$}/game/sound-spell/","Spell","Spell","choose");

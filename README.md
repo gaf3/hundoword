@@ -300,6 +300,10 @@ In all JavaScript API functions, the arguments success, error, and complete are 
         * last_name
         * age
         * words - Array of words to learn (string)
+        * focus - Array of words to focus on 
+        * position - Object of where the student is at
+          * word - Key of the word
+            * achievements - Id's of achievements held
     * JavaScript - `api.student.list(success,error,complete)`
   * Select - Retrieves Student using id
     * Request - `GET http://192.168.72.87/api/v0/student/<id>/`
@@ -309,19 +313,28 @@ In all JavaScript API functions, the arguments success, error, and complete are 
       * last_name
       * age
       * words - Array of words (string)
+      * focus - Array of words to focus on 
+      * position - Object of where the student is at
+        * word - Key of the word
+          * achievements - Id's of achievements held
     * JavaScript - `api.student.select(id,success,error,complete)`
   * Create - Creates a Student
     * Request - `POST http://192.168.72.87/api/v0/student/`
       * first_name
       * last_name
       * age
-      * words - Array of words (string) - Duplicates are ignored, no warning
+      * words - Array of words (string) - Duplicates are ignored, no warning, position maintained
+      * focus - Array of words to focus on 
     * Response - `201 Created`
       * id
       * first_name
       * last_name
       * age
       * words - Array of words (string)
+      * focus - Array of words to focus on 
+      * position - Object of where the student is at
+        * word - Key of the word
+          * achievements - Id's of achievements held
     * JavaScript - `api.student.create(data,success,error,complete)`
       * data - object to be posted
   * Update - Updates a Student
@@ -329,13 +342,18 @@ In all JavaScript API functions, the arguments success, error, and complete are 
       * first_name - (optional)
       * last_name - (optional)
       * age - (optional)
-      * words - (optional) Array of words (string) - Will overwrite existing list, dupes ignored
+      * words - (optional) Array of words (string) - Will overwrite existing list, dupes ignored, position maintained
+      * focus - Array of words to focus on 
     * Response - `202 Accepted`
       * id
       * first_name
       * last_name
       * age
       * words - Array of words (string)
+      * focus - Array of words to focus on
+      * position - Object of where the student is at
+        * word - Key of the word
+          * achievements - Id's of achievements held
     * JavaScript - `api.student.update(id,data,success,error,complete)`
       * data - object to be posted
   * Append - Adds words to a Student
@@ -358,28 +376,40 @@ In all JavaScript API functions, the arguments success, error, and complete are 
       * last_name
       * age
       * words - Array of words (string)
+      * focus - Array of words to focus on
+      * position - Object of where the student is at
+        * word - Key of the word
+          * achievements - Id's of achievements held
     * JavaScript - `api.student.remove(id,words,success,error,complete)`
       * words - array of words to remove
   * Focus - Have Student focus on particular words or get what they're focusing on
     * Request - `POST http://192.168.72.87/api/v0/student/<id>/focus/`
       * words - Array of words (string) - Will have their focus set to true
     * Response - `202 Accepted`
-      * word 
-      * focus - Whether this word is being focused on
-      * achievments - Array of achievement ids
+      * id
+      * first_name
+      * last_name
+      * age
+      * words - Array of words (string)
+      * focus - Array of words to focus on
+      * position - Object of where the student is at
+        * word - Key of the word
+          * achievements - Id's of achievements held
     * JavaScript - `api.student.focus(id,words,success,error,complete)`
       * words - array of words to focus on
-    * Request - `GET http://192.168.72.87/api/v0/student/<id>/focus/`
-    * Response - `200 OK`
-      * Array of words (string) that are being focused on
-    * JavaScript - `api.student.focus(id,null,success,error,complete)`
   * Blur - Have a Student stop focusing on particular words
     * Request - `POST http://192.168.72.87/api/v0/student/<id>/blur/`
       * words - Array of words (string) - Will have their focus set to true
     * Response - `202 Accepted`
-      * word 
-      * focus - Whether this word is being focused on
-      * achievments - Array of achievement ids
+      * id
+      * first_name
+      * last_name
+      * age
+      * words - Array of words (string)
+      * focus - Array of words to focus on
+      * position - Object of where the student is at
+        * word - Key of the word
+          * achievements - Id's of achievements held
     * JavaScript - `api.student.blur(id,words,success,error,complete)`
       * words - array of words to stop focusing on
   * Attain - Attains an achievement for a word for a Student and updates Position as well
@@ -409,10 +439,9 @@ In all JavaScript API functions, the arguments success, error, and complete are 
       * words = Only return positions for these words
       * focus = Only return position for this focus ('true'/'false')
     * Response - `200 Ok`
-      * Array - ordered by word
-        * word 
-        * focus - Whether this word is being focused on
-        * achievments - Array of achievement ids
+      * Object - keyed by word
+        * word - The word with these achievments
+          * achievments - Array of achievement ids
     * JavaScript - `api.student.position(id,words,focus,success,error,complete)`
       * words - Array of words to return data for
   * History - Retrieves Student History with words and Achievements using id
@@ -441,10 +470,11 @@ In all JavaScript API functions, the arguments success, error, and complete are 
       * to - Only Only chart progress to this date (YYYY-MM-DD - Exclusive, up to, not including this date)
     * Response - `200 Ok`
       * Object - If date range is specified, data will the filled in. Zeroes previous, last values after.
+        * words - Array - The words found matching the query
         * times - Array - Times of the data in the proper order as strings.
-        * data - Object - The data to graph
-          * time - Object - Achievement data for that time
-            * achievement_id - Number, has the count for this Achievement at this time
+        * data - Array of Objects - The data to graph, index the same as times
+          * achievement - The Achievement id of the data
+          * totals - The totals for this achievement at the end of this time perioud
     * JavaScript - `api.student.chart(id,by,focus,words[],achievements[],held,from,to,success,error,complete)`
   * Delete - Deletes a Student
     * Request - `DELETE http://192.168.72.87/api/v0/student/<id>/`

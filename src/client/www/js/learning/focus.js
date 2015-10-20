@@ -1,8 +1,7 @@
 Learning.controller("Focus","Changeable",{
     list: function() {
         this.it = {
-            student: hwAPI.student.select(this.application.current.path.student_id),
-            words: hwAPI.student.focus(this.application.current.path.student_id)
+            student: hwAPI.student.select(this.application.current.path.student_id)
         };
         this.application.render(this.it);
     },

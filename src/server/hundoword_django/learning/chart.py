@@ -191,14 +191,20 @@ def build(student_id,by,words,achievement_ids,from_date=None,to_date=None):
     elif by == "month":
         finish_date.replace(day=1)
 
-    data = {}
+    data = []
+    for index, achievement_id in enumerate(achievement_ids):
+        data.append({
+            "achievement": achievement_id,
+            "totals": []
+        })
+
     times = []
     current_date = start_date
     while current_date < finish_date:
 
         current = current_date.strftime(format)
 
-        data[current] = {}
+        totals = {}
         times.append(current)
 
         if current in finish_data:
@@ -207,9 +213,12 @@ def build(student_id,by,words,achievement_ids,from_date=None,to_date=None):
                     first[achievement_id][word] = finish_data[current][achievement_id][word]
 
         for achievement_id in first:
-            data[current][achievement_id] = 0
+            totals[achievement_id] = 0
             for word in first[achievement_id]:
-                data[current][achievement_id] += first[achievement_id][word]
+                totals[achievement_id] += first[achievement_id][word]
+
+        for index, achievement_id in enumerate(achievement_ids):
+            data[index]["totals"].append(totals[achievement_id])
 
         current_date += datetime.timedelta(**delta)
         if by == "month":

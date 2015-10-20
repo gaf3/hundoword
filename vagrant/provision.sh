@@ -24,6 +24,7 @@ sudo pip install mysqlclient
 sudo pip install pytz
 sudo pip install requests==2.5.3
 sudo pip install Django==1.8.4
+sudo pip install jsonfield
 sudo pip install djangorestframework==3.1
 
 if sudo mysql -u root -e "show databases" | grep -w hundoword_django; then

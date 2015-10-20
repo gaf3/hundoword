@@ -38,5 +38,5 @@ Learning.controller("Match","Game",{
 
 Learning.template("Match",Learning.load("game/match"),null,Learning.partials);
 
-Learning.route("game/sight-match","/student/{student_id:^\\d+$}/game/sight-match/","Match","Match","words");
-Learning.route("game/sound-match","/student/{student_id:^\\d+$}/game/sound-match/","Match","Match","words");
+Learning.route("game/sight-match","/student/{student_id:^\\d+$}/game/sight-match/","Match","Match","choose");
+Learning.route("game/sound-match","/student/{student_id:^\\d+$}/game/sound-match/","Match","Match","choose");

@@ -13,6 +13,7 @@ Learning.controller("Position","Changeable",{
             focus = this.application.current.query.focus.toLowerCase() == 'true';
         }
         this.it.positions = hwAPI.student.position(this.application.current.path.student_id,words,focus);
+        this.it.words = words !== null ? words : this.it.student.words;
         this.application.render(this.it);
     },
     search: function() {

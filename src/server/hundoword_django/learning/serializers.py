@@ -5,6 +5,15 @@ from learning.models import *
 from django.contrib.auth.models import User
 
 
+class JSONField(serializers.Field):
+
+    def to_internal_value(self, data):
+        return data
+
+    def to_representation(self, value):
+        return value
+
+
 class CreateUserSerializer(serializers.ModelSerializer):
 
     email = serializers.EmailField(required=True,allow_blank=False)
@@ -34,55 +43,31 @@ class AchievementSerializer(serializers.ModelSerializer):
         return str(obj)
 
 
-class ProgramWordSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = ProgramWord
-        readonly_fields = ('id','program')
-
-    def to_representation(self, obj):
-        return obj.word
-
-
 class ProgramSerializer(serializers.ModelSerializer):
 
-    words = ProgramWordSerializer(required=False,many=True)
+    words = JSONField()
 
     class Meta:
         model = Program
-        readonly_fields = ('id','words')
+        readonly_fields = ('id')
 
     def get_display(self, obj):
         return str(obj)
-
-
-class StudentWordSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = StudentWord
-
-    def to_representation(self, obj):
-        return obj.word
 
 
 class StudentSerializer(serializers.ModelSerializer):
 
-    words = StudentWordSerializer(required=False,many=True)
+    words = JSONField()
+    focus = JSONField()
+    position = JSONField()
 
     class Meta:
         model = Student
-        fields = ('id','first_name', 'last_name', 'age', 'words')
-        readonly_fields = ('id','teacher','words')
+        fields = ('id','first_name', 'last_name', 'age', 'words', 'focus', 'position')
+        readonly_fields = ('id','teacher','position')
 
     def get_display(self, obj):
         return str(obj)
-
-
-class PositionSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = StudentWord
-        fields = ('word','focus','achievements')
 
 
 class ProgressSerializer(serializers.ModelSerializer):
