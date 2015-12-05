@@ -1,4 +1,4 @@
-hondoword
+hundoword
 ===========
 
 The 100 (or so) words children first need to learn for reading.
