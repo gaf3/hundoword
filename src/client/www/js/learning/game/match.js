@@ -16,7 +16,7 @@ Learning.controller("Match","Game",{
             this.it.choices[Math.floor(Math.random() * this.it.student.words.length)] = this.it.word
             this.application.render(this.it);
         } else {
-            this.application.go("student/position",this.it.student.id);
+            this.finish();
         }
     },
     match: function(item) {
@@ -40,3 +40,6 @@ Learning.template("Match",Learning.load("game/match"),null,Learning.partials);
 
 Learning.route("game/sight-match","/student/{student_id:^\\d+$}/game/sight-match/","Match","Match","choose");
 Learning.route("game/sound-match","/student/{student_id:^\\d+$}/game/sound-match/","Match","Match","choose");
+
+Learning.route("self/sight-match","/student/{student_id:^\\d+$}/self/sight-match/","Match","Match","self");
+Learning.route("self/sound-match","/student/{student_id:^\\d+$}/self/sound-match/","Match","Match","self");

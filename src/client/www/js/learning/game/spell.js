@@ -8,7 +8,7 @@ Learning.controller("Spell","Game",{
             this.it.word = this.it.words[this.index];
             this.application.render(this.it);
         } else {
-            this.application.go("student/position",this.it.student.id);
+            this.finish();
         }
     },
     spell: function(item,sound) {
@@ -31,3 +31,6 @@ Learning.template("Spell",Learning.load("game/spell"),null,Learning.partials);
 
 Learning.route("game/sight-spell","/student/{student_id:^\\d+$}/game/sight-spell/","Spell","Spell","choose");
 Learning.route("game/sound-spell","/student/{student_id:^\\d+$}/game/sound-spell/","Spell","Spell","choose");
+
+Learning.route("self/sight-spell","/student/{student_id:^\\d+$}/self/sight-spell/","Spell","Spell","self");
+Learning.route("self/sound-spell","/student/{student_id:^\\d+$}/self/sound-spell/","Spell","Spell","self");
