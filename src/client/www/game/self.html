@@ -1,7 +1,4 @@
-{{#def.Header}}
 <div class="uk-overflow-container">
-    {{#def.StudentTabs}}
-    <br/><a href="{{=Learning.link('student/self',Learning.current.path.student_id)}}">Self Directed Learning</a><br/>
     <br/>
     <div class="uk-grid data-uk-grid-margin">
         {{~ it.achievements :achievement:index}}
@@ -10,12 +7,11 @@
     <div class="uk-grid data-uk-grid-margin">
         {{?}}
         <div class="uk-width-medium-1-3">
-            <div class="uk-panel-box" OnClick="Learning.go('game/{{=achievement.slug}}',{{=Learning.current.path.student_id}});">
+            <div class="uk-panel-box"  OnClick="Learning.go('self/{{=achievement.slug}}',{{=Learning.current.path.student_id}});" align="middle">
                 <h2 class="uk-panel-title">{{=achievement.name}}</h2>
-                {{=achievement.description}}
+                <img src="/images/{{=achievement.slug}}.png" align='middle'>
             </div>
         </div>
         {{~}}
     </div>
 </div>
-{{#def.Footer}}

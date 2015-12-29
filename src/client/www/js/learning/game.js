@@ -71,10 +71,40 @@ Learning.controller("Game","Changeable",{
             $(item).find('a').html(word);
         }
         $(sound).attr('played',true);
+    },
+    self: function() {
+        var student = hwAPI.student.select(this.application.current.path.student_id);
+        this.words = student.focus;
+        this.it = {
+            student: student,
+            achievement: hwAPI.achievement.slug(Learning.current.paths[3]),
+            words: this.words
+        };
+        this.application.shuffle(this.words);
+        this.it.words = this.words;
+        this.groups = [];
+        for (var word = 0; word < this.words.length; word++) {
+            var group = Math.floor(word/6.0);
+            if (!this.groups[group]) {
+                this.groups[group] = [];
+            }
+            this.groups[group].push(this.words[word]);
+        }
+        this.play(true);
+    },
+    finish: function() {
+        if (this.application.current.paths[2] == "game") {
+            this.application.go("student/position",this.it.student.id);
+        } else if (this.application.current.paths[2] == "self") {
+            this.application.go("student/self",this.it.student.id);
+        }
     }
 });
 
 Learning.template("Games",Learning.load("game/list"),null,Learning.partials);
 Learning.template("Words",Learning.load("game/words"),null,Learning.partials);
+Learning.template("Self",Learning.load("game/self"),null,Learning.partials);
 
 Learning.route("student/games","/student/{student_id:^\\d+$}/game/","Games","Game","list");
+Learning.route("student/self","/student/{student_id:^\\d+$}/self/","Self","Game","list");
+

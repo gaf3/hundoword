@@ -9,7 +9,7 @@ Learning.controller("Introduction","Game",{
             this.it.played = false;
             this.application.render(this.it);
         } else {
-            this.application.go("student/position",this.it.student.id);
+            this.finish();
         }
     },
     introduce: function(item,sound) {
@@ -31,3 +31,5 @@ Learning.controller("Introduction","Game",{
 Learning.template("Introduction",Learning.load("game/introduction"),null,Learning.partials);
 
 Learning.route("game/introduction","/student/{student_id:^\\d+$}/game/introduction/","Introduction","Introduction","choose");
+
+Learning.route("self/introduction","/student/{student_id:^\\d+$}/self/introduction/","Introduction","Introduction","self");

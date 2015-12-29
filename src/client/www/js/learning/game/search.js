@@ -124,7 +124,7 @@ Learning.controller("Search","Game",{
             canvas.height = window.innerHeight;
             this.draw();
         } else {
-            this.application.go("student/position",this.it.student.id);
+            this.finish();
         }
     },
     find: function(cell) {
@@ -295,3 +295,6 @@ Learning.template("Search",Learning.load("game/search"),null,Learning.partials);
 
 Learning.route("game/sight-search","/student/{student_id:^\\d+$}/game/sight-search/","Search","Search","choose");
 Learning.route("game/sound-search","/student/{student_id:^\\d+$}/game/sound-search/","Search","Search","choose");
+
+Learning.route("self/sight-search","/student/{student_id:^\\d+$}/self/sight-search/","Search","Search","self");
+Learning.route("self/sound-search","/student/{student_id:^\\d+$}/self/sound-search/","Search","Search","self");

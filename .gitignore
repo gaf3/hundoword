@@ -3,7 +3,7 @@
 
 *.pyc
 
-vagrant/.vagrant/
+.vagrant/
 
 src/server/hundoword_django/learning/migrations/
 

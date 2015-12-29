@@ -21,7 +21,7 @@ Learning.controller("Cross","Game",{
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
         } else {
-            this.application.go("student/position",this.it.student.id);
+            this.finish();
         }
     },
     cross: function(item,sound) {
@@ -132,3 +132,7 @@ Learning.template("Cross",Learning.load("game/cross"),null,Learning.partials);
 
 Learning.route("game/sight-cross","/student/{student_id:^\\d+$}/game/sight-cross/","Cross","Cross","choose");
 Learning.route("game/sound-cross","/student/{student_id:^\\d+$}/game/sound-cross/","Cross","Cross","choose");
+
+Learning.route("self/sight-cross","/student/{student_id:^\\d+$}/self/sight-cross/","Cross","Cross","self");
+Learning.route("self/sound-cross","/student/{student_id:^\\d+$}/self/sound-cross/","Cross","Cross","self");
+
