@@ -20,7 +20,6 @@ Learning.controller("Student","Changeable",{
         var student = {
             first_name: $("#first_name").val(), 
             last_name: $("#last_name").val(), 
-            age: $("#age").val(),
             words: this.application.words_array($("#words").val())
         };
         if (student_id) {

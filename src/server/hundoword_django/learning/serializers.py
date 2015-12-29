@@ -63,7 +63,7 @@ class StudentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Student
-        fields = ('id','first_name', 'last_name', 'age', 'words', 'focus', 'position')
+        fields = ('id','first_name', 'last_name', 'words', 'focus', 'position')
         readonly_fields = ('id','teacher','position')
 
     def get_display(self, obj):

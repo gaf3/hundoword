@@ -6,7 +6,6 @@
             <tr>
                 <th>First Name</th>
                 <th>Last Name</th>
-                <th>Age</th>
                 <th>Words</th>
             </tr>
         </thead>
@@ -15,7 +14,6 @@
             <tr OnClick="Learning.go('student/select',{{=student.id}})">
                 <td>{{=student.first_name}}</td>
                 <td>{{=student.last_name}}</td>
-                <td>{{=student.age}}</td>
                 <td>{{=Learning.words_string(student.words)}}</td>
             </tr>
             {{~}}

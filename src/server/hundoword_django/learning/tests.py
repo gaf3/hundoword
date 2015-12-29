@@ -486,6 +486,15 @@ class test_Django(SimpleTestCase):
 
         client = APIClient()
 
+        settings.REGISTER = False
+
+        response = client.post("/api/v0/register/",{}, format='json')
+        
+        self.assertEqual(response.status_code,status.HTTP_501_NOT_IMPLEMENTED)
+        self.assertEqual(response.data,{"detail": "Registration currently disabled."})
+
+        settings.REGISTER = True
+
         response = client.post("/api/v0/register/",{
             "username": "tester",
             "password": "tester"
@@ -874,7 +883,6 @@ class test_Django(SimpleTestCase):
         response = client.post("/api/v0/student/",{
             "first_name": "sane",
             "last_name": "jane",
-            "age": 5,
             "words": ["he","she","it","it"]
         }, format='json')
 
@@ -885,7 +893,6 @@ class test_Django(SimpleTestCase):
             "id": sane_jane_id,
             "first_name": "sane",
             "last_name": "jane",
-            "age": 5,
             "words": ["he","she","it"],
             "focus": [],
             "position": {}
@@ -906,7 +913,6 @@ class test_Django(SimpleTestCase):
             "id": sane_jane_id,
             "first_name": "sane",
             "last_name": "jane",
-            "age": 5,
             "words": ["he","she","it"],
             "focus": [],
             "position": {}
@@ -933,7 +939,6 @@ class test_Django(SimpleTestCase):
         # Update
 
         response = client.post("/api/v0/student/%s" % sane_jane_id,{
-            "age": 6,
             "words": ["it","there"]
         }, format='json')
 
@@ -941,7 +946,6 @@ class test_Django(SimpleTestCase):
             "id": sane_jane_id,
             "first_name": "sane",
             "last_name": "jane",
-            "age": 6,
             "words": ["it","there"],
             "focus": [],
             "position": {}
@@ -951,7 +955,6 @@ class test_Django(SimpleTestCase):
             "id": sane_jane_id,
             "first_name": "sane",
             "last_name": "jane",
-            "age": 6,
             "words": ["it","there"],
             "focus": [],
             "position": {}
@@ -986,7 +989,6 @@ class test_Django(SimpleTestCase):
             "id": sane_jane_id,
             "first_name": "sane",
             "last_name": "jane",
-            "age": 6,
             "words": ["it","there","here","everywhere"],
             "focus": [],
             "position": {}
@@ -996,7 +998,6 @@ class test_Django(SimpleTestCase):
             "id": sane_jane_id,
             "first_name": "sane",
             "last_name": "jane",
-            "age": 6,
             "words": ["it","there","here","everywhere"],
             "focus": [],
             "position": {}
@@ -1031,7 +1032,6 @@ class test_Django(SimpleTestCase):
             "id": sane_jane_id,
             "first_name": "sane",
             "last_name": "jane",
-            "age": 6,
             "words": ["it","everywhere"],
             "focus": [],
             "position": {}
@@ -1041,7 +1041,6 @@ class test_Django(SimpleTestCase):
             "id": sane_jane_id,
             "first_name": "sane",
             "last_name": "jane",
-            "age": 6,
             "words": ["it","everywhere"],
             "focus": [],
             "position": {}
@@ -1049,7 +1048,7 @@ class test_Django(SimpleTestCase):
 
         # List
 
-        student = Student(teacher=user,first_name="silly",last_name="billy",age=7)
+        student = Student(teacher=user,first_name="silly",last_name="billy")
         student.save()
         silly_billy_id = student.pk
 
@@ -1064,7 +1063,6 @@ class test_Django(SimpleTestCase):
                 "id": silly_billy_id,
                 "first_name": "silly",
                 "last_name": "billy",
-                "age": 7,
                 "words": [],
                 "focus": [],
                 "position": {}
@@ -1073,7 +1071,6 @@ class test_Django(SimpleTestCase):
                 "id": sane_jane_id,
                 "first_name": "sane",
                 "last_name": "jane",
-                "age": 6,
                 "words": ["it","everywhere"],
                 "focus": [],
                 "position": {}
@@ -1098,7 +1095,6 @@ class test_Django(SimpleTestCase):
                 "id": silly_billy_id,
                 "first_name": "silly",
                 "last_name": "billy",
-                "age": 7,
                 "words": [],
                 "focus": [],
                 "position": {}
@@ -1152,7 +1148,6 @@ class test_Django(SimpleTestCase):
             "id": silly_billy_id,
             "first_name": "silly",
             "last_name": "billy",
-            "age": 7,
             "words": ["here","there","everywhere"],
             "focus": ["here","there"],
             "position": {}
@@ -1203,7 +1198,6 @@ class test_Django(SimpleTestCase):
             "id": silly_billy_id,
             "first_name": "silly",
             "last_name": "billy",
-            "age": 7,
             "words": ["here","there","everywhere"],
             "focus": [],
             "position": {}

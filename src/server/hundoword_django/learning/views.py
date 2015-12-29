@@ -93,6 +93,9 @@ def register(request):
 
     try:
 
+        if not settings.REGISTER:
+            return Response({"detail": "Registration currently disabled."}, status=status.HTTP_501_NOT_IMPLEMENTED)
+
         serializer = CreateUserSerializer(data=request.DATA)
 
         if serializer.is_valid():
@@ -275,7 +278,7 @@ def student(request,pk='',action=''):
 
         if request.method == 'POST' and not pk:
 
-            student = serialize_request(Student,request.DATA,['first_name','last_name'],['age','words','focus'])
+            student = serialize_request(Student,request.DATA,['first_name','last_name'],['words','focus'])
             student.teacher = request.user
             student.save()
             serializer = StudentSerializer(student)
@@ -489,7 +492,7 @@ def audio(request,word):
         forvo_key = handle.readline().strip()
         handle.close()
 
-        url = "https://apifree.forvo.com/key/%s/format/json/action/word-pronunciations/language/en/country/usa/word/%s/limit/1" % (forvo_key,word)
+        url = "https://apicommercial.forvo.com/key/%s/format/json/action/word-pronunciations/language/en/country/usa/word/%s/limit/1" % (forvo_key,word)
         response = requests.get(url)
         response.raise_for_status()
         data = response.json()

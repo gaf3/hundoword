@@ -69,7 +69,6 @@ class Student(models.Model):
     teacher = models.ForeignKey(User)
     first_name = models.CharField(max_length=128,blank=True,default="")
     last_name = models.CharField(max_length=128,blank=True,default="")
-    age = models.IntegerField(blank=True,null=True)
     words = JSONField(blank=True,default=[])
     focus = JSONField(blank=True,default=[])
     position = JSONField(blank=True,default={})
