@@ -1,21 +1,45 @@
 <h2>Student - {{=it.student.id ? it.student.first_name + " " + it.student.last_name : "New"}}</h2>
 <ul class="uk-tab data-uk-tab">
-    <li class="{{? !it.student.id }}uk-disabled{{?? Learning.current.route.name == 'student/select' }}uk-active{{?}}">
+    {{? !it.student.id }}
+    <li class="uk-active">
+        <a>Info</a>
+    </li>
+    {{??}}
+    <li class="{{? Learning.current.route.name == 'student/select' }}uk-active{{?}}">
         <a href="{{=Learning.link('student/select',it.student.id)}}">Info</a>
     </li>
-    <li class="{{? !it.student.id }}uk-disabled{{?? Learning.current.route.name == 'student/focus' }}uk-active{{?}}">
+    {{?}}
+    {{? !it.student.id || !it.student.words.length}}
+    <li class="uk-disabled">
+        <a>Focus</a>
+    </li>
+    <li class="uk-disabled">
+        <a>Games</a>
+    </li>
+    <li class="uk-disabled">
+        <a>Position</a>
+    </li>
+    <li class="uk-disabled">
+        <a>Chart</a>
+    </li>
+    <li class="uk-disabled">
+        <a>History</a>
+    </li>
+    {{??}}
+    <li class="{{? Learning.current.route.name == 'student/focus' }}uk-active{{?}}">
         <a href="{{=Learning.link('student/focus',it.student.id)}}">Focus</a>
     </li>
-    <li class="{{? !it.student.id }}uk-disabled{{?? Learning.current.paths[2] == 'game'}}uk-active{{?}}">
+    <li class="{{? Learning.current.paths[2] == 'game'}}uk-active{{?}}">
         <a href="{{=Learning.link('student/games',it.student.id)}}">Games</a>
     </li>
-    <li class="{{? !it.student.id }}uk-disabled{{?? Learning.current.route.name == 'student/position' }}uk-active{{?}}">
+    <li class="{{? Learning.current.route.name == 'student/position' }}uk-active{{?}}">
         <a href="{{=Learning.link('student/position',it.student.id)}}">Position</a>
     </li>
-    <li class="{{? !it.student.id }}uk-disabled{{?? Learning.current.route.name == 'student/chart' }}uk-active{{?}}">
+    <li class="{{? Learning.current.route.name == 'student/chart' }}uk-active{{?}}">
         <a href="{{=Learning.link('student/chart',it.student.id)}}">Chart</a>
     </li>
-    <li class="{{? !it.student.id }}uk-disabled{{?? Learning.current.route.name == 'student/history' }}uk-active{{?}}">
+    <li class="{{? Learning.current.route.name == 'student/history' }}uk-active{{?}}">
         <a href="{{=Learning.link('student/history',it.student.id)}}">History</a>
     </li>
+    {{?}}
 </ul>

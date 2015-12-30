@@ -74,7 +74,7 @@ Learning.controller("Game","Changeable",{
     },
     self: function() {
         var student = hwAPI.student.select(this.application.current.path.student_id);
-        this.words = student.focus;
+        this.words = student.focus.length > 0 ? student.focus : student.words;
         this.it = {
             student: student,
             achievement: hwAPI.achievement.slug(Learning.current.paths[3]),
