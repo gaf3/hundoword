@@ -115,15 +115,21 @@ Learning.controller("Cross","Game",{
                 hwAPI.student.yield(this.it.student.id,word,this.it.achievement.id);
             }
         }
-        var transform = "rotate(" + -180 * (1 - matches.length / this.it.crosses)  + "deg)";
-        $('.hw-complete').css({
-            "webkitTransform":transform,
-            "MozTransform":transform,
-            "msTransform":transform,
-            "OTransform":transform,
-            "transform":transform
-        });
-        $('.hw-complete').show();
+        if (matches.length == this.it.crosses) {
+            $('.hw-attain').show();
+        } else if (matches.length == 0) {
+            $('.hw-yield').show();
+        } else {
+            var transform = "rotate(" + -180 * (1 - matches.length / this.it.crosses)  + "deg)";
+            $('.hw-complete').css({
+                "webkitTransform":transform,
+                "MozTransform":transform,
+                "msTransform":transform,
+                "OTransform":transform,
+                "transform":transform
+            });
+            $('.hw-complete').show();
+        }
         $('.hw-progress').hide();
     }
 });

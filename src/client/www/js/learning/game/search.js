@@ -278,15 +278,21 @@ Learning.controller("Search","Game",{
                 this.select(context,$(start_query)[0],$(end_query)[0]);
             }
         }
-        var transform = "rotate(" + -180 * (1 - finds.length / this.groups[this.index].length)  + "deg)";
-        $('.hw-complete').css({
-            "webkitTransform":transform,
-            "MozTransform":transform,
-            "msTransform":transform,
-            "OTransform":transform,
-            "transform":transform
-        });
-        $('.hw-complete').show();
+        if (finds.length == this.groups[this.index].length) {
+            $('.hw-attain').show();
+        } else if (finds.length == 0) {
+            $('.hw-yield').show();
+        } else {
+            var transform = "rotate(" + -180 * (1 - finds.length / this.groups[this.index].length)  + "deg)";
+            $('.hw-complete').css({
+                "webkitTransform":transform,
+                "MozTransform":transform,
+                "msTransform":transform,
+                "OTransform":transform,
+                "transform":transform
+            });
+            $('.hw-complete').show();
+        }
         $('.hw-progress').hide();
     }
 });
