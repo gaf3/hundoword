@@ -60,15 +60,34 @@ Learning.controller("Cross","Game",{
         var context = $("#matches")[0].getContext("2d");
         context.clearRect(0, 0, window.innerWidth, window.innerHeight);
         context.lineWidth = 1;
-        $("#crosses li[column='left'][match]").each(function() {
-            var left = this.getBoundingClientRect();
-            var right = $("#crosses li[column='right'][match='" + $(this).attr("word") + "']")[0].getBoundingClientRect();
-            context.beginPath();
-            context.moveTo(left.right,left.top+0.5*left.height);
-            context.lineTo(right.left,right.top+0.5*right.height);
-            context.strokeStyle = '#a0a0a0';
-            context.stroke();
-        });
+        if ($('.hw-progress').is(':visible')) {
+            $("#crosses li[column='left'][match]").each(function() {
+                var left = this.getBoundingClientRect();
+                var right = $("#crosses li[column='right'][match='" + $(this).attr("word") + "']")[0].getBoundingClientRect();
+                context.beginPath();
+                context.moveTo(left.right,left.top+0.5*left.height);
+                context.lineTo(right.left,right.top+0.5*right.height);
+                context.strokeStyle = '#a0a0a0';
+                context.stroke();
+            });
+        } else {
+            $("#crosses li[column='left'][match]").each(function() {
+                var other = $("#crosses li[column='right'][word='" + $(this).attr("match") + "']")[0];
+                var left = this.getBoundingClientRect();
+                var right = other.getBoundingClientRect();
+                var color = '#d32c46';
+                if ($(this).attr('word') == $(other).attr('word')) {
+                    color = '#82bb42';
+                }
+                context.strokeStyle = color;
+                $(this).find('a').css('color',color);
+                $(other).find('a').css('color',color);
+                context.beginPath();
+                context.moveTo(left.right,left.top+0.5*left.height);
+                context.lineTo(right.left,right.top+0.5*right.height);
+                context.stroke();
+            });
+        }
     },
     move: function(event) {
         var current = $("#crosses li.uk-active")[0];
@@ -91,20 +110,9 @@ Learning.controller("Cross","Game",{
         var matches = [];
         $("#crosses li[column='left'][match]").each(function() {
             var other = $("#crosses li[column='right'][word='" + $(this).attr("match") + "']")[0];
-            var left = this.getBoundingClientRect();
-            var right = other.getBoundingClientRect();
-            var color = '#d32c46';
             if ($(this).attr('word') == $(other).attr('word')) {
                 matches.push($(this).attr('word'));
-                color = '#82bb42';
             }
-            context.strokeStyle = color;
-            $(this).find('a').css('color',color);
-            $(other).find('a').css('color',color);
-            context.beginPath();
-            context.moveTo(left.right,left.top+0.5*left.height);
-            context.lineTo(right.left,right.top+0.5*right.height);
-            context.stroke();
         });
         $("#crosses li:not([match]) a").css('color','#d32c46');
         for (var index = 0; index < this.it.lefts.length; index++) {
@@ -131,6 +139,7 @@ Learning.controller("Cross","Game",{
             $('.hw-complete').show();
         }
         $('.hw-progress').hide();
+        this.draw();
     }
 });
 
