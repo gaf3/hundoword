@@ -9,3 +9,4 @@ src/server/hundoword_django/learning/migrations/
 
 src/server/hundoword_django/.coverage
 
+src/server/hundoword_django/hundoword_django/settings.py
