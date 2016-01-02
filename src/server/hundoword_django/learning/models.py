@@ -13,6 +13,17 @@ def validate_words(field,words):
         if not isinstance(word,str) and not isinstance(word,unicode):
             raise ValidationError({field: "All list items be be strings."})
 
+
+def validate_achievements(field,achievements):
+
+    if not isinstance(achievements,list):
+        raise ValidationError({field: "Must be a list."})
+
+    for achievement in achievements:
+        if not isinstance(achievement,int) and not isinstance(achievement,long):
+            raise ValidationError({field: "All list items be be integers."})
+
+
 def unique_words(words):
 
     unique = []
@@ -21,6 +32,7 @@ def unique_words(words):
             unique.append(word)
 
     return unique
+
 
 class Achievement(models.Model):
 
@@ -96,6 +108,18 @@ class Student(models.Model):
 
             if extra:
                 raise ValidationError({'focus': extra})
+
+        if not isinstance(self.plan,dict):
+            raise ValidationError({"plan": "Must be an object."})
+
+        if "focus" in self.plan and not isinstance(self.plan["focus"],int):
+            raise ValidationError({"plan.focus": "Must be an integer."})
+
+        if "required" in self.plan:
+            validate_achievements("plan.required",self.plan["required"])
+
+        if "forgo" in self.plan:
+            validate_achievements("plan.forgo",self.plan["forgo"])
 
         super(Student, self).clean(*args, **kwargs)
 

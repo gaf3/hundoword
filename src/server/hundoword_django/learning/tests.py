@@ -114,7 +114,7 @@ class test_Django(SimpleTestCase):
         self.assertEqual(student.focus,[])
         self.assertEqual(student.position,{})
 
-        # Validate words and focs
+        # Validate words
 
         try: 
 
@@ -135,6 +135,76 @@ class test_Django(SimpleTestCase):
         except ValidationError as exception:
 
             self.assertEqual(exception.message_dict,{"words": ["All list items be be strings."]})
+
+        # Validate plan
+
+        try: 
+
+            program = Student(teacher=user,first_name="not",last_name="list.",plan="this")
+            program.save()
+            self.fail()
+
+        except ValidationError as exception:
+
+            self.assertEqual(exception.message_dict,{"plan": ["Must be an object."]})
+
+        # Validate plan.focus
+
+        try: 
+
+            program = Student(teacher=user,first_name="all",last_name="numbers",plan={"focus": "this"})
+            program.save()
+            self.fail()
+
+        except ValidationError as exception:
+
+            self.assertEqual(exception.message_dict,{"plan.focus": ["Must be an integer."]})
+
+        # Validate plan.required
+
+        try: 
+
+            program = Student(teacher=user,first_name="not",last_name="list.",plan={"required":"this"})
+            program.save()
+            self.fail()
+
+        except ValidationError as exception:
+
+            self.assertEqual(exception.message_dict,{"plan.required": ["Must be a list."]})
+
+        try: 
+
+            program = Student(teacher=user,first_name="all",last_name="numbers",plan={"required":["this","that"]})
+            program.save()
+            self.fail()
+
+        except ValidationError as exception:
+
+            self.assertEqual(exception.message_dict,{"plan.required": ["All list items be be integers."]})
+
+        # Validate plan.forgo
+
+        try: 
+
+            program = Student(teacher=user,first_name="not",last_name="list.",plan={"forgo":"this"})
+            program.save()
+            self.fail()
+
+        except ValidationError as exception:
+
+            self.assertEqual(exception.message_dict,{"plan.forgo": ["Must be a list."]})
+
+        try: 
+
+            program = Student(teacher=user,first_name="all",last_name="numbers",plan={"forgo":["this","that"]})
+            program.save()
+            self.fail()
+
+        except ValidationError as exception:
+
+            self.assertEqual(exception.message_dict,{"plan.forgo": ["All list items be be integers."]})
+
+        # Validate focus
 
         try: 
 
@@ -888,6 +958,13 @@ class test_Django(SimpleTestCase):
 
         self.assertEqual(response.status_code,status.HTTP_400_BAD_REQUEST);
         self.assertEqual(response.data,{"words": ["Must be a list."]})
+
+        # Plan validation
+
+        response = client.post("/api/v0/student/",{"first_name": "sane", "last_name": "jane", "plan": "oops"}, format='json')
+
+        self.assertEqual(response.status_code,status.HTTP_400_BAD_REQUEST);
+        self.assertEqual(response.data,{"plan": ["Must be an object."]})
 
         # Create
 
