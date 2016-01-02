@@ -112,8 +112,8 @@ class Student(models.Model):
         if not isinstance(self.plan,dict):
             raise ValidationError({"plan": "Must be an object."})
 
-        if "focus" in self.plan and not isinstance(self.plan["focus"],int):
-            raise ValidationError({"plan.focus": "Must be an integer."})
+        if "focus" in self.plan and (not isinstance(self.plan["focus"],int) or not self.plan["focus"] > 0):
+            raise ValidationError({"plan.focus": "Must be a positive integer."})
 
         if "required" in self.plan:
             validate_achievements("plan.required",self.plan["required"])
@@ -185,6 +185,26 @@ class Student(models.Model):
             learned.append(word)
 
         return learned
+
+    def evaluate(self):
+
+        learned = self.learned()
+
+        if not learned or not "focus" in self.plan:
+            return
+
+        focus = self.plan["focus"]
+
+        for word in [word for word in self.focus if word in learned]:
+            self.focus.pop(self.focus.index(word))
+
+        for word in self.words:
+
+            if len(self.focus) >= focus:
+                break
+
+            if word not in learned and word not in self.focus:
+                self.focus.append(word)
 
 
 class Progress(models.Model):

@@ -158,7 +158,17 @@ class test_Django(SimpleTestCase):
 
         except ValidationError as exception:
 
-            self.assertEqual(exception.message_dict,{"plan.focus": ["Must be an integer."]})
+            self.assertEqual(exception.message_dict,{"plan.focus": ["Must be a positive integer."]})
+
+        try: 
+
+            program = Student(teacher=user,first_name="all",last_name="numbers",plan={"focus": -1})
+            program.save()
+            self.fail()
+
+        except ValidationError as exception:
+
+            self.assertEqual(exception.message_dict,{"plan.focus": ["Must be a positive integer."]})
 
         # Validate plan.required
 
@@ -272,7 +282,7 @@ class test_Django(SimpleTestCase):
         student.save()
         self.assertEqual(student.position,{"that": [achievement.id]})
 
-        # Indicate learned
+        # learned
 
         progress = Progress(student=student,word="this",achievement=achievement,held=False,at=at)
         progress.save()
@@ -282,6 +292,22 @@ class test_Django(SimpleTestCase):
         self.assertEqual(student.learned(),[])
         student.plan = {"required": [achievement.id]}
         self.assertEqual(student.learned(),["that"])
+
+        # evaluate
+
+        student.words = ["every","this","that","where"]
+        student.focus = ["this","that"]
+        student.plan = {}
+        student.evaluate()
+        self.assertEqual(student.focus,["this","that"])
+
+        student.plan = {"required": [achievement.id]}
+        student.evaluate()
+        self.assertEqual(student.focus,["this","that"])
+
+        student.plan = {"focus": 3, "required": [achievement.id]}
+        student.evaluate()
+        self.assertEqual(student.focus,["this","every","where"])
 
 
     def test_Progress(self):
