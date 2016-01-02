@@ -204,6 +204,9 @@ class test_Django(SimpleTestCase):
 
         # Indicate learned
 
+        progress = Progress(student=student,word="this",achievement=achievement,held=False,at=at)
+        progress.save()
+
         self.assertEqual(student.learned(),[])
         student.plan = {"required": []}
         self.assertEqual(student.learned(),[])
@@ -1421,6 +1424,27 @@ class test_Django(SimpleTestCase):
         self.assertEqual(client.get("/api/v0/student/%s/position?focus=false" % silly_billy_id).data,{
             "there": []
         })
+
+        # Learned
+
+        client.force_authenticate(user=loser)
+
+        response = client.get("/api/v0/student/%s/learned" % silly_billy_id)
+
+        self.assertEqual(response.status_code,status.HTTP_404_NOT_FOUND);
+        self.assertEqual(response.data,{"detail": "Student not found"})
+
+        client.force_authenticate(user=user)
+
+        self.assertEqual(client.get("/api/v0/student/%s/learned" % silly_billy_id).data,[])
+
+        silly_billy = Student.objects.get(pk=silly_billy_id)
+        silly_billy.plan = {"required": [sight_id]}
+        silly_billy.save()
+
+        self.assertEqual(client.get("/api/v0/student/%s/learned" % silly_billy_id).data,[
+            "here"
+        ])
 
         # History
 

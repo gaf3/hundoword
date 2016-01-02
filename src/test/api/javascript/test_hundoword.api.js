@@ -1877,6 +1877,51 @@ QUnit.test("position", function(assert) {
 
 });
 
+QUnit.test("learned", function(assert) {
+
+    var api = new HundoWord.API(hundoword_django_host + "/api/v0/");
+    check_user(api,"tester0","tester0","tester0@hundoword.com");
+
+    var sight = api.achievement.create({
+        name: make_achievement("Sight"), 
+        slug: make_achievement("sight"), 
+        description: "See it", 
+        progression: 100
+    });
+    var sound = api.achievement.create({
+        name: make_achievement("Sound"), 
+        slug: make_achievement("sound"), 
+        description: "Hear it", 
+        progression: 101
+    });
+
+    var sane_jane = api.student.create({first_name: "Sane", last_name: "Jane", words:["fun","time"],plan:{required: [sight.id]}});
+
+    api.student.attain(sane_jane.id,"fun",sight.id);
+    api.student.attain(sane_jane.id,"time",sound.id);
+
+    assert.deepEqual(
+        api.student.learned(sane_jane.id),
+        ["fun"]
+    );
+
+    var pass = assert.async();
+    api.student.learned(sane_jane.id,
+        function (data) {
+            assert.deepEqual(
+                data,
+                ["fun"]
+            );
+            pass();
+        },
+        function () {
+            assert.ok(false);
+            pass();
+        }
+    );
+
+});
+
 QUnit.test("history", function(assert) {
 
     var api = new HundoWord.API(hundoword_django_host + "/api/v0/");

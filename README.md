@@ -478,6 +478,11 @@ In all JavaScript API functions, the arguments success, error, and complete are 
           * achievments - Array of achievement ids
     * JavaScript - `api.student.position(id,words,focus,success,error,complete)`
       * words - Array of words to return data for
+  * Learned - Indicates which words are learned according to plan
+    * Request - `GET http://192.168.72.87/api/v0/student/<id>/learned/`
+    * Response - `200 Ok`
+      * Array - words that satisify the lesson plan
+    * JavaScript - `api.student.learned(id,success,error,complete)`
   * History - Retrieves Student History with words and Achievements using id
     * Request - `GET http://192.168.72.87/api/v0/student/<id>/history/?words=<word>,<word>&achievements=<achievement>,<achievement>`
       * words = Only return history for these words

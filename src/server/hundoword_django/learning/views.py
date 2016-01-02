@@ -324,6 +324,12 @@ def student(request,pk='',action=''):
 
                 return Response(position)
 
+            # Learned
+
+            elif action == "learned": 
+
+                return Response(student.learned())
+
             # History
 
             elif action == "history": 

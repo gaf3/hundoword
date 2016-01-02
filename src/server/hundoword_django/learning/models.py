@@ -155,9 +155,8 @@ class Student(models.Model):
             if word not in self.position:
                 continue
 
-            for achievement_id in self.plan["required"]:
-                if word not in self.position[word]:
-                    continue
+            if [id for id in self.plan["required"] if id not in self.position[word]]:
+                continue
 
             learned.append(word)
 
