@@ -202,6 +202,14 @@ class test_Django(SimpleTestCase):
         student.save()
         self.assertEqual(student.position,{"that": [achievement.id]})
 
+        # Indicate learned
+
+        self.assertEqual(student.learned(),[])
+        student.plan = {"required": []}
+        self.assertEqual(student.learned(),[])
+        student.plan = {"required": [achievement.id]}
+        self.assertEqual(student.learned(),["that"])
+
 
     def test_Progress(self):
 

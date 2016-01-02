@@ -70,7 +70,7 @@ Without this, none of the pronounciation works.  I think we're eventually just g
   * focus - List of words to focus on 
   * position - Record of where the student is at
     * word - Word
-    * achievements - Achievements held for that word
+    * achievements - List of achievements held for that word
 * Progress - Event when a student attains or yields an achievement with a word
   * student 
   * achievement

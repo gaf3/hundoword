@@ -143,6 +143,26 @@ class Student(models.Model):
         elif not progress.held and progress.achievement.id in self.position[progress.word]:
             self.position[progress.word].pop(self.position[progress.word].index(progress.achievement.id))
 
+    def learned(self):
+
+        learned = []
+
+        if not self.plan or not self.plan["required"]:
+            return learned
+
+        for word in self.words:
+
+            if word not in self.position:
+                continue
+
+            for achievement_id in self.plan["required"]:
+                if word not in self.position[word]:
+                    continue
+
+            learned.append(word)
+
+        return learned
+
 
 class Progress(models.Model):
 
