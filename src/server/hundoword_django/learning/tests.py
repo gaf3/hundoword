@@ -883,7 +883,9 @@ class test_Django(SimpleTestCase):
         response = client.post("/api/v0/student/",{
             "first_name": "sane",
             "last_name": "jane",
-            "words": ["he","she","it","it"]
+            "words": ["he","she","it","it"],
+            "plan": {"focus": 2},
+            "focus": ["he","she"]
         }, format='json')
 
         student = Student.objects.get(teacher=user,first_name="sane",last_name="jane")
@@ -894,7 +896,8 @@ class test_Django(SimpleTestCase):
             "first_name": "sane",
             "last_name": "jane",
             "words": ["he","she","it"],
-            "focus": [],
+            "plan": {"focus": 2},
+            "focus": ["he","she"],
             "position": {}
         })
 
@@ -914,7 +917,8 @@ class test_Django(SimpleTestCase):
             "first_name": "sane",
             "last_name": "jane",
             "words": ["he","she","it"],
-            "focus": [],
+            "plan": {"focus": 2},
+            "focus": ["he","she"],
             "position": {}
         })
 
@@ -939,7 +943,9 @@ class test_Django(SimpleTestCase):
         # Update
 
         response = client.post("/api/v0/student/%s" % sane_jane_id,{
-            "words": ["it","there"]
+            "words": ["it","there"],
+            "plan": {"focus": 1},
+            "focus": ["it"]
         }, format='json')
 
         self.assertEqual(response.data,{
@@ -947,7 +953,8 @@ class test_Django(SimpleTestCase):
             "first_name": "sane",
             "last_name": "jane",
             "words": ["it","there"],
-            "focus": [],
+            "plan": {"focus": 1},
+            "focus": ["it"],
             "position": {}
         })
 
@@ -956,7 +963,8 @@ class test_Django(SimpleTestCase):
             "first_name": "sane",
             "last_name": "jane",
             "words": ["it","there"],
-            "focus": [],
+            "plan": {"focus": 1},
+            "focus": ["it"],
             "position": {}
         })
 
@@ -990,7 +998,8 @@ class test_Django(SimpleTestCase):
             "first_name": "sane",
             "last_name": "jane",
             "words": ["it","there","here","everywhere"],
-            "focus": [],
+            "plan": {"focus": 1},
+            "focus": ["it"],
             "position": {}
         })
 
@@ -999,7 +1008,8 @@ class test_Django(SimpleTestCase):
             "first_name": "sane",
             "last_name": "jane",
             "words": ["it","there","here","everywhere"],
-            "focus": [],
+            "plan": {"focus": 1},
+            "focus": ["it"],
             "position": {}
         })
 
@@ -1033,7 +1043,8 @@ class test_Django(SimpleTestCase):
             "first_name": "sane",
             "last_name": "jane",
             "words": ["it","everywhere"],
-            "focus": [],
+            "plan": {"focus": 1},
+            "focus": ["it"],
             "position": {}
         })
 
@@ -1042,7 +1053,8 @@ class test_Django(SimpleTestCase):
             "first_name": "sane",
             "last_name": "jane",
             "words": ["it","everywhere"],
-            "focus": [],
+            "plan": {"focus": 1},
+            "focus": ["it"],
             "position": {}
         })
 
@@ -1064,6 +1076,7 @@ class test_Django(SimpleTestCase):
                 "first_name": "silly",
                 "last_name": "billy",
                 "words": [],
+                "plan": {},
                 "focus": [],
                 "position": {}
             },
@@ -1072,7 +1085,8 @@ class test_Django(SimpleTestCase):
                 "first_name": "sane",
                 "last_name": "jane",
                 "words": ["it","everywhere"],
-                "focus": [],
+                "plan": {"focus": 1},
+                "focus": ["it"],
                 "position": {}
             }
         ])
@@ -1096,6 +1110,7 @@ class test_Django(SimpleTestCase):
                 "first_name": "silly",
                 "last_name": "billy",
                 "words": [],
+                "plan": {},
                 "focus": [],
                 "position": {}
             }
@@ -1149,6 +1164,7 @@ class test_Django(SimpleTestCase):
             "first_name": "silly",
             "last_name": "billy",
             "words": ["here","there","everywhere"],
+            "plan": {},
             "focus": ["here","there"],
             "position": {}
         })
@@ -1199,6 +1215,7 @@ class test_Django(SimpleTestCase):
             "first_name": "silly",
             "last_name": "billy",
             "words": ["here","there","everywhere"],
+            "plan": {},
             "focus": [],
             "position": {}
         })

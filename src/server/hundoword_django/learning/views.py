@@ -278,7 +278,7 @@ def student(request,pk='',action=''):
 
         if request.method == 'POST' and not pk:
 
-            student = serialize_request(Student,request.DATA,['first_name','last_name'],['words','focus'])
+            student = serialize_request(Student,request.DATA,['first_name','last_name'],['words','plan','focus'])
             student.teacher = request.user
             student.save()
             serializer = StudentSerializer(student)

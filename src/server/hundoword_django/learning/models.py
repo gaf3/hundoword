@@ -70,6 +70,7 @@ class Student(models.Model):
     first_name = models.CharField(max_length=128,blank=True,default="")
     last_name = models.CharField(max_length=128,blank=True,default="")
     words = JSONField(blank=True,default=[])
+    plan = JSONField(blank=True,default={})
     focus = JSONField(blank=True,default=[])
     position = JSONField(blank=True,default={})
 

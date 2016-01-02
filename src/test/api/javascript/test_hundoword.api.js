@@ -1308,18 +1308,21 @@ QUnit.test("create", function(assert) {
     var api = new HundoWord.API(hundoword_django_host + "/api/v0/");
     check_user(api,"tester0","tester0","tester0@hundoword.com");
 
-    var sane_jane = api.student.create({first_name: "Sane", last_name: "Jane", words:["fun","time"]});
+    var sane_jane = api.student.create({first_name: "Sane", last_name: "Jane", words:["fun","time"],plan:{focus: 1},focus:["fun"]});
     assert.equal(sane_jane.first_name,"Sane");
     assert.equal(sane_jane.last_name,"Jane");
     assert.deepEqual(sane_jane.words,["fun","time"]);
+    assert.deepEqual(sane_jane.plan,{focus: 1});
+    assert.deepEqual(sane_jane.focus,["fun"]);
 
     var pass = assert.async();
-    api.student.create({first_name: "Silly", last_name: "Billy", words: ["base","time"],focus:["base"]},
+    api.student.create({first_name: "Silly", last_name: "Billy", words: ["base","time"],plan:{focus: 2},focus:["base","time"]},
         function (data) {
             assert.equal(data.first_name,"Silly");
             assert.equal(data.last_name,"Billy");
             assert.deepEqual(data.words,["base","time"]);
-            assert.deepEqual(data.focus,["base"]);
+            assert.deepEqual(data.plan,{focus: 2});
+            assert.deepEqual(data.focus,["base","time"]);
             assert.deepEqual(data.position,{});
             pass();
         },
@@ -1345,6 +1348,7 @@ QUnit.test("select", function(assert) {
             first_name: "Sane",
             last_name: "Jane",
             words: ["fun","time"],
+            plan: {},
             focus: ["fun"],
             position: {}
         }
@@ -1360,6 +1364,7 @@ QUnit.test("select", function(assert) {
                     first_name: "Sane",
                     last_name: "Jane",
                     words: ["fun","time"],
+                    plan: {},
                     focus: ["fun"],
                     position: {}
                 }
@@ -1390,6 +1395,7 @@ QUnit.test("list", function(assert) {
                 first_name: "Silly", 
                 last_name: "Billy",
                 words: ["base","time"],
+                plan: {},
                 focus: ["base"],
                 position: {}
             },
@@ -1398,6 +1404,7 @@ QUnit.test("list", function(assert) {
                 first_name: "Sane",
                 last_name: "Jane",
                 words: ["fun","time"],
+                plan: {},
                 focus: ["fun"],
                 position: {}
             }
@@ -1415,6 +1422,7 @@ QUnit.test("list", function(assert) {
                         first_name: "Silly", 
                         last_name: "Billy",
                         words: ["base","time"],
+                        plan: {},
                         focus: ["base"],
                         position: {}
                     },
@@ -1423,6 +1431,7 @@ QUnit.test("list", function(assert) {
                         first_name: "Sane",
                         last_name: "Jane",
                         words: ["fun","time"],
+                        plan: {},
                         focus: ["fun"],
                         position: {}
                     }
@@ -1452,6 +1461,7 @@ QUnit.test("update", function(assert) {
             first_name: "Sane", 
             last_name: "Janey",
             words: ["fun","time"],
+            plan: {},
             focus: ["fun"],
             position: {}
         }
@@ -1464,6 +1474,7 @@ QUnit.test("update", function(assert) {
             first_name: "Sane", 
             last_name: "Janey",
             words: ["fun","time"],
+            plan: {},
             focus: ["fun"],
             position: {}
         }
@@ -1479,6 +1490,7 @@ QUnit.test("update", function(assert) {
                     first_name: "Sane", 
                     last_name: "Janes",
                     words: ["fun","time"],
+                    plan: {},
                     focus: ["fun"],
                     position: {}
                 }
@@ -1507,6 +1519,7 @@ QUnit.test("append", function(assert) {
             first_name: "Sane", 
             last_name: "Jane",
             words: ["fun","time","dee","lite"],
+            plan: {},
             focus: ["fun"],
             position: {}
         }
@@ -1519,6 +1532,7 @@ QUnit.test("append", function(assert) {
             first_name: "Sane", 
             last_name: "Jane",
             words: ["fun","time","dee","lite"],
+            plan: {},
             focus: ["fun"],
             position: {}
         }
@@ -1534,6 +1548,7 @@ QUnit.test("append", function(assert) {
                     first_name: "Sane", 
                     last_name: "Jane",
                     words: ["fun","time","dee","lite","groove"],
+                    plan: {},
                     focus: ["fun"],
                     position: {}
                 }
@@ -1562,6 +1577,7 @@ QUnit.test("remove", function(assert) {
             first_name: "Sane", 
             last_name: "Jane",
             words: ["fun","groove","time"],
+            plan: {},
             focus: ["fun"],
             position: {}
         }
@@ -1574,6 +1590,7 @@ QUnit.test("remove", function(assert) {
             first_name: "Sane", 
             last_name: "Jane",
             words: ["fun","groove","time"],
+            plan: {},
             focus: ["fun"],
             position: {}
         }
@@ -1589,6 +1606,7 @@ QUnit.test("remove", function(assert) {
                     first_name: "Sane", 
                     last_name: "Jane",
                     words: ["fun","time"],
+                    plan: {},
                     focus: ["fun"],
                     position: {}
                 }
@@ -1617,6 +1635,7 @@ QUnit.test("focus", function(assert) {
             first_name: "Sane", 
             last_name: "Jane",
             words: ["fun","time","party"],
+            plan: {},
             focus: ["fun","time"],
             position: {}
         }
@@ -1632,6 +1651,7 @@ QUnit.test("focus", function(assert) {
                     first_name: "Sane", 
                     last_name: "Jane",
                     words: ["fun","time","party"],
+                    plan: {},
                     focus: ["fun","time","party"],
                     position: {}
                 }
@@ -1660,6 +1680,7 @@ QUnit.test("blur", function(assert) {
             first_name: "Sane", 
             last_name: "Jane",
             words: ["fun","time","party"],
+            plan: {},
             focus: ["party"],
             position: {}
         }
@@ -1675,6 +1696,7 @@ QUnit.test("blur", function(assert) {
                     first_name: "Sane", 
                     last_name: "Jane",
                     words: ["fun","time","party"],
+                    plan: {},
                     focus: [],
                     position: {}
                 }
@@ -2133,6 +2155,7 @@ QUnit.test("delete", function(assert) {
                 first_name: "Silly", 
                 last_name: "Billy",
                 words: ["base","time"],
+                plan: {},
                 focus: [],
                 position: {}
             }

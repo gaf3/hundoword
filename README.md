@@ -50,9 +50,7 @@ Without this, none of the pronounciation works.  I think we're eventually just g
 * Program - Collections of words
   * name 
   * description
-* ProgramWord - A word in a collection
-  * program
-  * word
+  * words - List of words for the program
 * User - Someone who logs in and controls the site
   * username
   * password
@@ -64,11 +62,15 @@ Without this, none of the pronounciation works.  I think we're eventually just g
   * teacher - User that managers the students progress (defaults to user)
   * first_name
   * last_name 
-  * age
-* StudentWord - Word a student is working on
-  * student
-  * word
-  * achievements - achievements student currently holds with the word (many to many)
+  * words - List of words to learn (string)
+  * plan - Plan for progression of words
+    * focus - How many words to focus on at a time
+    * required - Achievements required to complete a word
+    * forgo - Achievements to not check for at all
+  * focus - List of words to focus on 
+  * position - Record of where the student is at
+    * word - Word
+    * achievements - Achievements held for that word
 * Progress - Event when a student attains or yields an achievement with a word
   * student 
   * achievement
@@ -112,6 +114,8 @@ There's already an existing user/pass: vagrant/vagrant or you can create a new o
 * `#/student/<id>/focus/` - Focus: What words a student should be focusing on
   * id - Student to select
 * `#/student/<id>/game/` - Games: Where a student can play games and attain/yield achievements
+  * id - Student to select
+* `#/student/<id>/self/` - Games: Where a student can play games and attain/yield achievements
   * id - Student to select
 * `#/student/<id>/position/?words=<word>,<word>,focus=true/false` - Position: Where a student stands on each of their words' achievements.
   * id - Student to select
@@ -298,8 +302,11 @@ In all JavaScript API functions, the arguments success, error, and complete are 
         * id
         * first_name
         * last_name
-        * age
         * words - Array of words to learn (string)
+        * plan - Object of progression of words
+          * focus - Count of words to focus on at a time
+          * required - Id's of achievements required to complete a word
+          * forgo - Id's of achievements to not check for at all
         * focus - Array of words to focus on 
         * position - Object of where the student is at
           * word - Key of the word
@@ -311,8 +318,11 @@ In all JavaScript API functions, the arguments success, error, and complete are 
       * id
       * first_name
       * last_name
-      * age
       * words - Array of words (string)
+      * plan - Object of progression of words
+        * focus - Count of words to focus on at a time
+        * required - Id's of achievements required to complete a word
+        * forgo - Id's of achievements to not check for at all
       * focus - Array of words to focus on 
       * position - Object of where the student is at
         * word - Key of the word
@@ -322,15 +332,21 @@ In all JavaScript API functions, the arguments success, error, and complete are 
     * Request - `POST http://192.168.72.87/api/v0/student/`
       * first_name
       * last_name
-      * age
       * words - Array of words (string) - Duplicates are ignored, no warning, position maintained
+      * plan - Object of progression of words
+        * focus - Count of words to focus on at a time
+        * required - Id's of achievements required to complete a word
+        * forgo - Id's of achievements to not check for at all
       * focus - Array of words to focus on 
     * Response - `201 Created`
       * id
       * first_name
       * last_name
-      * age
       * words - Array of words (string)
+      * plan - Object of progression of words
+        * focus - Count of words to focus on at a time
+        * required - Id's of achievements required to complete a word
+        * forgo - Id's of achievements to not check for at all
       * focus - Array of words to focus on 
       * position - Object of where the student is at
         * word - Key of the word
@@ -341,15 +357,17 @@ In all JavaScript API functions, the arguments success, error, and complete are 
     * Request - `POST http://192.168.72.87/api/v0/student/<id>/`
       * first_name - (optional)
       * last_name - (optional)
-      * age - (optional)
       * words - (optional) Array of words (string) - Will overwrite existing list, dupes ignored, position maintained
       * focus - Array of words to focus on 
     * Response - `202 Accepted`
       * id
       * first_name
       * last_name
-      * age
       * words - Array of words (string)
+      * plan - Object of progression of words
+        * focus - Count of words to focus on at a time
+        * required - Id's of achievements required to complete a word
+        * forgo - Id's of achievements to not check for at all
       * focus - Array of words to focus on
       * position - Object of where the student is at
         * word - Key of the word
@@ -363,19 +381,29 @@ In all JavaScript API functions, the arguments success, error, and complete are 
       * id
       * first_name
       * last_name
-      * age
       * words - Array of words (string)
+      * plan - Object of progression of words
+        * focus - Count of words to focus on at a time
+        * required - Id's of achievements required to complete a word
+        * forgo - Id's of achievements to not check for at all
+      * focus - Array of words to focus on
+      * position - Object of where the student is at
+        * word - Key of the word
+          * achievements - Id's of achievements held
     * JavaScript - `api.student.append(id,words,success,error,complete)`
       * words - array of words to append
   * Remove - Removes words to a Student
-    * Request - `POST http://192.168.72.87/api/v0/student/<id>/append/`
+    * Request - `POST http://192.168.72.87/api/v0/student/<id>/remove/`
       * words - Array of words (string) - Will be removed from existing list, dupes ignored
     * Response - `202 Accepted`
       * id
       * first_name
       * last_name
-      * age
       * words - Array of words (string)
+      * plan - Object of progression of words
+        * focus - Count of words to focus on at a time
+        * required - Id's of achievements required to complete a word
+        * forgo - Id's of achievements to not check for at all
       * focus - Array of words to focus on
       * position - Object of where the student is at
         * word - Key of the word
@@ -389,8 +417,11 @@ In all JavaScript API functions, the arguments success, error, and complete are 
       * id
       * first_name
       * last_name
-      * age
       * words - Array of words (string)
+      * plan - Object of progression of words
+        * focus - Count of words to focus on at a time
+        * required - Id's of achievements required to complete a word
+        * forgo - Id's of achievements to not check for at all
       * focus - Array of words to focus on
       * position - Object of where the student is at
         * word - Key of the word
@@ -404,8 +435,11 @@ In all JavaScript API functions, the arguments success, error, and complete are 
       * id
       * first_name
       * last_name
-      * age
       * words - Array of words (string)
+      * plan - Object of progression of words
+        * focus - Count of words to focus on at a time
+        * required - Id's of achievements required to complete a word
+        * forgo - Id's of achievements to not check for at all
       * focus - Array of words to focus on
       * position - Object of where the student is at
         * word - Key of the word
