@@ -295,18 +295,18 @@ class test_Django(SimpleTestCase):
 
         # evaluate
 
-        student.words = ["every","this","that","where"]
+        student.words = ["every","this","that","where","you"]
         student.focus = ["this","that"]
         student.plan = {}
-        student.evaluate()
+        self.assertIsNone(student.evaluate())
         self.assertEqual(student.focus,["this","that"])
 
         student.plan = {"required": [achievement.id]}
-        student.evaluate()
+        self.assertIsNone(student.evaluate())
         self.assertEqual(student.focus,["this","that"])
 
         student.plan = {"focus": 3, "required": [achievement.id]}
-        student.evaluate()
+        self.assertEqual(student.evaluate(),(["that"],["that"],["every","where"]))
         self.assertEqual(student.focus,["this","every","where"])
 
 
@@ -1549,6 +1549,21 @@ class test_Django(SimpleTestCase):
             "here"
         ])
 
+        # Evaluate
+
+        silly_billy = Student.objects.get(pk=silly_billy_id)
+        silly_billy.words = ["every","here","there","where"]
+        silly_billy.focus = ["here","there"]
+        silly_billy.plan = {"focus": 3, "required": [sight_id]}
+        silly_billy.save()
+
+        self.assertEqual(client.post("/api/v0/student/%s/evaluate" % silly_billy_id).data,{
+            "learned": ["here"],
+            "blurred": ["here"],
+            "focused": ["every","where"],
+            "focus": ["there","every","where"]
+        })
+
         # History
 
         client.force_authenticate(user=loser)
@@ -1793,7 +1808,7 @@ class test_Django(SimpleTestCase):
         chart = dict(client.get("/api/v0/student/%s/chart/" % (silly_billy_id)).data)
 
         self.assertEqual(chart,{
-            "words": ["here","there"],
+            "words": ["every","here","there","where"],
             "times": [
                 "2015-09-20",
                 "2015-09-21",
@@ -1811,7 +1826,7 @@ class test_Django(SimpleTestCase):
         chart = dict(client.get("/api/v0/student/%s/chart/?by=week" % (silly_billy_id)).data)
 
         self.assertEqual(chart,{
-            "words": ["here","there"],
+            "words": ["every","here","there","where"],
             "times": [
                 "2015-09-14",
                 "2015-09-21"
@@ -1825,7 +1840,7 @@ class test_Django(SimpleTestCase):
         chart = dict(client.get("/api/v0/student/%s/chart/?by=month" % (silly_billy_id)).data)
 
         self.assertEqual(chart,{
-            "words": ["here","there"],
+            "words": ["every","here","there","where"],
             "times": [
                 "2015-09"
             ],
@@ -1884,7 +1899,7 @@ class test_Django(SimpleTestCase):
         chart = dict(client.get("/api/v0/student/%s/chart/?focus=true" % (silly_billy_id)).data)
 
         self.assertEqual(chart,{
-            "words": ["there"],
+            "words": ["there","every","where"],
             "times": [
                 "2015-09-22",
                 "2015-09-23",
@@ -1899,7 +1914,7 @@ class test_Django(SimpleTestCase):
         chart = dict(client.get("/api/v0/student/%s/chart/?achievements=%s" % (silly_billy_id,spell_id)).data)
 
         self.assertEqual(chart,{
-            "words": ["here","there"],
+            "words": ["every","here","there","where"],
             "times": [
                 "2015-09-22",
                 "2015-09-23",
@@ -1914,7 +1929,7 @@ class test_Django(SimpleTestCase):
         chart = dict(client.get("/api/v0/student/%s/chart/?from=2015-09-22&to=2015-09-25" % (silly_billy_id)).data)
 
         self.assertEqual(chart,{
-            "words": ["here","there"],
+            "words": ["every","here","there","where"],
             "times": [
                 "2015-09-22",
                 "2015-09-23",

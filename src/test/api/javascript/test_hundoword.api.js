@@ -1797,6 +1797,56 @@ QUnit.test("yield", function(assert) {
 
 });
 
+QUnit.test("evaluate", function(assert) {
+
+    var api = new HundoWord.API(hundoword_django_host + "/api/v0/");
+    check_user(api,"tester0","tester0","tester0@hundoword.com");
+
+    var sight = api.achievement.create({
+        name: make_achievement("Sight"), 
+        slug: make_achievement("sight"), 
+        description: "See it", 
+        progression: 100
+    });
+
+    var sane_jane = api.student.create({first_name: "Sane", last_name: "Jane", words:["fun","time","player"], focus: ["fun"], plan: {focus: 1, required: [sight.id]}});
+
+    api.student.attain(sane_jane.id,"fun",sight.id,"2015-09-22T00:00:00Z");
+    
+    assert.deepEqual(
+        api.student.evaluate(sane_jane.id),
+        {
+            "learned": ["fun"],
+            "blurred": ["fun"],
+            "focused": ["time"],
+            "focus": ["time"]
+        }
+    );
+
+    api.student.attain(sane_jane.id,"time",sight.id,"2015-09-22T00:00:00Z");
+
+    var pass = assert.async();
+    api.student.evaluate(sane_jane.id,
+        function (data) {
+            assert.deepEqual(
+                data,
+                {
+                    "learned": ["fun","time"],
+                    "blurred": ["time"],
+                    "focused": ["player"],
+                    "focus": ["player"]
+                }
+            );
+            pass();
+        },
+        function () {
+            assert.ok(false);
+            pass();
+        }
+    );
+
+});
+
 QUnit.test("position", function(assert) {
 
     var api = new HundoWord.API(hundoword_django_host + "/api/v0/");

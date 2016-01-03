@@ -189,6 +189,8 @@ class Student(models.Model):
     def evaluate(self):
 
         learned = self.learned()
+        blurred = []
+        focused = []
 
         if not learned or not "focus" in self.plan:
             return
@@ -196,6 +198,7 @@ class Student(models.Model):
         focus = self.plan["focus"]
 
         for word in [word for word in self.focus if word in learned]:
+            blurred.append(word)
             self.focus.pop(self.focus.index(word))
 
         for word in self.words:
@@ -204,7 +207,10 @@ class Student(models.Model):
                 break
 
             if word not in learned and word not in self.focus:
+                focused.append(word)
                 self.focus.append(word)
+
+        return (learned,blurred,focused)
 
 
 class Progress(models.Model):

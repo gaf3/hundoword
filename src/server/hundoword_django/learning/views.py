@@ -463,6 +463,13 @@ def student(request,pk='',action=''):
                 serializer = ProgressSerializer(progress)
                 return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
 
+            elif action == "evaluate": 
+
+                (learned, blurred, focused) = student.evaluate()
+                student.save()
+                evaluate = {"learned": learned, "blurred": blurred, "focused": focused, "focus": student.focus}
+                return Response(evaluate, status=status.HTTP_202_ACCEPTED)
+
         # Delete
 
         elif request.method == 'DELETE' and pk:

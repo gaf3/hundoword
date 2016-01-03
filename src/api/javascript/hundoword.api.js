@@ -129,6 +129,10 @@ HundoWord.Student.prototype.yield = function(id,word,achievement,at,success,erro
     return this.rest("POST",this.build_url(id,"yield"),data,success,error,complete);
 }
 
+HundoWord.Student.prototype.evaluate = function(id,success,error,complete) {
+    return this.rest("POST",this.build_url(id,"evaluate"),{},success,error,complete);
+}
+
 HundoWord.Student.prototype.position = function(id,words,focus,success,error,complete) {
     var parameters = {};
     if (words) {
