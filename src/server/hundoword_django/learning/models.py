@@ -192,23 +192,26 @@ class Student(models.Model):
         blurred = []
         focused = []
 
-        if not learned or not "focus" in self.plan:
-            return
+        if "focus" in self.plan and "required" in self.plan:
 
-        focus = self.plan["focus"]
+            for word in [word for word in self.focus if word in learned]:
+                blurred.append(word)
 
-        for word in [word for word in self.focus if word in learned]:
-            blurred.append(word)
-            self.focus.pop(self.focus.index(word))
+            last = self.focus
+            self.focus = []
+            focus = self.plan["focus"]
 
-        for word in self.words:
+            for word in self.words:
 
-            if len(self.focus) >= focus:
-                break
+                if len(self.focus) >= focus:
+                    break
 
-            if word not in learned and word not in self.focus:
-                focused.append(word)
-                self.focus.append(word)
+                if word not in learned and word not in self.focus:
+
+                    if word not in last:
+                        focused.append(word)
+
+                    self.focus.append(word)
 
         return (learned,blurred,focused)
 

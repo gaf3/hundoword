@@ -298,16 +298,16 @@ class test_Django(SimpleTestCase):
         student.words = ["every","this","that","where","you"]
         student.focus = ["this","that"]
         student.plan = {}
-        self.assertIsNone(student.evaluate())
+        self.assertEqual(student.evaluate(),([],[],[]))
         self.assertEqual(student.focus,["this","that"])
 
         student.plan = {"required": [achievement.id]}
-        self.assertIsNone(student.evaluate())
+        self.assertEqual(student.evaluate(),(["that"],[],[]))
         self.assertEqual(student.focus,["this","that"])
 
         student.plan = {"focus": 3, "required": [achievement.id]}
         self.assertEqual(student.evaluate(),(["that"],["that"],["every","where"]))
-        self.assertEqual(student.focus,["this","every","where"])
+        self.assertEqual(student.focus,["every","this","where"])
 
 
     def test_Progress(self):
@@ -1561,7 +1561,7 @@ class test_Django(SimpleTestCase):
             "learned": ["here"],
             "blurred": ["here"],
             "focused": ["every","where"],
-            "focus": ["there","every","where"]
+            "focus": ["every","there","where"]
         })
 
         # History
@@ -1899,7 +1899,7 @@ class test_Django(SimpleTestCase):
         chart = dict(client.get("/api/v0/student/%s/chart/?focus=true" % (silly_billy_id)).data)
 
         self.assertEqual(chart,{
-            "words": ["there","every","where"],
+            "words": ["every","there","where"],
             "times": [
                 "2015-09-22",
                 "2015-09-23",
