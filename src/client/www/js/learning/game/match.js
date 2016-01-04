@@ -13,7 +13,7 @@ Learning.controller("Match","Game",{
                     this.it.choices.push(choice);
                 }
             }
-            this.it.choices[Math.floor(Math.random() * this.it.student.words.length)] = this.it.word
+            this.it.choices[Math.floor(Math.random() * 6)] = this.it.word
             this.application.render(this.it);
         } else {
             this.finish();
