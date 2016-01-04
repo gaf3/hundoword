@@ -72,6 +72,15 @@ Learning.controller("Game","Changeable",{
         }
         $(sound).attr('played',true);
     },
+    evaluate: function() {
+        var evaluate = hwAPI.student.evaluate(this.application.current.path.student_id);
+        this.it = {
+            student: hwAPI.student.select(this.application.current.path.student_id),
+            achievements: hwAPI.achievement.list(),
+            evaluate: evaluate
+        };
+        this.application.render(this.it);
+    },
     self: function() {
         var student = hwAPI.student.select(this.application.current.path.student_id);
         this.words = student.focus.length > 0 ? student.focus : student.words;
@@ -106,5 +115,5 @@ Learning.template("Words",Learning.load("game/words"),null,Learning.partials);
 Learning.template("Self",Learning.load("game/self"),null,Learning.partials);
 
 Learning.route("student/games","/student/{student_id:^\\d+$}/game/","Games","Game","list");
-Learning.route("student/self","/student/{student_id:^\\d+$}/self/","Self","Game","list");
+Learning.route("student/self","/student/{student_id:^\\d+$}/self/","Self","Game","evaluate");
 
