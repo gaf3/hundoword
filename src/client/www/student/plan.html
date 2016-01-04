@@ -7,7 +7,7 @@
             <fieldset data-uk-margin>
                 <strong>Focus</strong>
                 <input 
-                    id="focus" type="text" value='{{=it.student.plan.focus}}'
+                    id="focus" type="text" value='{{=it.student.plan.focus || ''}}'
                     OnChange="Learning.current.controller.save();" class="uk-form-width-mini" 
                 />
                 <button OnClick="Learning.current.controller.evaluate();" class="uk-button uk-button-primary">

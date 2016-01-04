@@ -420,7 +420,7 @@ DoTRoute.Application.prototype.go = function(route) {
     // and use that
 
     this.pane.location.hash = typeof(route) == "string" && route[0] == '#' ? route : this.link.apply(this,arguments);
-    this.router();
+    //this.router();
 
 }
 

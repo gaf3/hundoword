@@ -66,7 +66,7 @@ Without this, none of the pronounciation works.  I think we're eventually just g
   * plan - Plan for progression of words
     * focus - How many words to focus on at a time
     * required - Achievements required to complete a word
-    * forgo - Achievements to not check for at all
+    * forgo - Achievements to not show at all
   * focus - List of words to focus on 
   * position - Record of where the student is at
     * word - Word
@@ -80,7 +80,6 @@ Without this, none of the pronounciation works.  I think we're eventually just g
 
 ## Achievements / Games
 
-Completed:
 * Introduction - Just shows the word, plays its sound, and has a speaker icon to replay.
 * Sight Match - Show the word above and they have to click the word in a group below. First click either pass or fail.
 * Sight Spell - Show the word above and they have to type in characters to match the spelling.
@@ -90,6 +89,15 @@ Completed:
 * Sound Spell - Show the word above and they have to type in characters to match the spelling.
 * Sound Cross - Line of speakers and line of words.  Play the speaker, match the words.
 * Sound Search - Basic word search. List of speakers for words to search for. Student clicks letters, circling in row. When circle matches, word is green. Indifferent button to give up.
+
+## Plans
+
+Plans allow for self directed learning.  With a plan, you can specify 
+* How man words a Student should focus on at a time
+* Which achievements a Student must attain for a word for it to be considered learn
+* Which achievements you want them to ignore altogether for now
+
+Once you define a Plan on the Plan tab, you can click the Evaluate button, and the Student's focus will automatically be updated as well as the list of words considered learned.  You can update their Plan and reevaluate as many times as you want. 
 
 # Web
 
@@ -110,6 +118,8 @@ There's already an existing user/pass: vagrant/vagrant or you can create a new o
   * id - Program to select
 * `#/student/` - Students: List existing students or create a new one
 * `#/student/<id>/` - Student: Selecting existing student using id, edit or delete.
+  * id - Student to select
+* `#/student/<id>/plan/` - Plan: How many words should the student focus on and what achievements are required to move on
   * id - Student to select
 * `#/student/<id>/focus/` - Focus: What words a student should be focusing on
   * id - Student to select
@@ -483,6 +493,14 @@ In all JavaScript API functions, the arguments success, error, and complete are 
     * Response - `200 Ok`
       * Array - words that satisify the lesson plan
     * JavaScript - `api.student.learned(id,success,error,complete)`
+  * Evaluate - Determine what a student should focus on next
+    * Request - `POST http://192.168.72.87/api/v0/student/<id>/evaluate/`
+    * Response - `202 Accepted`
+      * blurred - The words the Student learned from this evaluation
+      * focused - The words the Student is now focusing on from this evaluation
+      * learned - All the words the Student has learned
+      * focus - All the words the Student is focusing on 
+    * JavaScript - `api.student.evaluate(id,success,error,complete)`
   * History - Retrieves Student History with words and Achievements using id
     * Request - `GET http://192.168.72.87/api/v0/student/<id>/history/?words=<word>,<word>&achievements=<achievement>,<achievement>`
       * words = Only return history for these words
