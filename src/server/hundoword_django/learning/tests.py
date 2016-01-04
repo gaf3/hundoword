@@ -114,7 +114,7 @@ class test_Django(SimpleTestCase):
         self.assertEqual(student.focus,[])
         self.assertEqual(student.position,{})
 
-        # Validate words and focs
+        # Validate words
 
         try: 
 
@@ -135,6 +135,86 @@ class test_Django(SimpleTestCase):
         except ValidationError as exception:
 
             self.assertEqual(exception.message_dict,{"words": ["All list items be be strings."]})
+
+        # Validate plan
+
+        try: 
+
+            program = Student(teacher=user,first_name="not",last_name="list.",plan="this")
+            program.save()
+            self.fail()
+
+        except ValidationError as exception:
+
+            self.assertEqual(exception.message_dict,{"plan": ["Must be an object."]})
+
+        # Validate plan.focus
+
+        try: 
+
+            program = Student(teacher=user,first_name="all",last_name="numbers",plan={"focus": "this"})
+            program.save()
+            self.fail()
+
+        except ValidationError as exception:
+
+            self.assertEqual(exception.message_dict,{"plan.focus": ["Must be a positive integer."]})
+
+        try: 
+
+            program = Student(teacher=user,first_name="all",last_name="numbers",plan={"focus": -1})
+            program.save()
+            self.fail()
+
+        except ValidationError as exception:
+
+            self.assertEqual(exception.message_dict,{"plan.focus": ["Must be a positive integer."]})
+
+        # Validate plan.required
+
+        try: 
+
+            program = Student(teacher=user,first_name="not",last_name="list.",plan={"required":"this"})
+            program.save()
+            self.fail()
+
+        except ValidationError as exception:
+
+            self.assertEqual(exception.message_dict,{"plan.required": ["Must be a list."]})
+
+        try: 
+
+            program = Student(teacher=user,first_name="all",last_name="numbers",plan={"required":["this","that"]})
+            program.save()
+            self.fail()
+
+        except ValidationError as exception:
+
+            self.assertEqual(exception.message_dict,{"plan.required": ["All list items be be integers."]})
+
+        # Validate plan.forgo
+
+        try: 
+
+            program = Student(teacher=user,first_name="not",last_name="list.",plan={"forgo":"this"})
+            program.save()
+            self.fail()
+
+        except ValidationError as exception:
+
+            self.assertEqual(exception.message_dict,{"plan.forgo": ["Must be a list."]})
+
+        try: 
+
+            program = Student(teacher=user,first_name="all",last_name="numbers",plan={"forgo":["this","that"]})
+            program.save()
+            self.fail()
+
+        except ValidationError as exception:
+
+            self.assertEqual(exception.message_dict,{"plan.forgo": ["All list items be be integers."]})
+
+        # Validate focus
 
         try: 
 
@@ -201,6 +281,33 @@ class test_Django(SimpleTestCase):
         student.progress_position(progress)
         student.save()
         self.assertEqual(student.position,{"that": [achievement.id]})
+
+        # learned
+
+        progress = Progress(student=student,word="this",achievement=achievement,held=False,at=at)
+        progress.save()
+
+        self.assertEqual(student.learned(),[])
+        student.plan = {"required": []}
+        self.assertEqual(student.learned(),[])
+        student.plan = {"required": [achievement.id]}
+        self.assertEqual(student.learned(),["that"])
+
+        # evaluate
+
+        student.words = ["every","this","that","where","you"]
+        student.focus = ["this","that"]
+        student.plan = {}
+        self.assertEqual(student.evaluate(),([],[],[]))
+        self.assertEqual(student.focus,["this","that"])
+
+        student.plan = {"required": [achievement.id]}
+        self.assertEqual(student.evaluate(),(["that"],[],[]))
+        self.assertEqual(student.focus,["this","that"])
+
+        student.plan = {"focus": 3, "required": [achievement.id]}
+        self.assertEqual(student.evaluate(),(["that"],["that"],["every","where"]))
+        self.assertEqual(student.focus,["every","this","where"])
 
 
     def test_Progress(self):
@@ -878,12 +985,21 @@ class test_Django(SimpleTestCase):
         self.assertEqual(response.status_code,status.HTTP_400_BAD_REQUEST);
         self.assertEqual(response.data,{"words": ["Must be a list."]})
 
+        # Plan validation
+
+        response = client.post("/api/v0/student/",{"first_name": "sane", "last_name": "jane", "plan": "oops"}, format='json')
+
+        self.assertEqual(response.status_code,status.HTTP_400_BAD_REQUEST);
+        self.assertEqual(response.data,{"plan": ["Must be an object."]})
+
         # Create
 
         response = client.post("/api/v0/student/",{
             "first_name": "sane",
             "last_name": "jane",
-            "words": ["he","she","it","it"]
+            "words": ["he","she","it","it"],
+            "plan": {"focus": 2},
+            "focus": ["he","she"]
         }, format='json')
 
         student = Student.objects.get(teacher=user,first_name="sane",last_name="jane")
@@ -894,7 +1010,8 @@ class test_Django(SimpleTestCase):
             "first_name": "sane",
             "last_name": "jane",
             "words": ["he","she","it"],
-            "focus": [],
+            "plan": {"focus": 2},
+            "focus": ["he","she"],
             "position": {}
         })
 
@@ -914,7 +1031,8 @@ class test_Django(SimpleTestCase):
             "first_name": "sane",
             "last_name": "jane",
             "words": ["he","she","it"],
-            "focus": [],
+            "plan": {"focus": 2},
+            "focus": ["he","she"],
             "position": {}
         })
 
@@ -939,7 +1057,9 @@ class test_Django(SimpleTestCase):
         # Update
 
         response = client.post("/api/v0/student/%s" % sane_jane_id,{
-            "words": ["it","there"]
+            "words": ["it","there"],
+            "plan": {"focus": 1},
+            "focus": ["it"]
         }, format='json')
 
         self.assertEqual(response.data,{
@@ -947,7 +1067,8 @@ class test_Django(SimpleTestCase):
             "first_name": "sane",
             "last_name": "jane",
             "words": ["it","there"],
-            "focus": [],
+            "plan": {"focus": 1},
+            "focus": ["it"],
             "position": {}
         })
 
@@ -956,7 +1077,8 @@ class test_Django(SimpleTestCase):
             "first_name": "sane",
             "last_name": "jane",
             "words": ["it","there"],
-            "focus": [],
+            "plan": {"focus": 1},
+            "focus": ["it"],
             "position": {}
         })
 
@@ -990,7 +1112,8 @@ class test_Django(SimpleTestCase):
             "first_name": "sane",
             "last_name": "jane",
             "words": ["it","there","here","everywhere"],
-            "focus": [],
+            "plan": {"focus": 1},
+            "focus": ["it"],
             "position": {}
         })
 
@@ -999,7 +1122,8 @@ class test_Django(SimpleTestCase):
             "first_name": "sane",
             "last_name": "jane",
             "words": ["it","there","here","everywhere"],
-            "focus": [],
+            "plan": {"focus": 1},
+            "focus": ["it"],
             "position": {}
         })
 
@@ -1033,7 +1157,8 @@ class test_Django(SimpleTestCase):
             "first_name": "sane",
             "last_name": "jane",
             "words": ["it","everywhere"],
-            "focus": [],
+            "plan": {"focus": 1},
+            "focus": ["it"],
             "position": {}
         })
 
@@ -1042,7 +1167,8 @@ class test_Django(SimpleTestCase):
             "first_name": "sane",
             "last_name": "jane",
             "words": ["it","everywhere"],
-            "focus": [],
+            "plan": {"focus": 1},
+            "focus": ["it"],
             "position": {}
         })
 
@@ -1064,6 +1190,7 @@ class test_Django(SimpleTestCase):
                 "first_name": "silly",
                 "last_name": "billy",
                 "words": [],
+                "plan": {},
                 "focus": [],
                 "position": {}
             },
@@ -1072,7 +1199,8 @@ class test_Django(SimpleTestCase):
                 "first_name": "sane",
                 "last_name": "jane",
                 "words": ["it","everywhere"],
-                "focus": [],
+                "plan": {"focus": 1},
+                "focus": ["it"],
                 "position": {}
             }
         ])
@@ -1096,6 +1224,7 @@ class test_Django(SimpleTestCase):
                 "first_name": "silly",
                 "last_name": "billy",
                 "words": [],
+                "plan": {},
                 "focus": [],
                 "position": {}
             }
@@ -1149,6 +1278,7 @@ class test_Django(SimpleTestCase):
             "first_name": "silly",
             "last_name": "billy",
             "words": ["here","there","everywhere"],
+            "plan": {},
             "focus": ["here","there"],
             "position": {}
         })
@@ -1199,6 +1329,7 @@ class test_Django(SimpleTestCase):
             "first_name": "silly",
             "last_name": "billy",
             "words": ["here","there","everywhere"],
+            "plan": {},
             "focus": [],
             "position": {}
         })
@@ -1395,6 +1526,42 @@ class test_Django(SimpleTestCase):
 
         self.assertEqual(client.get("/api/v0/student/%s/position?focus=false" % silly_billy_id).data,{
             "there": []
+        })
+
+        # Learned
+
+        client.force_authenticate(user=loser)
+
+        response = client.get("/api/v0/student/%s/learned" % silly_billy_id)
+
+        self.assertEqual(response.status_code,status.HTTP_404_NOT_FOUND);
+        self.assertEqual(response.data,{"detail": "Student not found"})
+
+        client.force_authenticate(user=user)
+
+        self.assertEqual(client.get("/api/v0/student/%s/learned" % silly_billy_id).data,[])
+
+        silly_billy = Student.objects.get(pk=silly_billy_id)
+        silly_billy.plan = {"required": [sight_id]}
+        silly_billy.save()
+
+        self.assertEqual(client.get("/api/v0/student/%s/learned" % silly_billy_id).data,[
+            "here"
+        ])
+
+        # Evaluate
+
+        silly_billy = Student.objects.get(pk=silly_billy_id)
+        silly_billy.words = ["every","here","there","where"]
+        silly_billy.focus = ["here","there"]
+        silly_billy.plan = {"focus": 3, "required": [sight_id]}
+        silly_billy.save()
+
+        self.assertEqual(client.post("/api/v0/student/%s/evaluate" % silly_billy_id).data,{
+            "learned": ["here"],
+            "blurred": ["here"],
+            "focused": ["every","where"],
+            "focus": ["every","there","where"]
         })
 
         # History
@@ -1641,7 +1808,7 @@ class test_Django(SimpleTestCase):
         chart = dict(client.get("/api/v0/student/%s/chart/" % (silly_billy_id)).data)
 
         self.assertEqual(chart,{
-            "words": ["here","there"],
+            "words": ["every","here","there","where"],
             "times": [
                 "2015-09-20",
                 "2015-09-21",
@@ -1659,7 +1826,7 @@ class test_Django(SimpleTestCase):
         chart = dict(client.get("/api/v0/student/%s/chart/?by=week" % (silly_billy_id)).data)
 
         self.assertEqual(chart,{
-            "words": ["here","there"],
+            "words": ["every","here","there","where"],
             "times": [
                 "2015-09-14",
                 "2015-09-21"
@@ -1673,7 +1840,7 @@ class test_Django(SimpleTestCase):
         chart = dict(client.get("/api/v0/student/%s/chart/?by=month" % (silly_billy_id)).data)
 
         self.assertEqual(chart,{
-            "words": ["here","there"],
+            "words": ["every","here","there","where"],
             "times": [
                 "2015-09"
             ],
@@ -1732,7 +1899,7 @@ class test_Django(SimpleTestCase):
         chart = dict(client.get("/api/v0/student/%s/chart/?focus=true" % (silly_billy_id)).data)
 
         self.assertEqual(chart,{
-            "words": ["there"],
+            "words": ["every","there","where"],
             "times": [
                 "2015-09-22",
                 "2015-09-23",
@@ -1747,7 +1914,7 @@ class test_Django(SimpleTestCase):
         chart = dict(client.get("/api/v0/student/%s/chart/?achievements=%s" % (silly_billy_id,spell_id)).data)
 
         self.assertEqual(chart,{
-            "words": ["here","there"],
+            "words": ["every","here","there","where"],
             "times": [
                 "2015-09-22",
                 "2015-09-23",
@@ -1762,7 +1929,7 @@ class test_Django(SimpleTestCase):
         chart = dict(client.get("/api/v0/student/%s/chart/?from=2015-09-22&to=2015-09-25" % (silly_billy_id)).data)
 
         self.assertEqual(chart,{
-            "words": ["here","there"],
+            "words": ["every","here","there","where"],
             "times": [
                 "2015-09-22",
                 "2015-09-23",

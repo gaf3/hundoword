@@ -72,6 +72,54 @@ Learning.controller("Game","Changeable",{
         }
         $(sound).attr('played',true);
     },
+    learn: function() {
+        this.it.learn = [];
+        for (var achievement = 0; achievement < this.it.achievements.length; achievement++) {
+            if (($.inArray(this.it.achievements[achievement].id,this.application.took) == -1) &&
+                (!('forgo' in this.it.student.plan) || 
+                ($.inArray(this.it.achievements[achievement].id,this.it.student.plan.forgo) == -1))) {
+                this.it.learn.push(this.it.achievements[achievement]);
+            }
+        }
+    },
+    plan: function() {
+        this.it = {
+            student: hwAPI.student.select(this.application.current.path.student_id),
+            achievements: hwAPI.achievement.list()
+        };
+        if ('required' in this.it.student.plan && this.it.student.plan.required.length) {
+            var evaluate = true;
+            if ('took' in this.application) {
+                JSON.stringify(this.application.took);
+                for (var required = 0; required < this.it.student.plan.required.length; required++) {
+                    if ($.inArray(this.it.student.plan.required[required],this.application.took) == -1) {
+                        evaluate = false;
+                    }
+                }
+            }
+            if (evaluate) {
+                this.application.took = [];
+                this.it.evaluate = hwAPI.student.evaluate(this.application.current.path.student_id);
+            } else {
+                this.it.evaluate = {
+                    focus: this.it.student.focus,
+                    learned: hwAPI.student.learned(this.application.current.path.student_id),
+                    blurred: [],
+                    focused: []
+                };
+            }
+            this.learn();
+        } else {
+            this.it.evaluate = {
+                focus: this.it.student.focus,
+                learned: [],
+                blurred: [],
+                focused: []
+            };
+            this.it.learn = this.it.achievements;
+        }
+        this.application.render(this.it);
+    },
     self: function() {
         var student = hwAPI.student.select(this.application.current.path.student_id);
         this.words = student.focus.length > 0 ? student.focus : student.words;
@@ -96,6 +144,7 @@ Learning.controller("Game","Changeable",{
         if (this.application.current.paths[2] == "game") {
             this.application.go("student/position",this.it.student.id);
         } else if (this.application.current.paths[2] == "self") {
+            this.application.took.push(this.it.achievement.id);
             this.application.go("student/self",this.it.student.id);
         }
     }
@@ -106,5 +155,5 @@ Learning.template("Words",Learning.load("game/words"),null,Learning.partials);
 Learning.template("Self",Learning.load("game/self"),null,Learning.partials);
 
 Learning.route("student/games","/student/{student_id:^\\d+$}/game/","Games","Game","list");
-Learning.route("student/self","/student/{student_id:^\\d+$}/self/","Self","Game","list");
+Learning.route("student/self","/student/{student_id:^\\d+$}/self/","Self","Game","plan");
 

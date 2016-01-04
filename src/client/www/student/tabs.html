@@ -11,6 +11,9 @@
     {{?}}
     {{? !it.student.id || !it.student.words.length}}
     <li class="uk-disabled">
+        <a>Plan</a>
+    </li>
+    <li class="uk-disabled">
         <a>Focus</a>
     </li>
     <li class="uk-disabled">
@@ -26,6 +29,9 @@
         <a>History</a>
     </li>
     {{??}}
+    <li class="{{? Learning.current.route.name == 'student/plan' }}uk-active{{?}}">
+        <a href="{{=Learning.link('student/plan',it.student.id)}}">Plan</a>
+    </li>
     <li class="{{? Learning.current.route.name == 'student/focus' }}uk-active{{?}}">
         <a href="{{=Learning.link('student/focus',it.student.id)}}">Focus</a>
     </li>

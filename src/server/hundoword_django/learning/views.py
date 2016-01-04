@@ -278,7 +278,7 @@ def student(request,pk='',action=''):
 
         if request.method == 'POST' and not pk:
 
-            student = serialize_request(Student,request.DATA,['first_name','last_name'],['words','focus'])
+            student = serialize_request(Student,request.DATA,['first_name','last_name'],['words','plan','focus'])
             student.teacher = request.user
             student.save()
             serializer = StudentSerializer(student)
@@ -323,6 +323,12 @@ def student(request,pk='',action=''):
                     position[word] = student.position[word] if word in student.position else {}
 
                 return Response(position)
+
+            # Learned
+
+            elif action == "learned": 
+
+                return Response(student.learned())
 
             # History
 
@@ -456,6 +462,13 @@ def student(request,pk='',action=''):
 
                 serializer = ProgressSerializer(progress)
                 return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+
+            elif action == "evaluate": 
+
+                (learned, blurred, focused) = student.evaluate()
+                student.save()
+                evaluate = {"learned": learned, "blurred": blurred, "focused": focused, "focus": student.focus}
+                return Response(evaluate, status=status.HTTP_202_ACCEPTED)
 
         # Delete
 

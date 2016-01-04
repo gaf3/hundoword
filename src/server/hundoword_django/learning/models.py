@@ -13,6 +13,17 @@ def validate_words(field,words):
         if not isinstance(word,str) and not isinstance(word,unicode):
             raise ValidationError({field: "All list items be be strings."})
 
+
+def validate_achievements(field,achievements):
+
+    if not isinstance(achievements,list):
+        raise ValidationError({field: "Must be a list."})
+
+    for achievement in achievements:
+        if not isinstance(achievement,int) and not isinstance(achievement,long):
+            raise ValidationError({field: "All list items be be integers."})
+
+
 def unique_words(words):
 
     unique = []
@@ -21,6 +32,7 @@ def unique_words(words):
             unique.append(word)
 
     return unique
+
 
 class Achievement(models.Model):
 
@@ -70,6 +82,7 @@ class Student(models.Model):
     first_name = models.CharField(max_length=128,blank=True,default="")
     last_name = models.CharField(max_length=128,blank=True,default="")
     words = JSONField(blank=True,default=[])
+    plan = JSONField(blank=True,default={})
     focus = JSONField(blank=True,default=[])
     position = JSONField(blank=True,default={})
 
@@ -95,6 +108,18 @@ class Student(models.Model):
 
             if extra:
                 raise ValidationError({'focus': extra})
+
+        if not isinstance(self.plan,dict):
+            raise ValidationError({"plan": "Must be an object."})
+
+        if "focus" in self.plan and (not isinstance(self.plan["focus"],int) or not self.plan["focus"] > 0):
+            raise ValidationError({"plan.focus": "Must be a positive integer."})
+
+        if "required" in self.plan:
+            validate_achievements("plan.required",self.plan["required"])
+
+        if "forgo" in self.plan:
+            validate_achievements("plan.forgo",self.plan["forgo"])
 
         super(Student, self).clean(*args, **kwargs)
 
@@ -141,6 +166,54 @@ class Student(models.Model):
             self.position[progress.word].append(progress.achievement.id)
         elif not progress.held and progress.achievement.id in self.position[progress.word]:
             self.position[progress.word].pop(self.position[progress.word].index(progress.achievement.id))
+
+    def learned(self):
+
+        learned = []
+
+        if not self.plan or not self.plan["required"]:
+            return learned
+
+        for word in self.words:
+
+            if word not in self.position:
+                continue
+
+            if [id for id in self.plan["required"] if id not in self.position[word]]:
+                continue
+
+            learned.append(word)
+
+        return learned
+
+    def evaluate(self):
+
+        learned = self.learned()
+        blurred = []
+        focused = []
+
+        if "focus" in self.plan and "required" in self.plan:
+
+            for word in [word for word in self.focus if word in learned]:
+                blurred.append(word)
+
+            last = self.focus
+            self.focus = []
+            focus = self.plan["focus"]
+
+            for word in self.words:
+
+                if len(self.focus) >= focus:
+                    break
+
+                if word not in learned and word not in self.focus:
+
+                    if word not in last:
+                        focused.append(word)
+
+                    self.focus.append(word)
+
+        return (learned,blurred,focused)
 
 
 class Progress(models.Model):

@@ -58,12 +58,13 @@ class ProgramSerializer(serializers.ModelSerializer):
 class StudentSerializer(serializers.ModelSerializer):
 
     words = JSONField()
+    plan = JSONField()
     focus = JSONField()
     position = JSONField()
 
     class Meta:
         model = Student
-        fields = ('id','first_name', 'last_name', 'words', 'focus', 'position')
+        fields = ('id','first_name', 'last_name', 'words', 'plan', 'focus', 'position')
         readonly_fields = ('id','teacher','position')
 
     def get_display(self, obj):

@@ -108,9 +108,11 @@ HundoWord.Student.prototype.focus = function(id,words,success,error,complete) {
         return this.rest("GET",this.build_url(id,"focus"),null,success,error,complete);
     }
 }
+
 HundoWord.Student.prototype.blur = function(id,words,success,error,complete) {
     return this.rest("POST",this.build_url(id,"blur"),{words: words},success,error,complete);
 }
+
 HundoWord.Student.prototype.attain = function(id,word,achievement,at,success,error,complete) {
     var data = {word: word,achievement: achievement};
     if (at) {
@@ -118,6 +120,7 @@ HundoWord.Student.prototype.attain = function(id,word,achievement,at,success,err
     }
     return this.rest("POST",this.build_url(id,"attain"),data,success,error,complete);
 }
+
 HundoWord.Student.prototype.yield = function(id,word,achievement,at,success,error,complete) {
     var data = {word: word,achievement: achievement};
     if (at) {
@@ -125,6 +128,11 @@ HundoWord.Student.prototype.yield = function(id,word,achievement,at,success,erro
     }
     return this.rest("POST",this.build_url(id,"yield"),data,success,error,complete);
 }
+
+HundoWord.Student.prototype.evaluate = function(id,success,error,complete) {
+    return this.rest("POST",this.build_url(id,"evaluate"),{},success,error,complete);
+}
+
 HundoWord.Student.prototype.position = function(id,words,focus,success,error,complete) {
     var parameters = {};
     if (words) {
@@ -135,6 +143,11 @@ HundoWord.Student.prototype.position = function(id,words,focus,success,error,com
     }
     return this.rest("GET",this.build_url(id,"position",parameters),null,success,error,complete);
 }
+
+HundoWord.Student.prototype.learned = function(id,success,error,complete) {
+    return this.rest("GET",this.build_url(id,"learned"),null,success,error,complete);
+}
+
 HundoWord.Student.prototype.history = function(id,words,achievements,from,to,success,error,complete) {
     var parameters = {};
     if (words) {
