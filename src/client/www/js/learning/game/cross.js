@@ -51,7 +51,7 @@ Learning.controller("Cross","Game",{
             $(other).attr("match",$(item).attr("word"));
             $(item).attr("match",$(other).attr("word"));
             $(other).removeClass('uk-active');
-        } else {
+        } else if (column != 'right')  {
             $(item).addClass('uk-active');
         }
         this.draw();
