@@ -13,13 +13,11 @@
     <div class="uk-grid data-uk-grid-margin">
         {{?}}
         <div class="uk-width-medium-1-3">
-            <div class="uk-panel-box"  OnClick="Learning.go('self/{{=achievement.slug}}',{{=Learning.current.path.student_id}});" align="middle">
+            <div class="uk-panel-box"  OnClick="Learning.go('play/{{=achievement.slug}}',{{=Learning.current.path.student_id}});" align="middle">
                 <h2 class="uk-panel-title">{{=achievement.name}}</h2>
                 <img src="/images/{{=achievement.slug}}.png" align='middle'>
             </div>
         </div>
         {{~}}
     </div>
-    <br/>
-    <br/><a href="{{=Learning.link('student/position',Learning.current.path.student_id)}}">Current Position</a><br/>
 </div>

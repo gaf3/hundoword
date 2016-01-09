@@ -1,5 +1,5 @@
-Learning.controller("Cross","Game",{
-    play: function(start) {
+Learning.controller("Cross","Learn",{
+    next: function(start) {
         if (start) {
             this.index = -1;
         }
@@ -104,9 +104,6 @@ Learning.controller("Cross","Game",{
         }
     },
     check: function() {
-        var context = $("#matches")[0].getContext("2d");
-        context.clearRect(0, 0, window.innerWidth, window.innerHeight);
-        context.lineWidth = 1;
         var matches = [];
         $("#crosses li[column='left'][match]").each(function() {
             var other = $("#crosses li[column='right'][word='" + $(this).attr("match") + "']")[0];
@@ -114,7 +111,6 @@ Learning.controller("Cross","Game",{
                 matches.push($(this).attr('word'));
             }
         });
-        $("#crosses li:not([match]) a").css('color','#d32c46');
         for (var index = 0; index < this.it.lefts.length; index++) {
             var word = this.it.lefts[index].word;
             if ($.inArray(word,matches) > -1) {
@@ -123,31 +119,37 @@ Learning.controller("Cross","Game",{
                 hwAPI.student.yield(this.it.student.id,word,this.it.achievement.id);
             }
         }
-        if (matches.length == this.it.crosses) {
-            $('.hw-attain').show();
-        } else if (matches.length == 0) {
-            $('.hw-yield').show();
+        if (this.assessing) {
+            this.next();
         } else {
-            var transform = "rotate(" + -180 * (1 - matches.length / this.it.crosses)  + "deg)";
-            $('.hw-complete').css({
-                "webkitTransform":transform,
-                "MozTransform":transform,
-                "msTransform":transform,
-                "OTransform":transform,
-                "transform":transform
-            });
-            $('.hw-complete').show();
+            $("#crosses li:not([match]) a").css('color','#d32c46');
+            if (matches.length == this.it.crosses) {
+                $('.hw-attain').show();
+            } else if (matches.length == 0) {
+                $('.hw-yield').show();
+            } else {
+                var transform = "rotate(" + -180 * (1 - matches.length / this.it.crosses)  + "deg)";
+                $('.hw-complete').css({
+                    "webkitTransform":transform,
+                    "MozTransform":transform,
+                    "msTransform":transform,
+                    "OTransform":transform,
+                    "transform":transform
+                });
+                $('.hw-complete').show();
+            }
+            $('.hw-progress').hide();
+            this.draw();
         }
-        $('.hw-progress').hide();
-        this.draw();
     }
 });
 
-Learning.template("Cross",Learning.load("game/cross"),null,Learning.partials);
+Learning.template("Cross",Learning.load("learn/cross"),null,Learning.partials);
 
-Learning.route("game/sight-cross","/student/{student_id:^\\d+$}/game/sight-cross/","Cross","Cross","choose");
-Learning.route("game/sound-cross","/student/{student_id:^\\d+$}/game/sound-cross/","Cross","Cross","choose");
+Learning.route("play/sight-cross","/student/{student_id:^\\d+$}/play/sight-cross/","Cross","Cross","words");
+Learning.route("play/sound-cross","/student/{student_id:^\\d+$}/play/sound-cross/","Cross","Cross","words");
 
-Learning.route("self/sight-cross","/student/{student_id:^\\d+$}/self/sight-cross/","Cross","Cross","self");
-Learning.route("self/sound-cross","/student/{student_id:^\\d+$}/self/sound-cross/","Cross","Cross","self");
+Learning.route("assess/sight-cross","/student/{student_id:^\\d+$}/assess/sight-cross/","Cross","Cross","choose");
+Learning.route("assess/sound-cross","/student/{student_id:^\\d+$}/assess/sound-cross/","Cross","Cross","choose");
+
 

@@ -1,5 +1,5 @@
-Learning.controller("Match","Game",{
-    play: function(start) {
+Learning.controller("Match","Learn",{
+    next: function(start) {
         if (start) {
             this.index = -1;
         }
@@ -27,19 +27,27 @@ Learning.controller("Match","Game",{
         $('#choices li').attr('OnClick','');
         if ($('#choices li.uk-active').attr('word') == this.it.word) {
             hwAPI.student.attain(this.it.student.id,this.it.word,this.it.achievement.id);
-            $('.hw-attain').show();
         } else {
             hwAPI.student.yield(this.it.student.id,this.it.word,this.it.achievement.id);
-            $('.hw-yield').show();
         }
-        $('.hw-progress').hide();
+        if (this.assessing) {
+            this.next();
+        } else {
+            if ($('#choices li.uk-active').attr('word') == this.it.word) {
+                $('.hw-attain').show();
+            } else {
+                $('.hw-yield').show();
+            }
+            $('.hw-progress').hide();
+        }
     }
 });
 
-Learning.template("Match",Learning.load("game/match"),null,Learning.partials);
+Learning.template("Match",Learning.load("learn/match"),null,Learning.partials);
 
-Learning.route("game/sight-match","/student/{student_id:^\\d+$}/game/sight-match/","Match","Match","choose");
-Learning.route("game/sound-match","/student/{student_id:^\\d+$}/game/sound-match/","Match","Match","choose");
+Learning.route("play/sight-match","/student/{student_id:^\\d+$}/play/sight-match/","Match","Match","words");
+Learning.route("play/sound-match","/student/{student_id:^\\d+$}/play/sound-match/","Match","Match","words");
 
-Learning.route("self/sight-match","/student/{student_id:^\\d+$}/self/sight-match/","Match","Match","self");
-Learning.route("self/sound-match","/student/{student_id:^\\d+$}/self/sound-match/","Match","Match","self");
+Learning.route("assess/sight-match","/student/{student_id:^\\d+$}/assess/sight-match/","Match","Match","choose");
+Learning.route("assess/sound-match","/student/{student_id:^\\d+$}/assess/sound-match/","Match","Match","choose");
+
