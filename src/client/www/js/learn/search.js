@@ -1,4 +1,4 @@
-Learning.controller("Search","Game",{
+Learning.controller("Search","Learn",{
     size: 8,
     directions: [
         {row:1,col:1},
@@ -91,7 +91,7 @@ Learning.controller("Search","Game",{
         // If we're here, we've tried everything. Can't fit this word so move the previous word. 
         return false;
     },
-    play: function(start) {
+    next: function(start) {
         if (start) {
             this.index = -1;
         }
@@ -185,7 +185,9 @@ Learning.controller("Search","Game",{
             for (var find = 0; find < this.groups[this.index].length; find++) {
                 // If this word is the same, add to finds, null selection and make the word green
                 if (this.selection.word == this.groups[this.index][find].toUpperCase()) {
-                    $("#searches li[word='" + this.selection.word + "'] a").css('color','#82bb42');
+                    if (!this.assessing) {
+                        $("#searches li[word='" + this.selection.word + "'] a").css('color','#82bb42');
+                    }
                     this.finds.push(this.selection);
                     this.selection = null;
                     break;
@@ -220,19 +222,8 @@ Learning.controller("Search","Game",{
         var context = $("#finds")[0].getContext("2d");
         context.clearRect(0, 0, window.innerWidth, window.innerHeight);
         context.lineWidth = 1;
-        context.strokeStyle = '#82bb42';
-        for (var find = 0; find < this.finds.length; find++) {
-            var word = this.finds[find].word;
-            var position = this.finds[find].position;
-            var direction = this.finds[find].direction;
-            var start_query = "#table td[row=" + position.row + "]" + 
-                                       "[col=" + position.col + "]";
-            var end_query = "#table td[row=" + (position.row+(word.length-1)*direction.row) + "]" + 
-                                     "[col=" + (position.col+(word.length-1)*direction.col) + "]";
-            this.select(context,$(start_query)[0],$(end_query)[0]);
-        }
+        context.strokeStyle = '#0077dd';
         if (this.selection && this.selection.position) {
-            context.strokeStyle = '#0077dd';
             var position = this.selection.position;
             var start_query = "#table td[row=" + position.row + "]" + 
                                        "[col=" + position.col + "]";
@@ -245,6 +236,19 @@ Learning.controller("Search","Game",{
                 this.select(context,$(start_query)[0],$(start_query)[0]);
             }
         }
+        if (!this.assessing) {
+            context.strokeStyle = '#82bb42';
+        }
+        for (var find = 0; find < this.finds.length; find++) {
+            var word = this.finds[find].word;
+            var position = this.finds[find].position;
+            var direction = this.finds[find].direction;
+            var start_query = "#table td[row=" + position.row + "]" + 
+                                       "[col=" + position.col + "]";
+            var end_query = "#table td[row=" + (position.row+(word.length-1)*direction.row) + "]" + 
+                                     "[col=" + (position.col+(word.length-1)*direction.col) + "]";
+            this.select(context,$(start_query)[0],$(end_query)[0]);
+        }
     },
     check: function() {
         this.draw();
@@ -252,7 +256,7 @@ Learning.controller("Search","Game",{
         context.lineWidth = 1;
         context.strokeStyle = '#d32c46';
         var finds = [];
-        // Go through the list of words and finds, adding to fidns if found
+        // Go through the list of words and finds, adding to finds if found
         for (var sought = 0; sought < this.groups[this.index].length; sought++) {
             var word = this.groups[this.index][sought];
             for (var found = 0; found < this.finds.length; found++) {
@@ -267,40 +271,46 @@ Learning.controller("Search","Game",{
             // If we don't, we have yield and we need to color what's missing
             } else {
                 hwAPI.student.yield(this.it.student.id,word,this.it.achievement.id);
-                var place = this.places[sought];
-                $("#searches li[word='" + word.toUpperCase() + "'] a").css('color','#d32c46');
-                var position = place.position;
-                var direction = place.direction;
-                var start_query = "#table td[row=" + position.row + "]" + 
-                                           "[col=" + position.col + "]";
-                var end_query = "#table td[row=" + (position.row+(word.length-1)*direction.row) + "]" + 
-                                         "[col=" + (position.col+(word.length-1)*direction.col) + "]";
-                this.select(context,$(start_query)[0],$(end_query)[0]);
+                if (!this.assessing) {
+                    var place = this.places[sought];
+                    $("#searches li[word='" + word.toUpperCase() + "'] a").css('color','#d32c46');
+                    var position = place.position;
+                    var direction = place.direction;
+                    var start_query = "#table td[row=" + position.row + "]" + 
+                                               "[col=" + position.col + "]";
+                    var end_query = "#table td[row=" + (position.row+(word.length-1)*direction.row) + "]" + 
+                                             "[col=" + (position.col+(word.length-1)*direction.col) + "]";
+                    this.select(context,$(start_query)[0],$(end_query)[0]);
+                }
             }
         }
-        if (finds.length == this.groups[this.index].length) {
-            $('.hw-attain').show();
-        } else if (finds.length == 0) {
-            $('.hw-yield').show();
+        if (this.assessing) {
+            this.next();
         } else {
-            var transform = "rotate(" + -180 * (1 - finds.length / this.groups[this.index].length)  + "deg)";
-            $('.hw-complete').css({
-                "webkitTransform":transform,
-                "MozTransform":transform,
-                "msTransform":transform,
-                "OTransform":transform,
-                "transform":transform
-            });
-            $('.hw-complete').show();
+            if (finds.length == this.groups[this.index].length) {
+                $('.hw-attain').show();
+            } else if (finds.length == 0) {
+                $('.hw-yield').show();
+            } else {
+                var transform = "rotate(" + -180 * (1 - finds.length / this.groups[this.index].length)  + "deg)";
+                $('.hw-complete').css({
+                    "webkitTransform":transform,
+                    "MozTransform":transform,
+                    "msTransform":transform,
+                    "OTransform":transform,
+                    "transform":transform
+                });
+                $('.hw-complete').show();
+            }
+            $('.hw-progress').hide();
         }
-        $('.hw-progress').hide();
     }
 });
 
-Learning.template("Search",Learning.load("game/search"),null,Learning.partials);
+Learning.template("Search",Learning.load("learn/search"),null,Learning.partials);
 
-Learning.route("game/sight-search","/student/{student_id:^\\d+$}/game/sight-search/","Search","Search","choose");
-Learning.route("game/sound-search","/student/{student_id:^\\d+$}/game/sound-search/","Search","Search","choose");
+Learning.route("play/sight-search","/student/{student_id:^\\d+$}/play/sight-search/","Search","Search","words");
+Learning.route("play/sound-search","/student/{student_id:^\\d+$}/play/sound-search/","Search","Search","words");
 
-Learning.route("self/sight-search","/student/{student_id:^\\d+$}/self/sight-search/","Search","Search","self");
-Learning.route("self/sound-search","/student/{student_id:^\\d+$}/self/sound-search/","Search","Search","self");
+Learning.route("assess/sight-search","/student/{student_id:^\\d+$}/assess/sight-search/","Search","Search","choose");
+Learning.route("assess/sound-search","/student/{student_id:^\\d+$}/assess/sound-search/","Search","Search","choose");

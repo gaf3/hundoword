@@ -2,24 +2,20 @@
     <div class="uk-vertical-align-middle uk-width-1-2 uk-text-center">
         <audio id="sound"><source class="hw-mp3"/><source class="hw-ogg"/></audio>
         <ul class="uk-subnav uk-subnav-pill">
-            <li word="{{!it.word}}" OnClick="Learning.current.controller.audio(this,$('#sound')[0]);" >
+            <li word="{{!it.word}}" OnClick="Learning.current.controller.spell(this,$('#sound')[0]);" >
                 <a class="uk-text-large">???</a>
             </li>
         </ul>
-        <ul id="choices" class="uk-subnav uk-subnav-pill">
-        {{~ it.choices :choice}}
-        <li OnClick="Learning.current.controller.match(this);" word='{{!choice}}'>
-            <a class="uk-text-large">{{=choice}}</a>
-        </li>
-        {{~}}
-        </ul>
+        <input id="spell" type="text" style="text-align:center;" OnKeyPress="if (event.keyCode == 13) { Learning.current.controller.check(); }" class="uk-text-large"/>
+        <br/>
+        <br/>
         <button OnClick="Learning.current.controller.check();" class="uk-button uk-icon-spin hw-progress">
             <i class="uk-icon-thumbs-o-up"/>
         </button>
-        <button id="next" OnClick="Learning.current.controller.play();" class="uk-button uk-button-success hw-attain" style="display: none">
+        <button id="next" OnClick="Learning.current.controller.next();" class="uk-button uk-button-success hw-attain" style="display: none">
             <i class="uk-icon-thumbs-o-up"/>
         </button>
-        <button id="next" OnClick="Learning.current.controller.play();" class="uk-button uk-button-danger hw-yield" style="display: none">
+        <button id="next" OnClick="Learning.current.controller.next();" class="uk-button uk-button-danger hw-yield" style="display: none">
             <i class="uk-icon-thumbs-o-down"/>
         </button>
     </div>

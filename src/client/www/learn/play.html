@@ -1,0 +1,23 @@
+<div class="uk-overflow-container">
+    <br/>
+    {{~it.student.words :word}}
+        <span class='{{? $.inArray(word,it.evaluate.learned) > -1 }}uk-text-success{{?? $.inArray(word,it.evaluate.focus) > -1 }}uk-text-primary{{??}}uk-text-muted{{?}}
+        {{? ($.inArray(word,it.evaluate.blurred) > -1) || ($.inArray(word,it.evaluate.focused) > -1)}}uk-icon-spin{{?}}'>{{=word}}</span>
+    {{~}}
+    <br/>
+    <br/>
+    <div class="uk-grid data-uk-grid-margin">
+        {{~ it.learn :achievement:index}}
+        {{? index && index % 3 == 0}}
+    </div>
+    <div class="uk-grid data-uk-grid-margin">
+        {{?}}
+        <div class="uk-width-medium-1-3">
+            <div class="uk-panel-box"  OnClick="Learning.go('play/{{=achievement.slug}}',{{=Learning.current.path.student_id}});" align="middle">
+                <h2 class="uk-panel-title">{{=achievement.name}}</h2>
+                <img src="/images/{{=achievement.slug}}.png" align='middle'>
+            </div>
+        </div>
+        {{~}}
+    </div>
+</div>
