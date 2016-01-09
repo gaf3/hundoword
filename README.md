@@ -119,13 +119,13 @@ There's already an existing user/pass: vagrant/vagrant or you can create a new o
 * `#/student/` - Students: List existing students or create a new one
 * `#/student/<id>/` - Student: Selecting existing student using id, edit or delete.
   * id - Student to select
-* `#/student/<id>/plan/` - Plan: How many words should the student focus on and what achievements are required to move on
-  * id - Student to select
 * `#/student/<id>/focus/` - Focus: What words a student should be focusing on
   * id - Student to select
-* `#/student/<id>/game/` - Games: Where a student can play games and attain/yield achievements
+* `#/student/<id>/plan/` - Plan: How many words should the student focus on and what achievements are required to move on
   * id - Student to select
-* `#/student/<id>/self/` - Games: Where a student can play games and attain/yield achievements
+* `#/student/<id>/play/` - Play: Where a student can play games and attain/yield achievements with feedback and focus is automatically updated
+  * id - Student to select
+* `#/student/<id>/assess/` - Assess: Where a student can play games and attain/yield achievements without feedback, focus is controlled by Teacher
   * id - Student to select
 * `#/student/<id>/position/?words=<word>,<word>,focus=true/false` - Position: Where a student stands on each of their words' achievements.
   * id - Student to select
