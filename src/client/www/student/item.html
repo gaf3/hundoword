@@ -33,7 +33,21 @@
                     <span>{{=Learning.words_string(it.student.words)}}</span>
                 </div>
                 <div class="changing" style="display: none">
-                    <textarea id='words' placeholder="Enter words separated by spaces or commas or both. #yolo" class="uk-form-width-large">{{=Learning.words_string(it.student.words)}}</textarea>
+                    <textarea id='words' placeholder="Enter words separated by spaces or commas or both. #yolo" class="uk-form-width-large">{{=Learning.words_string(it.student.words)}}</textarea><br/>
+                    {{? it.lessons.length }}
+                    <strong>Lesson</strong>
+                    <select id="lesson" class="uk-form-select">
+                        {{~it.lessons :lesson}}
+                        <option value="{{!lesson.words}}">{{=lesson.name}}</option>
+                        {{~}}
+                    </select>
+                    <button OnClick="Learning.current.controller.set()" class="uk-button uk-button-primary">
+                        Set
+                    </button>
+                    <button OnClick="Learning.current.controller.add()" class="uk-button uk-button-primary">
+                        Add
+                    </button>
+                    {{?}}
                 </div>
             </div>
         </div>

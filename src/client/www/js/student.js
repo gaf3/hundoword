@@ -4,16 +4,28 @@ Learning.controller("Student","Changeable",{
         this.application.render(this.it);
     },
     select: function() {
-        this.it = {student: hwAPI.student.select(this.application.current.path.student_id)};
+        this.it = {
+            student: hwAPI.student.select(this.application.current.path.student_id),
+            lessons: hwAPI.lesson.list()
+        };
         this.application.render(this.it);
     },    
     new: function() {
-        this.it = {student: {}};
+        this.it = {
+            student: {},
+            lessons: hwAPI.lesson.list()
+        };
         this.application.render(this.it);
         this.changing();
     },
     edit: function() {
         this.changing();
+    },
+    set: function() {
+        $("#words").val($("#lesson").val().replace(/,/g,' '));
+    },
+    add: function() {
+        $("#words").val($("#words").val() + ' ' + $("#lesson").val().replace(/,/g,' '));
     },
     save: function() {
         var student_id = $("#student_id").val();
@@ -23,9 +35,15 @@ Learning.controller("Student","Changeable",{
             words: this.application.words_array($("#words").val())
         };
         if (student_id) {
-            this.it = {student: hwAPI.student.update(student_id,student)};
+            this.it = {
+                student: hwAPI.student.update(student_id,student),
+                lessons: hwAPI.lesson.list()
+            };
         } else {
-            this.it = {student: hwAPI.student.create(student)};
+            this.it = {
+                student: hwAPI.student.create(student),
+                lessons: hwAPI.lesson.list()
+            };
         }
         this.application.render(this.it);
     },
