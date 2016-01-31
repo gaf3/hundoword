@@ -1,6 +1,6 @@
 {{#def.Header}}
 <div class="uk-overflow-container">
-    <h2>Programs</h2>
+    <h2>Lessons</h2>
     <table class="uk-table uk-table-hover">
         <thead>
             <tr>
@@ -10,18 +10,18 @@
             </tr>
         </thead>
         <tbody>
-            {{~it.programs :program}}
-            <tr OnClick="Learning.go('program/select',{{=program.id}})">
-                <td>{{=program.name}}</td>
-                <td>{{=program.description}}</td>
-                <td>{{=Learning.words_string(program.words)}}</td>
+            {{~it.lessons :lesson}}
+            <tr OnClick="Learning.go('lesson/select',{{=lesson.id}})">
+                <td>{{=lesson.name}}</td>
+                <td>{{=lesson.description}}</td>
+                <td>{{=Learning.words_string(lesson.words)}}</td>
             </tr>
             {{~}}
         </tbody>
     </table>
 </div>
 <br/>
-<button OnClick="Learning.go('program/new')" class="uk-button uk-button-primary">
+<button OnClick="Learning.go('lesson/new')" class="uk-button uk-button-primary">
     <i class="uk-icon-plus"></i> New
 </button>
 {{#def.Footer}}

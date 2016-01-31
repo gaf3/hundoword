@@ -184,8 +184,8 @@ def achievement(request,pk='',action=''):
 
 
 @api_view(['GET', 'POST', 'DELETE'])
-def program(request,pk='',action=''):
-    """ Handles programs """
+def lesson(request,pk='',action=''):
+    """ Handles lessons """
 
     try:
 
@@ -193,36 +193,36 @@ def program(request,pk='',action=''):
 
         if request.method == 'POST' and not pk:
 
-            program = serialize_request(Program,request.DATA,['name'],['description','words'])
-            program.save()
-            serializer = ProgramSerializer(program)
+            lesson = serialize_request(Lesson,request.DATA,['name'],['description','words'])
+            lesson.save()
+            serializer = LessonSerializer(lesson)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         # List
 
         elif request.method == 'GET' and not pk:
 
-            programs = Program.objects.all()
-            serializer = ProgramSerializer(programs, many=True)
+            lessons = Lesson.objects.all()
+            serializer = LessonSerializer(lessons, many=True)
             return Response(serializer.data)
 
         # Select
 
         elif request.method == 'GET' and pk:
 
-            program = Program.objects.get(pk=pk)
-            serializer = ProgramSerializer(program)
+            lesson = Lesson.objects.get(pk=pk)
+            serializer = LessonSerializer(lesson)
             return Response(serializer.data)
 
         elif request.method == 'POST' and pk:
 
-            program = Program.objects.get(pk=pk)
+            lesson = Lesson.objects.get(pk=pk)
 
             # Update
 
             if not action:
 
-                serializer = ProgramSerializer(program,data=request.DATA, partial=True)
+                serializer = LessonSerializer(lesson,data=request.DATA, partial=True)
                 serializer.is_valid(raise_exception=True)
                 serializer.save()
                 return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
@@ -231,9 +231,9 @@ def program(request,pk='',action=''):
 
             elif action == "append": 
 
-                program.words.extend(words_request(request.DATA))
-                program.save()
-                serializer = ProgramSerializer(program)
+                lesson.words.extend(words_request(request.DATA))
+                lesson.save()
+                serializer = LessonSerializer(lesson)
                 return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
 
             # Remove
@@ -241,23 +241,23 @@ def program(request,pk='',action=''):
             elif action == "remove": 
 
                 for word in words_request(request.DATA):
-                    if word in program.words:
-                        program.words.pop(program.words.index(word))
-                program.save()
-                serializer = ProgramSerializer(program)
+                    if word in lesson.words:
+                        lesson.words.pop(lesson.words.index(word))
+                lesson.save()
+                serializer = LessonSerializer(lesson)
                 return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
 
         # Delete
 
         elif request.method == 'DELETE' and pk:
 
-            program = Program.objects.get(pk=pk)
-            program.delete()
+            lesson = Lesson.objects.get(pk=pk)
+            lesson.delete()
             return Response({})
 
-    except Program.DoesNotExist as exception:
+    except Lesson.DoesNotExist as exception:
 
-        return exception_response(exception, "Program not found", status=status.HTTP_404_NOT_FOUND)
+        return exception_response(exception, "Lesson not found", status=status.HTTP_404_NOT_FOUND)
 
     except ValidationError as exception:
 
