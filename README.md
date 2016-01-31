@@ -5,11 +5,11 @@ The 100 (or so) words children first need to learn for reading.
 
 # Purpose
 
-Young readers need to know 100 or so words to really get started and there's several programs geared towards.  The purpose of this app is have a central location for all those programs, words, and what achievements students have reached with them. 
+Young readers need to know 100 or so words to really get started and there's several lessons geared towards.  The purpose of this app is have a central location for all those lessons, words, and what achievements students have reached with them. 
 
-With this app, someone will be able to easily create an account, enter the students they want to track (or their own child), pick a program, and then track their students' progress with each achievement, whether attained or not, and over time. 
+With this app, someone will be able to easily create an account, enter the students they want to track (or their own child), pick a lesson, and then track their students' progress with each achievement, whether attained or not, and over time. 
 
-I've just seen a lot of expnesive programs out there and I'm getting a little tired of making money off kids when we should be investing in them. 
+I've just seen a lot of expnesive lessons out there and I'm getting a little tired of making money off kids when we should be investing in them. 
 
 # Requirements
 
@@ -47,10 +47,10 @@ Without this, none of the pronounciation works.  I think we're eventually just g
   * name 
   * description
   * progression - Suggested order to attain
-* Program - Collections of words
+* Lesson - Collections of words
   * name 
   * description
-  * words - List of words for the program
+  * words - List of words for the lesson
 * User - Someone who logs in and controls the site
   * username
   * password
@@ -113,9 +113,9 @@ There's already an existing user/pass: vagrant/vagrant or you can create a new o
 * `#/achievement/` - Achievements: List existing achievements or create a new one
 * `#/achievement/<id>/` - Achievement: Selecting existing achievement using id, edit or delete.
   * id - Achievement to select
-* `#/program/` - Programs: List existing programs or create a new one
-* `#/program/<id>/` - Program: Selecting existing program using id, edit or delete.
-  * id - Program to select
+* `#/lesson/` - Lessons: List existing lessons or create a new one
+* `#/lesson/<id>/` - Lesson: Selecting existing lesson using id, edit or delete.
+  * id - Lesson to select
 * `#/student/` - Students: List existing students or create a new one
 * `#/student/<id>/` - Student: Selecting existing student using id, edit or delete.
   * id - Student to select
@@ -238,26 +238,26 @@ In all JavaScript API functions, the arguments success, error, and complete are 
     * Request - `DELETE http://192.168.72.87/api/v0/achievement/<id>/`
     * Response - `200 Ok`
     * JavaScript - `api.achievement.delete(id,success,error,complete)`
-* program
-  * List  - Retrieves list of Programs
-    * Request - `GET http://192.168.72.87/api/v0/program/`
+* lesson
+  * List  - Retrieves list of Lessons
+    * Request - `GET http://192.168.72.87/api/v0/lesson/`
     * Response - `200 Ok`
       * Array
         * id
         * name
         * description
-        * words - Array of words in the program (string)
-    * JavaScript - `api.program.list(success,error,complete)`
-  * Select - Retrieves Program using id
-    * Request - `GET http://192.168.72.87/api/v0/program/<id>/`
+        * words - Array of words in the lesson (string)
+    * JavaScript - `api.lesson.list(success,error,complete)`
+  * Select - Retrieves Lesson using id
+    * Request - `GET http://192.168.72.87/api/v0/lesson/<id>/`
     * Response - `200 Ok`
       * id
       * name
       * description
       * words - Array of words (string)
-    * JavaScript - `api.program.select(id,success,error,complete)`
-  * Create - Creates a Program
-    * Request - `POST http://192.168.72.87/api/v0/program/`
+    * JavaScript - `api.lesson.select(id,success,error,complete)`
+  * Create - Creates a Lesson
+    * Request - `POST http://192.168.72.87/api/v0/lesson/`
       * name
       * description
       * words - Array of words (string) - Duplicates are ignored, no warning
@@ -266,10 +266,10 @@ In all JavaScript API functions, the arguments success, error, and complete are 
       * name
       * description
       * words - Array of words (string)
-    * JavaScript - `api.program.create(data,success,error,complete)`
+    * JavaScript - `api.lesson.create(data,success,error,complete)`
       * data - object to be posted
-  * Update - Updates a Program
-    * Request - `POST http://192.168.72.87/api/v0/program/<id>/`
+  * Update - Updates a Lesson
+    * Request - `POST http://192.168.72.87/api/v0/lesson/<id>/`
       * name (optional)
       * description (optional)
       * words - Array of words (string) - Will overwrite existing list, dupes ignored
@@ -278,32 +278,32 @@ In all JavaScript API functions, the arguments success, error, and complete are 
       * name
       * description
       * words - Array of words (string)
-    * JavaScript - `api.program.update(id,data,success,error,complete)`
+    * JavaScript - `api.lesson.update(id,data,success,error,complete)`
       * data - object to be posted
-  * Append - Adds words to a Program
-    * Request - `POST http://192.168.72.87/api/v0/program/<id>/append/`
+  * Append - Adds words to a Lesson
+    * Request - `POST http://192.168.72.87/api/v0/lesson/<id>/append/`
       * words - Array of words (string) - Will be added to existing list, dupes already existing ignored
     * Response- `202 Accepted`
       * id
       * name
       * description
       * words - Array of words (string)
-    * JavaScript - `api.program.append(id,words,success,error,complete)`
+    * JavaScript - `api.lesson.append(id,words,success,error,complete)`
       * words - array of words to append
-  * Remove - Removes words to a Program
-    * Request - `POST http://192.168.72.87/api/v0/program/<id>/remove/`
+  * Remove - Removes words to a Lesson
+    * Request - `POST http://192.168.72.87/api/v0/lesson/<id>/remove/`
       * words - Array of words (string) - Will be removed from existing list, dupes ignored
     * Response - `202 Accepted`
       * id
       * name
       * description
       * words - Array of words (string)
-    * JavaScript - `api.program.remove(id,words,success,error,complete)`
+    * JavaScript - `api.lesson.remove(id,words,success,error,complete)`
       * words - array of words to remove
-  * Delete - Deletes a Program
-    * Request - `DELETE http://192.168.72.87/api/v0/program/<id>/`
+  * Delete - Deletes a Lesson
+    * Request - `DELETE http://192.168.72.87/api/v0/lesson/<id>/`
     * Response - `200 Ok`
-    * JavaScript - `api.program.delete(id,success,error,complete)`
+    * JavaScript - `api.lesson.delete(id,success,error,complete)`
 * student
   * List  - Retrieves list of Students
     * Request - `GET http://192.168.72.87/api/v0/student/`
@@ -590,7 +590,7 @@ It'll also generate a nice coverage report as the name implies.
 
 Go to `http://192.168.72.87/test/api/v0/javascript/` and wait.  You might want to get a sandwich. 
 
-This uses the existing database, but puts prefixes of 'api-js-test-' before all Users, Achievements, and Programs. It creates/destroys these Users, Achievements, and Programs before/after every test and it's slow.  
+This uses the existing database, but puts prefixes of 'api-js-test-' before all Users, Achievements, and Lessons. It creates/destroys these Users, Achievements, and Lessons before/after every test and it's slow.  
 
 The reason for this is the JavaScript API supports and even encourages asynchronous usage. It's hard to test creates, checks, updates, deletes, in a single bank of tests if things are asynchronous. 
 
