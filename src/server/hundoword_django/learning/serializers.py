@@ -43,12 +43,12 @@ class AchievementSerializer(serializers.ModelSerializer):
         return str(obj)
 
 
-class ProgramSerializer(serializers.ModelSerializer):
+class LessonSerializer(serializers.ModelSerializer):
 
     words = JSONField()
 
     class Meta:
-        model = Program
+        model = Lesson
         readonly_fields = ('id')
 
     def get_display(self, obj):

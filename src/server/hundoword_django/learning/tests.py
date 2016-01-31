@@ -58,22 +58,22 @@ class test_Django(SimpleTestCase):
         self.assertEqual(str(Achievement(name="plain",progression=1)),"plain")
 
 
-    def test_Program(self):
+    def test_Lesson(self):
 
-        program = Program(name="blank")
-        program.save()
+        lesson = Lesson(name="blank")
+        lesson.save()
 
         # Defaults are filled 
 
-        self.assertEqual(str(program),"blank")
-        self.assertEqual(program.words,[])
+        self.assertEqual(str(lesson),"blank")
+        self.assertEqual(lesson.words,[])
 
         # Validates words
 
         try: 
 
-            program = Program(name="string",words="this")
-            program.save()
+            lesson = Lesson(name="string",words="this")
+            lesson.save()
             self.fail()
 
         except ValidationError as exception:
@@ -82,8 +82,8 @@ class test_Django(SimpleTestCase):
 
         try: 
 
-            program = Program(name="numbers",words=[1,2,3])
-            program.save()
+            lesson = Lesson(name="numbers",words=[1,2,3])
+            lesson.save()
             self.fail()
 
         except ValidationError as exception:
@@ -92,11 +92,11 @@ class test_Django(SimpleTestCase):
 
         # Keeps words unique but still in order
 
-        program = Program(name="plain",words=["this","that","this"])
-        program.save()
+        lesson = Lesson(name="plain",words=["this","that","this"])
+        lesson.save()
 
-        self.assertEqual(str(program),"plain")
-        self.assertEqual(program.words,["this","that"])
+        self.assertEqual(str(lesson),"plain")
+        self.assertEqual(lesson.words,["this","that"])
 
 
     def test_Student(self):
@@ -118,8 +118,8 @@ class test_Django(SimpleTestCase):
 
         try: 
 
-            program = Student(teacher=user,first_name="not",last_name="list.",words="this")
-            program.save()
+            lesson = Student(teacher=user,first_name="not",last_name="list.",words="this")
+            lesson.save()
             self.fail()
 
         except ValidationError as exception:
@@ -128,8 +128,8 @@ class test_Django(SimpleTestCase):
 
         try: 
 
-            program = Student(teacher=user,first_name="all",last_name="numbers",words=[1,2,3])
-            program.save()
+            lesson = Student(teacher=user,first_name="all",last_name="numbers",words=[1,2,3])
+            lesson.save()
             self.fail()
 
         except ValidationError as exception:
@@ -140,8 +140,8 @@ class test_Django(SimpleTestCase):
 
         try: 
 
-            program = Student(teacher=user,first_name="not",last_name="list.",plan="this")
-            program.save()
+            lesson = Student(teacher=user,first_name="not",last_name="list.",plan="this")
+            lesson.save()
             self.fail()
 
         except ValidationError as exception:
@@ -152,8 +152,8 @@ class test_Django(SimpleTestCase):
 
         try: 
 
-            program = Student(teacher=user,first_name="all",last_name="numbers",plan={"focus": "this"})
-            program.save()
+            lesson = Student(teacher=user,first_name="all",last_name="numbers",plan={"focus": "this"})
+            lesson.save()
             self.fail()
 
         except ValidationError as exception:
@@ -162,8 +162,8 @@ class test_Django(SimpleTestCase):
 
         try: 
 
-            program = Student(teacher=user,first_name="all",last_name="numbers",plan={"focus": -1})
-            program.save()
+            lesson = Student(teacher=user,first_name="all",last_name="numbers",plan={"focus": -1})
+            lesson.save()
             self.fail()
 
         except ValidationError as exception:
@@ -174,8 +174,8 @@ class test_Django(SimpleTestCase):
 
         try: 
 
-            program = Student(teacher=user,first_name="not",last_name="list.",plan={"required":"this"})
-            program.save()
+            lesson = Student(teacher=user,first_name="not",last_name="list.",plan={"required":"this"})
+            lesson.save()
             self.fail()
 
         except ValidationError as exception:
@@ -184,8 +184,8 @@ class test_Django(SimpleTestCase):
 
         try: 
 
-            program = Student(teacher=user,first_name="all",last_name="numbers",plan={"required":["this","that"]})
-            program.save()
+            lesson = Student(teacher=user,first_name="all",last_name="numbers",plan={"required":["this","that"]})
+            lesson.save()
             self.fail()
 
         except ValidationError as exception:
@@ -196,8 +196,8 @@ class test_Django(SimpleTestCase):
 
         try: 
 
-            program = Student(teacher=user,first_name="not",last_name="list.",plan={"forgo":"this"})
-            program.save()
+            lesson = Student(teacher=user,first_name="not",last_name="list.",plan={"forgo":"this"})
+            lesson.save()
             self.fail()
 
         except ValidationError as exception:
@@ -206,8 +206,8 @@ class test_Django(SimpleTestCase):
 
         try: 
 
-            program = Student(teacher=user,first_name="all",last_name="numbers",plan={"forgo":["this","that"]})
-            program.save()
+            lesson = Student(teacher=user,first_name="all",last_name="numbers",plan={"forgo":["this","that"]})
+            lesson.save()
             self.fail()
 
         except ValidationError as exception:
@@ -218,8 +218,8 @@ class test_Django(SimpleTestCase):
 
         try: 
 
-            program = Student(teacher=user,first_name="not",last_name="list.",focus="this")
-            program.save()
+            lesson = Student(teacher=user,first_name="not",last_name="list.",focus="this")
+            lesson.save()
             self.fail()
 
         except ValidationError as exception:
@@ -228,8 +228,8 @@ class test_Django(SimpleTestCase):
 
         try: 
 
-            program = Student(teacher=user,first_name="all",last_name="numbers",focus=[1,2,3])
-            program.save()
+            lesson = Student(teacher=user,first_name="all",last_name="numbers",focus=[1,2,3])
+            lesson.save()
             self.fail()
 
         except ValidationError as exception:
@@ -240,8 +240,8 @@ class test_Django(SimpleTestCase):
 
         try: 
 
-            program = Student(teacher=user,first_name="all",last_name="numbers",words=["this"],focus=["that"])
-            program.save()
+            lesson = Student(teacher=user,first_name="all",last_name="numbers",words=["this"],focus=["that"])
+            lesson.save()
             self.fail()
 
         except ValidationError as exception:
@@ -786,7 +786,7 @@ class test_Django(SimpleTestCase):
         ])
 
 
-    def test_program(self):
+    def test_lesson(self):
 
         client = APIClient()
         user = User.objects.get(username="vagrant")
@@ -794,28 +794,28 @@ class test_Django(SimpleTestCase):
 
         # Fields validation
 
-        response = client.post("/api/v0/program/",{}, format='json')
+        response = client.post("/api/v0/lesson/",{}, format='json')
 
         self.assertEqual(response.status_code,status.HTTP_400_BAD_REQUEST);
         self.assertEqual(response.data,{"name": ["This field is required."]})
 
         # Words validation
 
-        response = client.post("/api/v0/program/",{"name": "plain", "words": "oops"}, format='json')
+        response = client.post("/api/v0/lesson/",{"name": "plain", "words": "oops"}, format='json')
 
         self.assertEqual(response.status_code,status.HTTP_400_BAD_REQUEST);
         self.assertEqual(response.data,{"words": ["Must be a list."]})
 
         # Create
 
-        response = client.post("/api/v0/program/",{
+        response = client.post("/api/v0/lesson/",{
             "name": "plain",
             "description": "Plain ol' example",
             "words": ["he","she","it","it"]
         }, format='json')
 
-        program = Program.objects.get(name="plain")
-        plain_id = program.pk
+        lesson = Lesson.objects.get(name="plain")
+        plain_id = lesson.pk
 
         self.assertEqual(response.data,{
             "id": plain_id,
@@ -826,12 +826,12 @@ class test_Django(SimpleTestCase):
 
         # Select
 
-        response = client.get("/api/v0/program/0")
+        response = client.get("/api/v0/lesson/0")
 
         self.assertEqual(response.status_code,status.HTTP_404_NOT_FOUND);
-        self.assertEqual(response.data,{"detail": "Program not found"})
+        self.assertEqual(response.data,{"detail": "Lesson not found"})
 
-        self.assertEqual(client.get("/api/v0/program/%s" % plain_id).data,{
+        self.assertEqual(client.get("/api/v0/lesson/%s" % plain_id).data,{
             "id": plain_id,
             "name": "plain",
             "description": "Plain ol' example",
@@ -840,12 +840,12 @@ class test_Django(SimpleTestCase):
 
         # Update 
 
-        response = client.post("/api/v0/program/%s" % plain_id,{"words": "oops"}, format='json')
+        response = client.post("/api/v0/lesson/%s" % plain_id,{"words": "oops"}, format='json')
 
         self.assertEqual(response.status_code,status.HTTP_400_BAD_REQUEST);
         self.assertEqual(response.data,{"words": ["Must be a list."]})
 
-        response = client.post("/api/v0/program/%s" % plain_id,{
+        response = client.post("/api/v0/lesson/%s" % plain_id,{
             "description": "Plain old example",
             "words": ["it","there"]
         }, format='json')
@@ -857,7 +857,7 @@ class test_Django(SimpleTestCase):
             "words": ["it","there"]
         })
 
-        self.assertEqual(client.get("/api/v0/program/%s" % plain_id).data,{
+        self.assertEqual(client.get("/api/v0/lesson/%s" % plain_id).data,{
             "id": plain_id,
             "name": "plain",
             "description": "Plain old example",
@@ -866,17 +866,17 @@ class test_Django(SimpleTestCase):
 
         # Append 
 
-        response = client.post("/api/v0/program/%s/append" % plain_id,{}, format='json')
+        response = client.post("/api/v0/lesson/%s/append" % plain_id,{}, format='json')
 
         self.assertEqual(response.status_code,status.HTTP_400_BAD_REQUEST);
         self.assertEqual(response.data,{"words": ["This field is required."]})
 
-        response = client.post("/api/v0/program/%s/append" % plain_id,{"words": "oops"}, format='json')
+        response = client.post("/api/v0/lesson/%s/append" % plain_id,{"words": "oops"}, format='json')
 
         self.assertEqual(response.status_code,status.HTTP_400_BAD_REQUEST);
         self.assertEqual(response.data,{"words": ["Must be a list."]})
 
-        response = client.post("/api/v0/program/%s/append" % plain_id,{
+        response = client.post("/api/v0/lesson/%s/append" % plain_id,{
             "words": ["here","everywhere"]
         }, format='json')
 
@@ -887,7 +887,7 @@ class test_Django(SimpleTestCase):
             "words": ["it","there","here","everywhere"]
         })
 
-        self.assertEqual(client.get("/api/v0/program/%s" % plain_id).data,{
+        self.assertEqual(client.get("/api/v0/lesson/%s" % plain_id).data,{
             "id": plain_id,
             "name": "plain",
             "description": "Plain old example",
@@ -896,17 +896,17 @@ class test_Django(SimpleTestCase):
 
         # Remove 
 
-        response = client.post("/api/v0/program/%s/remove" % plain_id,{}, format='json')
+        response = client.post("/api/v0/lesson/%s/remove" % plain_id,{}, format='json')
 
         self.assertEqual(response.status_code,status.HTTP_400_BAD_REQUEST);
         self.assertEqual(response.data,{"words": ["This field is required."]})
 
-        response = client.post("/api/v0/program/%s/remove" % plain_id,{"words": "oops"}, format='json')
+        response = client.post("/api/v0/lesson/%s/remove" % plain_id,{"words": "oops"}, format='json')
 
         self.assertEqual(response.status_code,status.HTTP_400_BAD_REQUEST);
         self.assertEqual(response.data,{"words": ["Must be a list."]})
 
-        response = client.post("/api/v0/program/%s/remove" % plain_id,{
+        response = client.post("/api/v0/lesson/%s/remove" % plain_id,{
             "words": ["here","there"]
         }, format='json')
 
@@ -917,7 +917,7 @@ class test_Django(SimpleTestCase):
             "words": ["it","everywhere"]
         })
 
-        self.assertEqual(client.get("/api/v0/program/%s" % plain_id).data,{
+        self.assertEqual(client.get("/api/v0/lesson/%s" % plain_id).data,{
             "id": plain_id,
             "name": "plain",
             "description": "Plain old example",
@@ -926,11 +926,11 @@ class test_Django(SimpleTestCase):
 
         # List
 
-        program = Program(name="jane")
-        program.save()
-        jane_id = program.pk
+        lesson = Lesson(name="jane")
+        lesson.save()
+        jane_id = lesson.pk
 
-        self.assertEqual([dict(program) for program in client.get("/api/v0/program/").data],[
+        self.assertEqual([dict(lesson) for lesson in client.get("/api/v0/lesson/").data],[
             {
                 "id": jane_id,
                 "name": "jane",
@@ -947,9 +947,9 @@ class test_Django(SimpleTestCase):
 
         # Delete
 
-        self.assertEqual(client.delete("/api/v0/program/%s" % plain_id).data,{})
+        self.assertEqual(client.delete("/api/v0/lesson/%s" % plain_id).data,{})
 
-        self.assertEqual([dict(program) for program in client.get("/api/v0/program/").data],[
+        self.assertEqual([dict(lesson) for lesson in client.get("/api/v0/lesson/").data],[
             {
                 "id": jane_id,
                 "name": "jane",

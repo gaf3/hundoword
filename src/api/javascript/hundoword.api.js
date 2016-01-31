@@ -85,13 +85,13 @@ HundoWord.Achievement.prototype.slug = function(slug,success,error,complete) {
     return this.rest("GET",this.build_url(slug,"slug"),null,success,error,complete);
 }
 
-// Program has words base
+// Lesson has words base
 
-HundoWord.Program = function(api) {
-    HundoWord.Words.call(this,api,"program");
+HundoWord.Lesson = function(api) {
+    HundoWord.Words.call(this,api,"lesson");
 }
 
-HundoWord.Program.prototype = new HundoWord.Words();
+HundoWord.Lesson.prototype = new HundoWord.Words();
 
 // Student has words base and a few more methods
 
@@ -196,7 +196,7 @@ HundoWord.API = function(url) {
     this.url = url;
 
     this.achievement = new HundoWord.Achievement(this);
-    this.program = new HundoWord.Program(this);
+    this.lesson = new HundoWord.Lesson(this);
     this.student = new HundoWord.Student(this);
 
 }

@@ -49,7 +49,7 @@ class Achievement(models.Model):
         return self.name
 
 
-class Program(models.Model):
+class Lesson(models.Model):
 
     name = models.CharField(max_length=128,unique=True)
     description = models.CharField(max_length=255,blank=True,default="")
@@ -65,7 +65,7 @@ class Program(models.Model):
 
         validate_words("words",self.words)
 
-        super(Program, self).clean(*args, **kwargs)
+        super(Lesson, self).clean(*args, **kwargs)
 
 
     def save(self, *args, **kwargs):
@@ -73,7 +73,7 @@ class Program(models.Model):
         self.full_clean()
         self.words = unique_words(self.words)
 
-        super(Program, self).save(*args, **kwargs) 
+        super(Lesson, self).save(*args, **kwargs) 
 
 
 class Student(models.Model):
