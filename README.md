@@ -30,7 +30,7 @@ vagrant ssh
 
 This will create an Ubuntu server and map the vagrant user's src directory to the checked out src directory.  It'll also map 192.168.72.87 locally to the VM.
 
-## Pronounciation
+## Pronunciation
 
 Right now, this requires an account at http://api.forvo.com/. I have the $1/month 500 req/day one right now.  If you see up an account, add your key to your vagrant instance like so:
 
@@ -39,7 +39,7 @@ sudo mkdir /etc/hundoword
 echo "your key here" | sudo tee /etc/hundoword/forvo.key
 ```
 
-Without this, none of the pronounciation works.  I think we're eventually just going to record our own and allow users to the do the same, but this works for now.
+Without this, none of the pronunciation works.  I think we're eventually just going to record our own and allow users to the do the same, but this works for now.
 
 # Data
 
@@ -571,7 +571,7 @@ sudo service apache2 start
 
 Make sure you're using Django in Development mode above.  Trust me, it'll save you a lot of headaches. 
 
-## Pronounciation
+## Pronunciation
 
 Without the a Forvo account, the audio RESTful and JavaScript tests fail in parts.  I may add something to say "not covered" or something instead. 
 
